@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GameProvider } from './store/gameStore';
 import { HomePage } from './pages/HomePage';
+import { MobileAppHomePage } from './pages/MobileAppHomePage';
 import { SetupPage } from './pages/SetupPage';
 import { GamePage } from './pages/GamePage';
 import { ResultPage } from './pages/ResultPage';
@@ -10,6 +11,21 @@ import { AppModeBanner } from './components/AppModeBanner';
 import { audioManager } from './utils/audioManager';
 
 function App() {
+  // QR 코드 접속 (?app=true, ?mode=app 등) 및 어플 모드 여부 감지
+  const [isQRAppMode, setIsQRAppMode] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    const hasAppParam = 
+      params.get('app') === 'true' || 
+      params.get('mode') === 'app' || 
+      params.get('qr') === 'true' ||
+      params.get('mobile') === 'true';
+    const standaloneMode = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone === true;
+    return hasAppParam || standaloneMode;
+  });
+
   // 새로고침 시 이어서 진행할 수 있도록 초기 페이지 선택
   const [currentPage, setCurrentPage] = useState<string>(() => {
     const saved = localStorage.getItem('money_track_game_state');
@@ -57,7 +73,16 @@ function App() {
         <AudioController />
 
         <main className="flex-grow">
-          {currentPage === 'home' && <HomePage onNavigate={setCurrentPage} />}
+          {currentPage === 'home' && (
+            isQRAppMode ? (
+              <MobileAppHomePage 
+                onNavigate={setCurrentPage} 
+                onSwitchToWebMode={() => setIsQRAppMode(false)} 
+              />
+            ) : (
+              <HomePage onNavigate={setCurrentPage} />
+            )
+          )}
           {currentPage === 'setup' && <SetupPage onNavigate={setCurrentPage} />}
           {currentPage === 'game' && <GamePage onNavigate={setCurrentPage} />}
           {currentPage === 'result' && <ResultPage onNavigate={setCurrentPage} />}
