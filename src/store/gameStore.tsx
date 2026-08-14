@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { GameState, Choice, GameEvent, TurnHistory } from '../types/finance';
 import { EVENTS } from '../data/events';
+import { ASSETS } from '../data/assets';
 import { SeededRandom } from '../engine/seededRandom';
 import { runTurnSimulation } from '../engine/simulation';
 import { calculateFinalScores } from '../engine/scoring';
