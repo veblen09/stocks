@@ -8,7 +8,7 @@ interface QRCodeModalProps {
 
 export const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
-  const [baseUrl, setBaseUrl] = useState<string>('https://moneytrack.vercel.app');
+  const [baseUrl, setBaseUrl] = useState<string>('https://monytrack.vercel.app');
   const [isEditingUrl, setIsEditingUrl] = useState<boolean>(false);
   const [tempUrl, setTempUrl] = useState<string>('');
   const [isLocalhost, setIsLocalhost] = useState<boolean>(false);
@@ -21,7 +21,7 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose }) => 
 
       // localhost 접속 시에는 스마트폰에서 열 수 있는 Vercel 실사용 기본 도메인으로 설정
       if (isLocal) {
-        setBaseUrl('https://moneytrack.vercel.app');
+        setBaseUrl('https://monytrack.vercel.app');
       } else {
         setBaseUrl(origin);
       }
