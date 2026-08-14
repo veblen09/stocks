@@ -9,7 +9,7 @@ export interface AudioSettings {
 }
 
 const DEFAULT_SETTINGS: AudioSettings = {
-  bgmEnabled: false, // 브라우저 자동재생 정책 및 수업 환경 고려 기본 꺼짐
+  bgmEnabled: false, // 브라우저 자동재생 정책 고려 기본 꺼짐
   sfxEnabled: true,
   masterVolume: 0.4, // 40%
   bgmVolume: 0.25,   // 25%
@@ -20,22 +20,71 @@ let audioCtx: AudioContext | null = null;
 let bgmAudio: HTMLAudioElement | null = null;
 let currentSettings: AudioSettings = { ...DEFAULT_SETTINGS };
 
-// 클래식 BGM 플레이리스트 (CORS 헤더가 완벽히 대응된 위키미디아 퍼블릭 도메인 파일들)
-const bgmPlaylist: string[] = [
-  '/audio/bgm-classical-calm.ogg',                                                            // 1. 모차르트 아이네 클라이네 나흐트무지크
-  'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg',                        // 2. 베토벤 엘리제를 위하여
-  'https://upload.wikimedia.org/wikipedia/commons/2/29/Beethoven_Moonlight_1st_movement.ogg', // 3. 베토벤 월광 소나타 1악장
-  'https://upload.wikimedia.org/wikipedia/commons/0/08/Goldberg_Variations_01_Aria.ogg'         // 4. 바흐 골드베르크 변주곡 아리아
+export interface ClassicalTrack {
+  name: string;
+  urls: string[];
+}
+
+const bgmPlaylist: ClassicalTrack[] = [
+  {
+    name: '비발디 - 사계 중 \'봄\' 1악장 (Allegro) 🎻',
+    urls: [
+      'https://upload.wikimedia.org/wikipedia/commons/f/ff/Vivaldi_-_Four_Seasons_1_Spring_mvt_1_Allegro_-_John_Harrison_violin.oga',
+      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg'
+    ]
+  },
+  {
+    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
+    urls: [
+      'https://upload.wikimedia.org/wikipedia/commons/b/b4/Radetzky_March.ogg',
+      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg'
+    ]
+  },
+  {
+    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
+    urls: [
+      './audio/bgm-nutcracker.ogg',
+      './public/audio/bgm-nutcracker.ogg',
+      'audio/bgm-nutcracker.ogg',
+      'public/audio/bgm-nutcracker.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/6/6c/Tchaikovsky--PianoConcerto1.ogg'
+    ]
+  },
+  {
+    name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
+    urls: [
+      './audio/bgm-classical-calm.ogg',
+      './public/audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg'
+    ]
+  },
+  {
+    name: '베토벤 - 엘리제를 위하여 🎹',
+    urls: [
+      './audio/bgm-furelise.ogg',
+      './public/audio/bgm-furelise.ogg',
+      'audio/bgm-furelise.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg'
+    ]
+  },
+  {
+    name: '바흐 - 골드베르크 변주곡 아리아 🎼',
+    urls: [
+      './audio/bgm-goldberg.ogg',
+      './public/audio/bgm-goldberg.ogg',
+      'audio/bgm-goldberg.ogg',
+      './audio/bgm-classical-calm.ogg'
+    ]
+  }
 ];
 
-const bgmNames = [
-  '모차르트 - 아이네 클라이네 🎻',
-  '베토벤 - 엘리제를 위하여 🎹',
-  '베토벤 - 월광 소나타 1악장 🌙',
-  '바흐 - 골드베르크 변주곡 아리아 🎹'
-];
+const bgmNames = bgmPlaylist.map(track => track.name);
 
 let currentTrackIndex = 0;
+let currentCandidateIndex = 0;
 let currentTrackName = bgmNames[0];
 
 // 브라우저 환경인지 확인 (SSR 방지)
@@ -65,46 +114,69 @@ const saveSettings = (settings: AudioSettings) => {
   }
 };
 
-// AudioContext 및 BGM 초기화
-const initAudio = () => {
-  if (!isBrowser || audioCtx) return;
-
-  // 1. AudioContext 생성 (첫 클릭 시)
-  const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-  if (AudioContextClass) {
-    audioCtx = new AudioContextClass();
-  }
-
-  // 2. BGM HTMLAudioElement 생성
-  bgmAudio = new Audio(bgmPlaylist[currentTrackIndex]);
-  bgmAudio.loop = false;
-  bgmAudio.preload = 'auto';
-  
-  // 파일이 없거나 네트워크 지연 시 오류 처리
-  bgmAudio.addEventListener('error', (e) => {
-    console.warn('BGM track failed to load, trying next track.', e);
-    setTimeout(() => {
-      audioManager.playNextBgm();
-    }, 2000);
-  });
-
-  // 한 곡 재생 완료 시 자동으로 플레이리스트 내 다음 클래식 곡 재생
-  bgmAudio.addEventListener('ended', () => {
-    audioManager.playNextBgm();
-  });
-
-  // 초기 볼륨 설정
-  updateBgmVolume();
-};
-
 const updateBgmVolume = () => {
   if (!bgmAudio) return;
   const targetVolume = currentSettings.masterVolume * currentSettings.bgmVolume;
   bgmAudio.volume = Math.max(0, Math.min(1, targetVolume));
 };
 
+const loadCurrentTrackCandidate = () => {
+  if (!bgmAudio) return;
+  const track = bgmPlaylist[currentTrackIndex];
+  if (!track || !track.urls.length) return;
+
+  const url = track.urls[currentCandidateIndex % track.urls.length];
+  bgmAudio.src = url;
+  bgmAudio.load();
+};
+
+// AudioContext 및 HTMLAudioElement 초기화
+const initAudio = () => {
+  if (!isBrowser) return;
+
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+
+  if (!bgmAudio) {
+    bgmAudio = new Audio();
+    bgmAudio.loop = false;
+    bgmAudio.preload = 'auto';
+
+    // 파일 로드 실패 시 다음 후보 URL로 자동 전환
+    bgmAudio.addEventListener('error', () => {
+      console.warn(`BGM candidate failed to load. Trying next candidate.`);
+      if (!bgmAudio) return;
+      const track = bgmPlaylist[currentTrackIndex];
+      if (track && currentCandidateIndex < track.urls.length - 1) {
+        currentCandidateIndex++;
+        loadCurrentTrackCandidate();
+        if (currentSettings.bgmEnabled) {
+          bgmAudio.play().catch(() => {});
+        }
+      } else {
+        // 다음 트랙으로 이동
+        setTimeout(() => {
+          audioManager.playNextBgm();
+        }, 1000);
+      }
+    });
+
+    // 한 곡 마치면 자동으로 다음 곡 재생
+    bgmAudio.addEventListener('ended', () => {
+      audioManager.playNextBgm();
+    });
+
+    // 초기 트랙 설정
+    loadCurrentTrackCandidate();
+    updateBgmVolume();
+  }
+};
+
 export const audioManager = {
-  // 초기 로드 시 설정값 불러오기
   init: () => {
     currentSettings = loadSettings();
   },
@@ -125,28 +197,28 @@ export const audioManager = {
     return bgmNames;
   },
 
-  // 특정 인덱스의 클래식 BGM 재생
+  // 특정 인덱스의 클래식 BGM 트랙 변경 및 즉시 재생
   playTrack: (index: number) => {
     initAudio();
     if (!bgmAudio) return;
 
     currentTrackIndex = index % bgmPlaylist.length;
-    bgmAudio.src = bgmPlaylist[currentTrackIndex];
-    bgmAudio.load();
-    currentTrackName = bgmNames[currentTrackIndex];
+    currentCandidateIndex = 0;
+    const track = bgmPlaylist[currentTrackIndex];
+    currentTrackName = track.name;
+    loadCurrentTrackCandidate();
 
     updateBgmVolume();
     if (currentSettings.bgmEnabled) {
       bgmAudio.play().catch((err) => {
-        console.warn('BGM play blocked:', err);
+        console.warn('BGM play blocked by browser policy:', err);
       });
     }
   },
 
-  // 브라우저 클릭 시 오디오 잠금 해제 (이벤트 발생 시점 호출)
   unlockAudioContext: async () => {
     initAudio();
-    
+
     if (audioCtx && audioCtx.state === 'suspended') {
       try {
         await audioCtx.resume();
@@ -155,9 +227,9 @@ export const audioManager = {
       }
     }
 
-    // BGM 자동재생이 켜져있을 때 재생 시도
     if (currentSettings.bgmEnabled && bgmAudio && bgmAudio.paused) {
       try {
+        updateBgmVolume();
         await bgmAudio.play();
       } catch (err) {
         console.warn('Autoplay BGM failed on unlock:', err);
@@ -165,12 +237,10 @@ export const audioManager = {
     }
   },
 
-  // 배경음악 재생
   playBgm: async () => {
     initAudio();
     if (!bgmAudio) return;
-    
-    // AudioContext 활성화
+
     if (audioCtx && audioCtx.state === 'suspended') {
       try {
         await audioCtx.resume();
@@ -183,27 +253,26 @@ export const audioManager = {
       updateBgmVolume();
       await bgmAudio.play();
     } catch (err) {
-      console.warn('Failed to play BGM (user interaction required):', err);
+      console.warn('Failed to play BGM:', err);
     }
   },
 
-  // 배경음악 일시정지
   pauseBgm: () => {
     if (bgmAudio) {
       bgmAudio.pause();
     }
   },
 
-  // 다음 배경음악 재생 (플레이리스트 순환)
   playNextBgm: async () => {
     initAudio();
     if (!bgmAudio) return;
-    
+
     currentTrackIndex = (currentTrackIndex + 1) % bgmPlaylist.length;
-    bgmAudio.src = bgmPlaylist[currentTrackIndex];
-    bgmAudio.load();
-    currentTrackName = bgmNames[currentTrackIndex];
-    
+    currentCandidateIndex = 0;
+    const track = bgmPlaylist[currentTrackIndex];
+    currentTrackName = track.name;
+    loadCurrentTrackCandidate();
+
     if (currentSettings.bgmEnabled) {
       try {
         updateBgmVolume();
@@ -214,26 +283,25 @@ export const audioManager = {
     }
   },
 
-  // 설정값 업데이트 및 반영
   setSettings: (newSettings: AudioSettings) => {
     currentSettings = { ...newSettings };
     saveSettings(currentSettings);
-    
-    // BGM 상태 업데이트
+
     if (bgmAudio) {
       updateBgmVolume();
       if (currentSettings.bgmEnabled) {
-        audioManager.playBgm();
+        if (bgmAudio.paused) {
+          audioManager.playBgm();
+        }
       } else {
         bgmAudio.pause();
       }
     }
   },
 
-  // Web Audio API를 활용한 순수 합성 효과음 재생
   playSound: (type: SoundType) => {
     if (!currentSettings.sfxEnabled) return;
-    
+
     initAudio();
     if (!audioCtx) return;
 
@@ -337,3 +405,4 @@ export const audioManager = {
     }
   }
 };
+

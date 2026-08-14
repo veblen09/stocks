@@ -178,6 +178,40 @@ export const AssetAllocationPanel: React.FC = () => {
     }
   };
 
+  // 대출 이자 지출 계산 및 비상금 부족 시 자산 매각 핸들러
+  const interestCost = parseFloat((((loans.credit || 0) * 0.030) + ((loans.mortgage || 0) * 0.0175)).toFixed(2));
+  const isCashDeficitForInterest = interestCost > 0 && remainingCash < interestCost;
+  const interestDeficit = isCashDeficitForInterest ? parseFloat((interestCost - remainingCash).toFixed(2)) : 0;
+
+  const handleAutoSellForInterest = () => {
+    if (interestDeficit <= 0) return;
+    audioManager.playSound('click');
+
+    let needed = interestDeficit;
+    const newChanges = { ...changes };
+
+    // 유동성 점수(liquidityScore) 내림차순 정렬 (유동성이 가장 높은 자산부터 우선 매도하여 대출 이자 상환)
+    const sortedAssets = [...ASSETS]
+      .filter(a => a.id !== 'cash' && a.id !== 'house' && a.id !== 'rent_deposit' && a.id !== 'housing')
+      .sort((a, b) => b.liquidityScore - a.liquidityScore);
+
+    for (const assetObj of sortedAssets) {
+      if (needed <= 0) break;
+      const assetId = assetObj.id;
+      const currentVal = allocations[assetId] || 0;
+      const currentChange = newChanges[assetId] || 0;
+      const availableToSell = currentVal + currentChange;
+
+      if (availableToSell > 0) {
+        const sellAmt = Math.min(availableToSell, needed);
+        newChanges[assetId] = parseFloat((currentChange - sellAmt).toFixed(2));
+        needed = parseFloat((needed - sellAmt).toFixed(2));
+      }
+    }
+
+    setChanges(newChanges);
+  };
+
   return (
     <div className="bg-white/85 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-slate-100/80 shadow-sm animate-fade-in-up relative select-none">
       {/* 배분 요약 헤더 배너 */}
@@ -201,6 +235,36 @@ export const AssetAllocationPanel: React.FC = () => {
               </span>
             )}
           </p>
+          {interestCost > 0 && (
+            <div className="mt-2 text-xs font-semibold text-rose-600 bg-rose-50/80 px-3.5 py-2.5 rounded-xl border border-rose-100 flex flex-col gap-1.5 select-text">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span>⚠️ 이번 턴 대출 이자 지출 예정액: <strong className="font-extrabold">{formatMoney(interestCost)}</strong></span>
+                  {isCashDeficitForInterest ? (
+                    <span className="text-[11px] font-black text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">
+                      (비상금 {formatMoney(interestDeficit)} 부족!)
+                    </span>
+                  ) : (
+                    <span className="text-[10.5px] text-slate-500 font-normal hidden sm:inline">(턴 진행 시 비상금 통장에서 차감)</span>
+                  )}
+                </div>
+
+                {isCashDeficitForInterest && (
+                  <button
+                    type="button"
+                    onClick={handleAutoSellForInterest}
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-xl text-xs transition shadow-sm cursor-pointer flex-shrink-0 flex items-center justify-center gap-1 active:scale-95"
+                  >
+                    ⚡ 자산 자동 매각하여 이자 충당
+                  </button>
+                )}
+              </div>
+              
+              <div className="text-[10px] text-rose-500 font-medium">
+                ※ 대출 이자를 상환할 비상금/자산이 부족하면 미납 이자가 신용대출 원금에 복리로 가산(연체 5% 추가)되며, 총부채가 총자산을 초과(순자산 음수)하면 🚨 <strong>금융 파산 (Game Over)</strong> 처리됩니다.
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap gap-3 text-xs">
           <div className="bg-white px-3 py-1.5 rounded-xl border border-slate-100/60 shadow-sm">

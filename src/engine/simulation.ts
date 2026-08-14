@@ -74,10 +74,10 @@ export function runTurnSimulation(
       } else if (suddenShock > 0.97) {
         returnRate += rng.range(20, 35);
       }
-    } else if (asset.id === 'house' || asset.id === 'rent_deposit') {
-      // 부동산(실물 주택 및 전월세 보증금)
+    } else if (asset.id === 'house') {
+      // 실물 주택 (부동산 아파트 시세 변동)
       // 실험기간(10년, 20년, 30년) 및 구입한 지역(강남, 마포, 분당, 경기 외곽 등)별 과거 실제 부동산 가격 추이 매핑
-      const regionKey = asset.id === 'house' ? (state.houseRegion || 'bundang') : 'rent_deposit';
+      const regionKey = state.houseRegion || 'bundang';
       const housingTrend = HOUSING_HISTORICAL_RETURNS[regionKey];
       const validYears = (simulationLength === 10 || simulationLength === 30) ? simulationLength : 20;
       const historyArr = housingTrend?.[validYears] || housingTrend?.[20] || [];
@@ -88,6 +88,9 @@ export function runTurnSimulation(
       // 실제 부동산 시세 궤적 + 미세 난수(±0.5%) + 난이도 변동성 적용
       const noise = rng.range(-0.5, 0.5) * difficultyVolMultiplier;
       returnRate = baseHistoricalReturn + noise;
+    } else if (asset.id === 'rent_deposit') {
+      // 부동산 임차보증금 (전월세 보증금은 원금이 보전되는 고정 자산으로 수익률 0% 유지)
+      returnRate = 0;
     } else {
       // 기타 투자 자산군 (국내ETF, 해외ETF, 채권, 금, 연금)
       const halfYearReturn = asset.expectedReturn / 2;

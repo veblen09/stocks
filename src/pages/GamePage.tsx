@@ -5,14 +5,16 @@ import { NetWorthChart } from '../components/NetWorthChart';
 import { PortfolioPieChart } from '../components/PortfolioPieChart';
 import { AssetAllocationPanel } from '../components/AssetAllocationPanel';
 import { EventModal } from '../components/EventModal';
+import { SettlementNoticeModal } from '../components/SettlementNoticeModal';
 import { Life3DAvatar } from '../components/Life3DAvatar';
 import { CharacterGuideCard } from '../components/CharacterGuideCard';
 import { LearningPointCard } from '../components/LearningPointCard';
 import { HeroBackground } from '../components/HeroBackground';
 import { GlassCard } from '../components/GlassCard';
 import { formatMoney } from '../utils/formatMoney';
-import { Landmark, RotateCcw, User, Eye } from 'lucide-react';
+import { Landmark, RotateCcw, User, Eye, FileDown, Check } from 'lucide-react';
 import { audioManager } from '../utils/audioManager';
+import { exportReportToHtml } from '../utils/exportHtml';
 
 interface GamePageProps {
   onNavigate: (page: string) => void;
@@ -23,6 +25,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const { nickname, currentTurn, currentAge, history, allocations, isGameOver, processedMaturityTurn, loans } = state;
   const [rightPanelTab, setRightPanelTab] = useState<'character' | 'avatar'>('character');
   const [maturityDecisions, setMaturityDecisions] = useState<{ [assetId: string]: 'reinvest' | 'withdraw' }>({});
+  const [downloadedHtml, setDownloadedHtml] = useState(false);
 
   const maturedAssets = Object.keys(allocations).filter(
     (id) => (id === 'deposit' || id === 'saving') && allocations[id] > 0
@@ -122,12 +125,27 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
               </div>
               <span className="text-xs font-black tracking-wider uppercase">머니트랙 시뮬레이션</span>
             </div>
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-1 text-[10px] sm:text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition cursor-pointer backdrop-blur-sm border border-white/10"
-            >
-              <RotateCcw size={12} /> 초기화
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playSound('click');
+                  exportReportToHtml(state);
+                  setDownloadedHtml(true);
+                  setTimeout(() => setDownloadedHtml(false), 2500);
+                }}
+                className="flex items-center gap-1 text-[10px] sm:text-xs font-bold px-3 py-1.5 bg-emerald-600/90 hover:bg-emerald-600 text-white rounded-xl transition cursor-pointer backdrop-blur-sm border border-emerald-400/40 shadow-sm"
+              >
+                {downloadedHtml ? <Check size={12} /> : <FileDown size={12} />}
+                {downloadedHtml ? '리포트 저장 완료!' : '결과 보고서 저장'}
+              </button>
+              <button
+                onClick={handleReset}
+                className="flex items-center gap-1 text-[10px] sm:text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition cursor-pointer backdrop-blur-sm border border-white/10"
+              >
+                <RotateCcw size={12} /> 초기화
+              </button>
+            </div>
           </div>
 
           {/* 히어로 중앙 정보 */}
@@ -270,6 +288,9 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
 
       {/* 이벤트 팝업 모달 */}
       <EventModal />
+
+      {/* 반기 정산 및 금융거래 고지 모달 */}
+      <SettlementNoticeModal />
 
       {/* 🔔 예적금 만기 도래 알림 및 수령 선택 모달 */}
       {currentTurn > 0 && currentTurn % 2 === 0 && processedMaturityTurn !== currentTurn && maturedAssets.length > 0 && (

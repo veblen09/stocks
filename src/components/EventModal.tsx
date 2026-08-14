@@ -17,6 +17,36 @@ import {
   HelpCircle 
 } from 'lucide-react';
 
+export const getAssetLabel = (assetId: string): string => {
+  const customNames: Record<string, string> = {
+    cash: '입출금/비상금',
+    deposit: '정기예금',
+    saving: '적금',
+    korea_etf: '국내 ETF',
+    global_etf: '글로벌 ETF',
+    stock_samsung: '국내 반도체 1위 (개별주)',
+    stock_skhynix: '글로벌 초고속 메모리 강자 (개별주)',
+    stock_hyundai: '글로벌 완성차 (개별주)',
+    stock_apple: '미국 IT 대장주 (개별주)',
+    stock_nvidia: '글로벌 AI 칩 (개별주)',
+    stock_tesla: '미국 자율주행 전기차 (개별주)',
+    stock_nokia: '글로벌 모바일 1위 (개별주)',
+    stock_blackberry: '비즈니스 모바일 (개별주)',
+    stock: '개별 주식',
+    bond: '채권형',
+    gold: '금',
+    pension: '연금저축/IRP',
+    housing: '주택청약',
+    rent_deposit: '임차보증금',
+    house: '실물 주택',
+  };
+
+  if (customNames[assetId]) return customNames[assetId];
+  if (assetId.startsWith('stock_')) return '개별 주식';
+  const found = ASSETS.find((a) => a.id === assetId);
+  return found ? found.name : assetId;
+};
+
 export const EventModal: React.FC = () => {
   const { state, selectChoice } = useGame();
   const { currentEvent } = state;
@@ -145,10 +175,7 @@ export const EventModal: React.FC = () => {
       }
 
       if (missedAssets.length > 0) {
-        const assetNames = missedAssets.map(id => {
-          const found = ASSETS.find(a => a.id === id);
-          return found ? found.name.split(' ')[0] : id;
-        }).join(', ');
+        const assetNames = missedAssets.map(id => getAssetLabel(id)).join(', ');
         
         return {
           mood: 'thinking',
@@ -211,15 +238,7 @@ export const EventModal: React.FC = () => {
                         key={assetId}
                         className="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-blue-100/30"
                       >
-                        {assetId === 'cash' ? '입출금/비상금' : 
-                         assetId === 'deposit' ? '정기예금' :
-                         assetId === 'saving' ? '적금' :
-                         assetId === 'korea_etf' ? '국내 ETF' :
-                         assetId === 'global_etf' ? '글로벌 ETF' :
-                         assetId === 'stock' ? '개별 주식' :
-                         assetId === 'bond' ? '채권형' :
-                         assetId === 'gold' ? '금' :
-                         assetId === 'pension' ? '연금저축/IRP' : '주택청약'}
+                        {getAssetLabel(assetId)}
                       </span>
                     ))}
                   </div>
@@ -305,15 +324,7 @@ export const EventModal: React.FC = () => {
                             isNegative ? 'bg-rose-50/50 border-rose-200 text-rose-700' : 'bg-emerald-50/50 border-emerald-200 text-emerald-700'
                           }`}>
                             <span className="text-xs font-bold">
-                              {assetId === 'cash' ? '입출금/비상금' : 
-                               assetId === 'deposit' ? '정기예금' :
-                               assetId === 'saving' ? '적금' :
-                               assetId === 'korea_etf' ? '국내 ETF' :
-                               assetId === 'global_etf' ? '글로벌 ETF' :
-                               assetId === 'stock' ? '개별 주식' :
-                               assetId === 'bond' ? '채권형' :
-                               assetId === 'gold' ? '금' :
-                               assetId === 'pension' ? '연금저축/IRP' : '주택청약'}
+                              {getAssetLabel(assetId)}
                             </span>
                             <span className="text-xs font-black">
                               {pct >= 0 ? '+' : ''}{pct.toFixed(0)}% {isNegative ? '📉' : '📈'}

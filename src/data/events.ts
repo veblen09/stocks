@@ -396,78 +396,78 @@ export const EVENTS: GameEvent[] = [
   },
   {
     id: 'housing_subscription_chance',
-    title: '신도시 아파트 청약 당첨!',
-    description: '축하합니다! 꾸준히 저축해 오신 주택청약 종합저축 점수와 가입 요건이 충족되어 신도시 아파트 청약에 최종 당첨되었습니다! 계약금과 잔금을 조달하여 내 집 마련을 달성할 기회입니다. 아래 지역 중 어느 곳의 아파트를 분양받으시겠습니까?',
+    title: '3기 신도시 로또 아파트 청약 도전 및 당첨!',
+    description: '축하합니다! 그동안 집을 소유하지 않고 유지해 오신 무주택 기간, 나이와 생애주기에 따른 가점(30대 결혼 배우자 가점 + 35세 자녀 부양가족 가점), 그리고 꾸준히 납입해 오신 주택청약 종합저축 통장 실적(84점 만점 고득점)이 모두 인정되어 3기 신도시 아파트 청약에 최종 당첨되었습니다! 청약 분양 특혜로 주변 시세보다 20%~30% 저렴한 "분양가 상한제" 특혜 가격에 내 집을 마련하여 억대 시세 차익 혜택을 누릴 대박 기회입니다. 아래 지역 중 어느 곳의 아파트를 분양받으시겠습니까?',
     affectedAssets: ['housing', 'cash', 'house', 'rent_deposit'],
     choices: [
       {
-        text: '[서울 강남] 분양가 8억 원 (담보대출 5.6억 + 신용대출 1.6억 실행)',
-        resultDescription: '대한민국 부동산의 핵심, 서울 강남의 분양권을 취득했습니다! 분양가 8억 원 중 주택청약 통장과 전세금을 깬 현금을 보태고 주택담보대출 5억 6,000만 원, 신용대출 1억 6,000만 원을 동원했습니다. 강남 지역은 연 +1.6%의 시세 성장 보너스가 주어지지만, 대출 원금이 많아 매 턴 상당한 이자가 빠져나갑니다. (이후 청약 저축은 자동 해지 상태가 됩니다)',
+        text: '[서울 강남 3기 신도시] 분양가 6.0억 원 (주변 시세 8.5억 대비 2.5억 시세 차익 혜택!)',
+        resultDescription: '대한민국 최선호 입지 서울 강남 분양권을 취득했습니다! 주변 시세 8억 5,000만 원 대비 2억 5,000만 원 저렴한 6.0억 원 분양가로 매입하여 당첨 즉시 2.5억 원의 시세 차익 혜택을 획득했습니다. (주택청약 통장은 자동 해지되어 본금 전액 자금에 충당되었으며, 주택담보대출 4.2억, 신용대출 1.0억이 실행되었습니다)',
         flatAssetChange: {
-          house: 80000,
+          house: 85000,
           rent_deposit: -99999,
           housing: -99999
         },
         loanChange: {
-          mortgage: 56000,
-          credit: 16000
+          mortgage: 42000,
+          credit: 10000
         },
         houseRegion: 'gangnam',
+        scoreChange: { decision: 30, longTerm: 25 }
+      },
+      {
+        text: '[서울 마포/성동] 분양가 3.8억 원 (주변 시세 5.2억 대비 1.4억 시세 차익 혜택!)',
+        resultDescription: '도심 접근성이 뛰어난 서울 마포 아파트를 취득했습니다! 주변 시세 5억 2,000만 원 대비 1억 4,000만 원 저렴한 3.8억 원 분양가로 당첨되어 시세 차익 혜택을 확보했습니다. (주택청약 통장은 해지 후 자금에 충당되었으며, 주택담보대출 2.6억, 신용대출 6,000만 원이 실행되었습니다)',
+        flatAssetChange: {
+          house: 52000,
+          rent_deposit: -99999,
+          housing: -99999
+        },
+        loanChange: {
+          mortgage: 26000,
+          credit: 6000
+        },
+        houseRegion: 'mapo',
         scoreChange: { decision: 25, longTerm: 20 }
       },
       {
-        text: '[서울 마포] 분양가 5억 원 (담보대출 3.5억 + 신용대출 1.0억 실행)',
-        resultDescription: '도심 접근성이 뛰어난 서울 마포 아파트를 취득했습니다! 분양가 5억 원 중 청약저축과 전세금을 뺀 현금을 내고 주택담보대출 3억 5,000만 원, 신용대출 1억 원을 동원했습니다. 마포 지역은 연 +0.8%의 시세 성장 보너스가 적용됩니다. (이후 청약 저축은 자동 해지 상태가 됩니다)',
+        text: '[경기 분당/판교] 분양가 2.6억 원 (주변 시세 3.6억 대비 1.0억 시세 차익 혜택!)',
+        resultDescription: '주거 만족도가 높은 1기 신도시 경기 분당 아파트를 취득했습니다! 주변 시세 3억 6,000만 원 대비 1억 원 저렴한 2.6억 원 분양가에 당첨되어 시세 차익을 거두었습니다. (주택담보대출 1.8억, 신용대출 4,000만 원 실행)',
         flatAssetChange: {
-          house: 50000,
+          house: 36000,
           rent_deposit: -99999,
           housing: -99999
         },
         loanChange: {
-          mortgage: 35000,
-          credit: 10000
+          mortgage: 18000,
+          credit: 4000
         },
-        houseRegion: 'mapo',
+        houseRegion: 'bundang',
         scoreChange: { decision: 20, longTerm: 15 }
       },
       {
-        text: '[경기 분당] 분양가 3.5억 원 (담보대출 2.45억 + 신용대출 7,000만 실행)',
-        resultDescription: '주거 만족도가 높은 1기 신도시 경기 분당 아파트를 취득했습니다! 분양가 3억 5,000만 원 중 청약저축과 전세금을 뺀 현금을 내고 주택담보대출 2억 4,500만 원, 신용대출 7,000만 원을 동원했습니다. 분당은 표준적인 주택 시장의 가치 변동이 적용됩니다. (이후 청약 저축은 자동 해지 상태가 됩니다)',
-        flatAssetChange: {
-          house: 35000,
-          rent_deposit: -99999,
-          housing: -99999
-        },
-        loanChange: {
-          mortgage: 24500,
-          credit: 7000
-        },
-        houseRegion: 'bundang',
-        scoreChange: { decision: 15, longTerm: 10 }
-      },
-      {
-        text: '[경기 외곽] 분양가 2억 원 (담보대출 1.4억 + 신용대출 4,000만 실행)',
-        resultDescription: '자금 부담이 덜한 경기 외곽 아파트를 취득했습니다! 분양가 2억 원 중 청약저축과 전세금을 뺀 현금을 내고 주택담보대출 1억 4,000만 원, 신용대출 4,000만 원을 동원했습니다. 빚 상환 이자 부담은 가장 작으나, 부동산 입지 특성상 장기적으로 시세 성장률은 연 -0.8%의 페널티를 보일 수 있습니다. (이후 청약 저축은 자동 해지 상태가 됩니다)',
+        text: '[경기 외곽 신도시] 분양가 1.5억 원 (주변 시세 2.0억 대비 5,000만 시세 차익 혜택!)',
+        resultDescription: '자금 부담이 가장 적은 경기 외곽 아파트를 취득했습니다! 주변 시세 2억 원 대비 5,000만 원 저렴한 1.5억 원 분양가로 매입하여 주거 안정을 달성했습니다. (주택담보대출 1.0억, 신용대출 2,000만 원 실행)',
         flatAssetChange: {
           house: 20000,
           rent_deposit: -99999,
           housing: -99999
         },
         loanChange: {
-          mortgage: 14000,
-          credit: 4000
+          mortgage: 10000,
+          credit: 2000
         },
         houseRegion: 'gyeonggi_outer',
-        scoreChange: { decision: 10, longTerm: 5 }
+        scoreChange: { decision: 15, longTerm: 10 }
       },
       {
-        text: '대출 이자 부담과 자금 여력이 불안하므로 이번 청약 기회를 포기한다.',
-        resultDescription: '청약 당첨 기회를 아쉽게 포기했습니다. 청약 통장 잔액과 가입 기간은 그대로 보전되나, 이번 당첨 권리는 소멸되었습니다.',
+        text: '대출 이자 부담과 자금 여력이 불안하므로 이번 청약 당첨 기회를 포기한다.',
+        resultDescription: '청약 당첨 기회를 미루고 가점과 청약 통장 잔액을 그대로 보전합니다.',
         scoreChange: { decision: 5, longTerm: -5 }
       }
     ],
-    lesson: '주택청약은 단순한 저축을 넘어 무주택 서민에게 아파트 분양 우선권을 주는 한국 특유의 혜택입니다. 청약에 당첨되면 입지와 매매가에 따른 주택담보대출(LTV)과 신용대출을 결합한 정밀한 자금 조달 계획(레버리지 설계)을 세워야 합니다.',
-    discussionQuestion: '자산을 모으는 목적 중에 "내 집 마련"이 갖는 장기적인 재정적·심리적 의미는 무엇일까요?'
+    lesson: '주택청약 종합저축은 무주택 서민에게 주변 시세보다 20%~30% 이상 저렴한 "분양가 상한제" 특혜 가격으로 새 아파트를 우선 분양해 주는 대한민국 고유의 내 집 마련 제도입니다. 집을 사지 않은 무주택 기간이 길어지고, 나이가 들며 결혼 및 자녀(부양가족)가 생길수록 청약 가점(84점 만점)이 상승하여 핵심 입지 분양 당첨 확률과 억대 시세 차익 혜택이 극대화됩니다.',
+    discussionQuestion: '무주택 기간과 부양가족(결혼, 자녀)에 따라 청약 가점을 부여하는 한국의 주택 청약 제도는 왜 도입되었을까요?'
   },
   {
     id: 'buy_house_opportunity',
@@ -680,5 +680,400 @@ export const EVENTS: GameEvent[] = [
     ],
     lesson: '자산관리는 시장뿐 아니라 정부의 세금 정책(세법)과 금융 제도 변화에도 큰 영향을 받습니다. 절세 혜택을 놓치지 않기 위해 매년 업데이트되는 연말정산 가이드와 저축 과세 혜택 정보를 확인하는 태도가 필요합니다.',
     discussionQuestion: '실제 주식 거래나 예금 이자 수령 시 차감되는 세금(소득세 등)에는 어떤 것들이 있을까요?'
+  },
+  {
+    id: 'tech_disruption_crash',
+    title: '기술 패러다임 전환과 1위 개별 기업의 몰락 위기',
+    description: '스마트폰 등장과 생태계 지각변동으로 한때 전 세계 1위였던 대표 휴대폰 테크 기업이 혁신에 실패하며 실적이 붕괴되고 주가가 상장폐지 위기(-80%)까지 고꾸라집니다.',
+    affectedAssets: ['stock_nokia', 'stock_blackberry', 'korea_etf', 'global_etf'],
+    choices: [
+      {
+        text: '개별 기업의 비체계적 위험을 인정하고, 몰락하는 기업 주식을 즉시 과감히 전액 손절하여 시장 ETF 및 안전자산으로 리밸런싱한다.',
+        resultDescription: '기술 도태 기업의 추가 폭락(-95%) 전 손실을 고통스럽게 확정 짓고, 시장 지수 ETF로 분산 이동하여 남은 시드머니를 지켰습니다.',
+        impact: {
+          stock_nokia: -0.60,
+          stock_blackberry: -0.65,
+          global_etf: 0.05
+        },
+        scoreChange: { decision: 20, diversification: 25, longTerm: 15 }
+      },
+      {
+        text: '“한때 전 세계 1위 기업인데 설마 진짜 망하겠어?”라며 존버(원금 회복 대기)를 고수한다.',
+        resultDescription: '혁신에 뒤처진 기업의 주가가 -85% 추가 폭락하여 휴지조각이 되었습니다. 개별주 올인 투자의 극단적 위험을 체감합니다.',
+        impact: {
+          stock_nokia: -0.85,
+          stock_blackberry: -0.90
+        },
+        scoreChange: { decision: -30, diversification: -25, longTerm: -20 }
+      }
+    ],
+    lesson: 'ETF(시장 지수 펀드)는 망해가는 기업을 지수에서 탈락시키고 새로 떠오르는 1위 기업을 자동 교체해주므로 상장폐지 위험이 없습니다. 그러나 개별 기업 올인 투자는 아무리 영원할 것 같은 1위 대기업이라도 0원으로 상장폐지될 수 있는 비체계적 위험(Unsystematic Risk)이 존재합니다.',
+    discussionQuestion: '전 세계 1위였던 대표 테크 기업들이 기술 패러다임 변화(스마트폰 등장 등) 이후 수년 만에 무너진 이유는 무엇일까요?'
+  },
+  {
+    id: 'ai_revolution',
+    title: 'AI 혁명과 반도체 슈퍼사이클',
+    description: '생성형 AI 및 차세대 AI 가속기 칩 수요가 전 세계적으로 폭증하면서 글로벌 AI 테크 주식과 메모리 반도체 주가가 급등하고 있습니다.',
+    affectedAssets: ['stock_nvidia', 'stock_skhynix', 'global_etf', 'stock_apple', 'korea_etf'],
+    choices: [
+      {
+        text: '포트폴리오의 분산 투자 원칙을 유지하며 글로벌 ETF와 반도체 우량주 비중을 차분히 운용한다.',
+        resultDescription: '기술 혁신의 결실을 안전하게 공유하면서 포트폴리오의 위험을 적절히 제어했습니다.',
+        impact: {
+          stock_nvidia: 0.25,
+          stock_skhynix: 0.20,
+          global_etf: 0.10,
+          stock_apple: 0.08,
+          korea_etf: 0.06
+        },
+        scoreChange: { decision: 15, diversification: 15, longTerm: 15 }
+      },
+      {
+        text: '이 기회에 상투를 잡더라도 한 방에 가자며 AI 개별주에 전 재산 영끌 올인을 감행한다.',
+        resultDescription: '단기 평가이익은 급증했으나 특정 개별주 변동성 노출이 극심해져 향후 조정장 시 막대한 손실 리스크를 안게 되었습니다.',
+        impact: {
+          stock_nvidia: 0.35,
+          stock_skhynix: 0.28
+        },
+        scoreChange: { decision: -15, diversification: -25, longTerm: -10 }
+      }
+    ],
+    lesson: '기술 혁신 초기에는 특정 주식이 폭등하지만, 변동성 또한 극심합니다. 시장 전체에 투자하는 글로벌 ETF나 우량 분산 포트폴리오를 활용하면 기술 성장 결실과 리스크 관리를 동시에 잡을 수 있습니다.',
+    discussionQuestion: '특정 산업이나 종목이 급등할 때 전 재산을 올인하는 투자가 위험한 이유는 무엇일까요?'
+  },
+  {
+    id: 'dividend_payout',
+    title: '결산 배당금 특별 입금',
+    description: '보유 중인 주식 및 ETF 기업들로부터 반기 결산 배당금 150만 원이 계좌로 현금 입금되었습니다.',
+    affectedAssets: ['cash', 'korea_etf', 'global_etf', 'stock_samsung', 'stock_apple'],
+    choices: [
+      {
+        text: '배당금 150만 원 전액을 우량 자산에 재투자하여 복리 스노볼 효과를 높인다.',
+        resultDescription: '배당금을 재투자하여 자산 수량을 늘림으로써 복리 효과의 엔진을 더욱 가속화했습니다.',
+        cashChange: -150,
+        flatAssetChange: { global_etf: 150 },
+        scoreChange: { decision: 20, longTerm: 20 }
+      },
+      {
+        text: '공돈이 생긴 느낌이므로 현금 150만 원으로 최고급 호텔 뷔페와 쇼핑을 즐긴다.',
+        resultDescription: '단기적 즐거움을 누렸으나 자산을 불릴 수 있는 중요한 복리 재투자 기회를 흘려보냈습니다.',
+        cashChange: 150,
+        scoreChange: { decision: -10, longTerm: -15 }
+      }
+    ],
+    lesson: '배당금(Dividend)은 기업이 올린 이익을 주주에게 현금으로 나누어 주는 것입니다. 배당금을 쓰지 않고 다시 투자(배당 재투자)하면 시간이 지남에 따라 자산이 기하급수적으로 늘어나는 복리 효과를 누릴 수 있습니다.',
+    discussionQuestion: '배당금을 받아 바로 소비하는 것과 재투자하는 것은 10년 후 자산 규모에 어떤 차이를 만들까요?'
+  },
+  {
+    id: 'side_hustle_success',
+    title: '퇴근 후 부업/N잡 성공과 추가 소득 창출',
+    description: '퇴근 후 꾸준히 준비해 온 온라인 지식 콘텐츠 판매와 부업이 히트를 치며 200만 원의 추가 현금 소득이 발생했습니다.',
+    affectedAssets: ['cash', 'deposit', 'saving'],
+    choices: [
+      {
+        text: '부업 소득 200만 원 전액을 비상금 통장과 적금에 이체하여 종잣돈 형성을 앞당긴다.',
+        resultDescription: '소득 증가를 소비로 돌리지 않고 자산 형성의 시드머니로 곧바로 연계하는 훌륭한 재무 습관을 보여주었습니다.',
+        cashChange: 200,
+        scoreChange: { decision: 20, emergency: 15, longTerm: 15 }
+      },
+      {
+        text: '고생한 나를 위한 보상으로 최신 프리미엄 스마트폰을 일시불로 구입한다.',
+        resultDescription: '기분은 좋아졌지만 추가 소득이 자산으로 축적되지 않고 일시적 소비재 구매로 사라졌습니다.',
+        cashChange: 50,
+        scoreChange: { decision: -10, longTerm: -10 }
+      }
+    ],
+    lesson: '본업 소득 외에 추가 소득(N잡, 부업 등)이 생겼을 때 이를 소비로 소비해 버리지 않고 투자 시드머니로 직행시키는 행동은 자산 형성 속도를 획기적으로 끌어올립니다.',
+    discussionQuestion: '소득이 늘었을 때 소비를 늘리지 않고 투자를 늘리는 습관을 유지하려면 어떤 노력이 필요할까요?'
+  },
+  {
+    id: 'jeonse_fraud_prevention',
+    title: '역전세 및 전세 보증금 불안 경보',
+    description: '주변 아파트 매매 시세 하락으로 집주인이 만기 때 보증금을 돌려주기 어렵다는 뉴스(역전세)가 흘러나옵니다.',
+    affectedAssets: ['cash', 'rent_deposit'],
+    choices: [
+      {
+        text: 'HUG 전세보증금 반환보증 보험에 신속히 가입(소액 보증료 지출)하고 집주인과 사전 확인을 진행한다.',
+        resultDescription: '소액의 보증료(30만 원) 지출로 소중한 전세 보증금 전액을 확실하게 지켜내는 리스크 관리를 성취했습니다.',
+        cashChange: -30,
+        scoreChange: { decision: 20, emergency: 15 }
+      },
+      {
+        text: '설마 내 집주인이 돈을 안 주겠어 하며 아무런 대비 없이 방치한다.',
+        resultDescription: '만기 시 보증금 반환이 지연되어 이사 일정에 차질이 생기고 법적 분쟁 리스크에 노출되는 불안을 겪습니다.',
+        scoreChange: { decision: -15, emergency: -20 }
+      }
+    ],
+    lesson: '전세 보증금은 개인 자산 중 가장 큰 비중을 차지합니다. 역전세나 전세 사기 위험에 대비해 전세보증금 반환보증 보험 가입 등 선제적인 금융 안전장치를 마련하는 것이 필수적입니다.',
+    discussionQuestion: '큰 자산이 묶여 있는 전세 계약 시 세입자가 확인할 수 있는 안전 대책에는 무엇이 있을까요?'
+  },
+  {
+    id: 'bank_failure_panic',
+    title: '해외 중소형 은행 부실 뱅크런 사태',
+    description: '해외 중소형 은행의 갑작스러운 파산 뉴스에 금융 시장 전반에 불안 심리가 확산되며 글로벌 증시가 휘청입니다.',
+    affectedAssets: ['deposit', 'bond', 'gold', 'korea_etf', 'global_etf'],
+    choices: [
+      {
+        text: '예금자보호제도(5천만 원)와 안전자산의 역할을 신뢰하고 동요 없이 기존 포트폴리오를 사수한다.',
+        resultDescription: '시장 일시적 패닉에 흔들리지 않고 원칙을 지켜내어 금융 시장 안정 후 수익 회복을 누리게 되었습니다.',
+        impact: {
+          bond: 0.03,
+          gold: 0.05,
+          korea_etf: -0.05,
+          global_etf: -0.04
+        },
+        scoreChange: { decision: 15, longTerm: 15 }
+      },
+      {
+        text: '불안감에 휩싸여 정기예금과 주식 자산을 모두 중도 해지/손절하고 현금으로 인출한다.',
+        resultDescription: '손실을 확정 짓고 아까운 예금이자를 포기하여 공포에 의한 실수를 저질렀습니다.',
+        impact: {
+          korea_etf: -0.12,
+          global_etf: -0.10
+        },
+        cashChange: -100,
+        scoreChange: { decision: -20, longTerm: -15 }
+      }
+    ],
+    lesson: '뱅크런(대규모 예금 인출 사태)이나 시스템 불안 소식이 들릴 때 예금자보호제도 등 제도적 안전장치를 이해하고 공포에 질린 패닉 셀을 삼가는 금융 지능이 중요합니다.',
+    discussionQuestion: '은행이 위기에 처했을 때 국가가 예금자를 보호해 주는 예금자보호제도의 한도와 역할은 무엇일까요?'
+  },
+  {
+    id: 'marriage_expense',
+    title: '결혼 및 신혼 가계 형성',
+    description: '인생의 새로운 출발인 결혼을 맞이하게 되었습니다. 예식 비용, 신혼 살림 및 축의금 정산 이슈가 발생합니다.',
+    affectedAssets: ['cash', 'rent_deposit'],
+    choices: [
+      {
+        text: '실속 있는 스몰 웨딩과 합리적인 가전 구성으로 예산을 절약하고 남은 자금을 자산 형성에 집중한다.',
+        resultDescription: '결혼식 비용 300만 원 지출에 그치고, 남은 시드머니를 주거 및 자산 투자로 연결했습니다.',
+        cashChange: -300,
+        scoreChange: { decision: 15, longTerm: 15 }
+      },
+      {
+        text: '일생에 한 번뿐인 결혼식이라며 최고급 호텔 예식과 프리미엄 명품 가전에 900만 원을 지출한다.',
+        resultDescription: '화려한 성파티를 즐겼으나 시드머니 900만 원이 소모 지출되어 향후 투자 및 내 집 마련 기회비용이 감소했습니다.',
+        cashChange: -900,
+        scoreChange: { decision: -15, emergency: -15 }
+      }
+    ],
+    lesson: '결혼은 자산 형성기 초반에 일어나는 가장 큰 재무 이벤트 중 하나입니다. 남들에게 보여주기 위한 과소비를 줄이고 실속 있게 예산을 관리해야 신혼기 자산 스노볼 효과를 이어나갈 수 있습니다.',
+    discussionQuestion: '인생의 대형 이벤트(결혼, 이사 등)에서 예산 한도를 정하고 지키는 것은 왜 중요할까요?'
+  },
+  {
+    id: 'unlisted_stock_scam',
+    title: '“상장 직전 5배 대박 확정!” 비상장주 투자 사기',
+    description: '소셜 미디어와 브로커를 통해 "3개월 뒤 코스닥 상장이 확정된 바이오 벤처 비상장 주식이다. 지금 사면 최소 5배"라는 밀실 권유가 들어옵니다.',
+    affectedAssets: ['cash'],
+    choices: [
+      {
+        text: '비상장주 허위 상장 사기의 전형적 수법임을 직시하고 단칼에 거절한다.',
+        resultDescription: '금융 사기 세력의 달콤한 유혹을 물리치고 귀중한 현금 자산을 완벽하게 사수했습니다.',
+        scoreChange: { decision: 20, longTerm: 10 }
+      },
+      {
+        text: '상장 대박으로 인생을 바꿀 수 있다는 일확천금의 욕심에 현금 400만 원을 송금해 주식을 산다.',
+        resultDescription: '해당 기업은 페이퍼 컴퍼니였으며 브로커는 잠적했습니다. 400만 원을 전액 사기당해 날렸습니다.',
+        cashChange: -400,
+        scoreChange: { decision: -30, longTerm: -20 }
+      }
+    ],
+    lesson: '상장 직전 며칠 만에 몇 배의 수익을 보장한다는 비상장주 투자 권유는 대부분 원금 전부를 노리는 금융 사기입니다. 정보가 검증되지 않은 시장 투자는 극도로 위험합니다.',
+    discussionQuestion: '비공개 정보나 대박을 약속하는 비공식 투자 권유를 받았을 때 철저히 의심해야 하는 이유는 무엇일까요?'
+  },
+  {
+    id: 'isa_tax_exemption',
+    title: 'ISA(개인자산관리계좌) 3년 만기 세제 혜택',
+    description: '3년간 꾸준히 모아온 만능 통장 ISA 계좌가 만기되어 배당 및 이자 소득세 비과세 절세 혜택 100만 원을 챙겼습니다.',
+    affectedAssets: ['cash', 'pension', 'deposit'],
+    choices: [
+      {
+        text: 'ISA 만기 자금 중 100만 원을 연금저축/IRP 계좌로 이전하여 추가 세액공제 절세 혜택을 챙긴다.',
+        resultDescription: '절세 통장의 만기 혜택을 연금 계좌로 연계하여 추가 16.5% 세금 환급까지 챙기는 최고 수준의 절세 전략을 펼쳤습니다.',
+        cashChange: 100,
+        scoreChange: { decision: 20, longTerm: 15 }
+      },
+      {
+        text: '절세로 돌려받은 현금을 모두 통장에서 꺼내 고급 명품 옷과 쇼핑에 사용한다.',
+        resultDescription: '소소한 쇼핑을 누렸지만 절세 자금을 재투자하여 더 큰 혜택을 만드는 연계 재무 전략을 놓쳤습니다.',
+        cashChange: 100,
+        scoreChange: { decision: -5, longTerm: -10 }
+      }
+    ],
+    lesson: 'ISA(개인자산관리계좌)는 이자와 배당 소득세를 덜어주는 절세 필수 통장입니다. ISA 만기 해지금을 연금 계좌로 이전하면 추가 세액공제까지 받을 수 있는 "절세의 콤보 효과"가 발생합니다.',
+    discussionQuestion: '정부가 마련한 다양한 절세 계좌(ISA, 연금저축 등)를 적극 활용하면 투자 수익률에 어떤 이점이 생길까요?'
+  },
+  {
+    id: 'oil_price_surge',
+    title: '국제 유가 폭등과 원자재 쇼크',
+    description: '중동 분쟁으로 국제 유가가 배럴당 120달러를 넘어서며 기업들의 제조·물류 원가 부담이 가중되고 증시가 하락 압력을 받습니다.',
+    affectedAssets: ['gold', 'korea_etf', 'stock_hyundai', 'cash'],
+    choices: [
+      {
+        text: '인플레이션 방어력이 뛰어난 금과 원자재 비중을 확인하고 섣부른 주식 투매를 자제한다.',
+        resultDescription: '원자재 쇼크 속에서도 금 가격 상승으로 포트폴리오 충격을 이겨내고 시장 복원력을 기다렸습니다.',
+        impact: {
+          gold: 0.10,
+          korea_etf: -0.06,
+          stock_hyundai: -0.08
+        },
+        scoreChange: { decision: 15, diversification: 15 }
+      },
+      {
+        text: '유가 폭등으로 경제가 망할 것 같다는 뉴스 보도에 주식을 헐값에 모두 손절 매도한다.',
+        resultDescription: '원자재 파동의 일시적 충격을 견디지 못하고 손실을 최고조에서 확정 짓는 우를 범했습니다.',
+        impact: {
+          korea_etf: -0.15,
+          stock_hyundai: -0.18
+        },
+        scoreChange: { decision: -15, longTerm: -15 }
+      }
+    ],
+    lesson: '유가 등 원자재 가격 폭등은 기업 이익을 악화시켜 주가를 누르지만, 금과 같은 실물 자산은 가치가 오르는 경향이 있습니다. 자산 배분이 잘된 포트폴리오는 원자재 쇼크를 견뎌냅니다.',
+    discussionQuestion: '유가가 오르면 전반적인 물가와 주식 시장에는 어떤 영향을 미치게 될까요?'
+  },
+  {
+    id: 'mortgage_refinancing_chance',
+    title: '주택담보대출 고금리 갈아타기 (대환대출)',
+    description: '정부의 원스톱 대환대출 서비스 출시로 기존 연 5.5%의 주택담보대출을 연 3.8% 저금리 대출로 갈아탈 수 있는 기회가 생겼습니다.',
+    affectedAssets: ['house', 'cash'],
+    choices: [
+      {
+        text: '온라인 이자 비교 앱을 이용해 즉시 저금리 대출로 대환 신청을 완료한다.',
+        resultDescription: '대출 이자 부담이 획기적으로 줄어들어 매 반기 현금 흐름 100만 원의 절감 이익을 획득했습니다.',
+        cashChange: 100,
+        scoreChange: { decision: 20, longTerm: 10 }
+      },
+      {
+        text: '서류 준비가 귀찮고 복잡하다며 기존 고금리 대출을 그대로 방치한다.',
+        resultDescription: '앉은 자리에서 아낄 수 있는 수백만 원의 대출 이자를 허공으로 날려 보냈습니다.',
+        scoreChange: { decision: -15, longTerm: -15 }
+      }
+    ],
+    lesson: '대출 이자는 자산 형성의 가장 큰 적입니다. 금리 변동기나 정책 금융 서비스가 출시되었을 때 신속하게 저금리 대출로 갈아타는(대환) 적극성이 가계 재정을 지킵니다.',
+    discussionQuestion: '대출 금리를 1%p 낮추었을 때 억 단위 대출에서 절약되는 이자는 어느 정도일까요?'
+  },
+  {
+    id: 'overseas_stock_tax_notice',
+    title: '해외주식 양도소득세 과세 통지',
+    description: '지난해 해외주식 및 글로벌 ETF 매도로 발생한 수익이 연간 기본공제 250만 원을 초과하여 22% 양도소득세 통지서가 발송되었습니다.',
+    affectedAssets: ['global_etf', 'stock_apple', 'stock_nvidia', 'cash'],
+    choices: [
+      {
+        text: '연말 손익 통산(손실 종목 사전 매도) 기법을 숙지하고 정해진 기한 내에 성실하게 납부한다.',
+        resultDescription: '해외 투자 세법 규칙을 이해하고 성실히 세금을 납부하여 건전한 금융 상식을 갖추었습니다.',
+        cashChange: -50,
+        scoreChange: { decision: 20, longTerm: 10 }
+      },
+      {
+        text: '세금이 아깝다며 납부를 미루다가 징벌적 가산세까지 추가로 부담하게 된다.',
+        resultDescription: '세금 납부 지연으로 불필요한 가산세 80만 원이 추가 지출되어 큰 손해를 입었습니다.',
+        cashChange: -80,
+        scoreChange: { decision: -20, emergency: -10 }
+      }
+    ],
+    lesson: '해외주식은 수익 중 연 250만 원을 초과하는 금액에 대해 22%의 양도소득세가 부과됩니다. 매년 이익과 손실을 상계하는 손익 통산 절세 전략을 활용하면 세금 부담을 합리적으로 줄일 수 있습니다.',
+    discussionQuestion: '해외 주식 투자 시 국내 주식과 달리 고려해야 하는 세금(양도소득세, 환율)에는 어떤 것들이 있을까요?'
+  },
+  {
+    id: 'appliance_breakdown',
+    title: '갑작스러운 가전 고장 및 누수 수리비 청구',
+    description: '여름철 냉장고와 에어컨이 동시에 고장 나고 욕실 누수 수리로 인해 200만 원의 급작스러운 지출이 발생했습니다.',
+    affectedAssets: ['cash', 'deposit', 'saving'],
+    choices: [
+      {
+        text: '입출금 통장에 마련해 둔 비상금 200만 원으로 수리비를 즉시 충당한다.',
+        resultDescription: '든든하게 모아둔 비상금 덕분에 가입 중인 정기예적금이나 주식을 해지하지 않고 위기를 말끔히 넘겼습니다.',
+        cashChange: -200,
+        scoreChange: { emergency: 20, decision: 10 }
+      },
+      {
+        text: '비상금이 없어 눈물을 머금고 만기가 얼마 안 남은 정기적금을 중도 해지한다.',
+        resultDescription: '적금을 깨면서 중도해지 이율 페널티를 물고 그동안 쌓아온 이자를 크게 손해 보았습니다.',
+        cashChange: -200,
+        impact: {
+          saving: -0.10
+        },
+        scoreChange: { emergency: -15, decision: -15 }
+      }
+    ],
+    lesson: '살다 보면 예치하지 못한 가전 고장, 누수, 사고 등 급전 지출이 발생합니다. 비상금(Cash)이 구축되어 있어야만 소중한 장기 적금이나 투자를 깨지 않고 수비할 수 있습니다.',
+    discussionQuestion: '갑작스러운 200만 원 지출 상황에서 비상금이 있는 사람과 없는 사람의 대처 차이는 무엇일까요?'
+  },
+  {
+    id: 'child_education_planning',
+    title: '자녀 성장에 따른 교육비 지출 증가',
+    description: '자녀가 성장함에 따라 학원비 및 교재비 등 월 고정 지출 부담이 크게 늘어나기 시작합니다.',
+    affectedAssets: ['cash', 'saving', 'pension'],
+    choices: [
+      {
+        text: '지출 예산을 재조정하여 불필요한 외식 소비를 줄이고 자동 연금과 저축 납입을 포기하지 않고 사수한다.',
+        resultDescription: '소비 지출을 효율화하여 자녀 교육 지원과 부모의 장기 노후 대비 투자를 동시에 훌륭하게 밸런스 잡았습니다.',
+        cashChange: -100,
+        scoreChange: { decision: 15, longTerm: 15 }
+      },
+      {
+        text: '교육비 충당을 핑계로 가입되어 있던 장기 연금저축 통장을 해지하여 전액 소비해 버린다.',
+        resultDescription: '세제 혜택받은 금액을 다시 뱉어내며 연금을 해지하여 장기 노후 자산에 큰 구멍이 뚫렸습니다.',
+        cashChange: -100,
+        impact: {
+          pension: -0.15
+        },
+        scoreChange: { longTerm: -20, decision: -15 }
+      }
+    ],
+    lesson: '자녀 교육비는 자산 형성기에 다가오는 거대한 고정 지출입니다. 교육비 지출을 위해 노후 대비 연금을 깨기보다는 평소 생활비 소비를 줄이고 장기 저축 구조를 지켜내는 재무 밸런스가 절실합니다.',
+    discussionQuestion: '자녀 교육비 지출과 부모의 노후 준비 연금 투자 간의 균형은 어떻게 잡아야 할까요?'
+  },
+  {
+    id: 'semiconductor_downcycle',
+    title: '반도체 빙하기와 업황 다운사이클',
+    description: '글로벌 IT 기기 수요 둔화로 메모리 반도체 재고가 쌓이고 가격이 급락하면서 보유 중인 반도체 우량주 주가가 하락 조정받습니다.',
+    affectedAssets: ['stock_samsung', 'stock_skhynix', 'korea_etf'],
+    choices: [
+      {
+        text: '반도체 산업의 업황 사이클(다운사이클 후 회복)을 이해하고 적립식 투자를 유지하며 바닥을 인내한다.',
+        resultDescription: '주기적 사이클 산업의 본질을 파악하고 최저점 투매를 피해 훗날 업턴(상승장) 시 큰 수익을 거둘 기반을 지켰습니다.',
+        impact: {
+          stock_samsung: -0.10,
+          stock_skhynix: -0.15,
+          korea_etf: -0.05
+        },
+        scoreChange: { longTerm: 15, decision: 10 }
+      },
+      {
+        text: '주가가 계속 떨어질 것 같은 공포에 견디지 못하고 최저점 구간에서 손절매를 단행한다.',
+        resultDescription: '공포심에 주식을 최저점에서 팔아 치워 향후 업황 회복 시 다가올 상승 혜택을 스스로 포기했습니다.',
+        impact: {
+          stock_samsung: -0.18,
+          stock_skhynix: -0.25
+        },
+        scoreChange: { longTerm: -20, decision: -15 }
+      }
+    ],
+    lesson: '반도체 등 사이클 산업은 불황과 호황이 번갈아 찾아옵니다. 다운사이클(불황)의 바닥에서 공포를 견디지 못하고 투매하면 손실이 확정되므로 사이클을 이해하는 긴 호흡이 필수적입니다.',
+    discussionQuestion: '경기 사이클을 타는 산업(반도체, 자동차 등)에 투자할 때 주가 하락기에 지켜야 할 마음가짐은 무엇일까요?'
+  },
+  {
+    id: 'sns_fomo_luxury',
+    title: 'SNS 명품 및 럭셔리 여행 허세의 유혹',
+    description: 'SNS에서 동창들이 화려한 명품 시계와 유럽 럭셔리 여행 사진을 자랑하는 것을 보고 깊은 소외감(FOMO)과 소비욕을 느낍니다.',
+    affectedAssets: ['cash'],
+    choices: [
+      {
+        text: '남과의 비교는 자산 형성의 가장 큰 적임을 상각하고 나만의 복리 자산 성장 목표에 주체적으로 집중한다.',
+        resultDescription: '단기적 과시 욕구를 성공적으로 제어하고 장기 자산가의 단단한 심리를 증명해 보였습니다.',
+        scoreChange: { decision: 20, longTerm: 15 }
+      },
+      {
+        text: '남들에게 질 수 없다며 즉흥적으로 6개월 할부로 300만 원짜리 명품 시계를 구매한다.',
+        resultDescription: '일시적 허세는 챙겼으나 매달 할부금이 나가며 시드머니를 모을 저축 여력이 크게 감축되었습니다.',
+        cashChange: -300,
+        scoreChange: { decision: -20, longTerm: -15 }
+      }
+    ],
+    lesson: '남들과 나를 비교하며 소비하는 "체면 소비"와 "포모(FOMO)"는 복리 자산 형성을 막는 최고의 장애물입니다. 소비 통제력이 뛰어난 사람만이 진정한 재정적 자유를 얻을 수 있습니다.',
+    discussionQuestion: 'SNS 과시 문화 속에서 타인과의 비교에 흔들리지 않고 나의 소비 원칙을 지키는 방법은 무엇일까요?'
   }
 ];
+

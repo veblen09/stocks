@@ -69,6 +69,17 @@ export const ASSETS: Asset[] = [
     educationTip: '국내 반도체 1위 기업은 전자제품, 스마트폰, 메모리 시장을 이끄는 대표 우량주입니다. 글로벌 메모리 반도체 업황 사이클에 따라 주기적인 주가 변동을 보이므로 분석 후 장기적 관점에서 접근하는 것이 좋습니다.'
   },
   {
+    id: 'stock_nokia',
+    name: '개별주: 글로벌 모바일 통신 1위 기업',
+    category: 'equity',
+    expectedReturn: 16.5,
+    volatility: 28,
+    liquidityScore: 9,
+    riskScore: 8,
+    description: '전 세계 휴대폰 시장의 40% 이상을 점유 중인 독보적 모바일 거대 챔피언 기업입니다.',
+    educationTip: '글로벌 모바일 통신 1위 기업은 막대한 시장 점유율을 자랑하지만, 기술 패러다임 변화에 뒤처질 경우 주가가 90% 이상 폭락할 수 있습니다. 개별 기업 올인은 상장폐지 위험(비체계적 위험)을 동반합니다.'
+  },
+  {
     id: 'stock_skhynix',
     name: '개별주: 글로벌 초고속 메모리 강자',
     category: 'equity',
@@ -80,17 +91,6 @@ export const ASSETS: Asset[] = [
     educationTip: '글로벌 초고속 메모리 강자 기업은 AI 가속기용 차세대 HBM 메모리 분야의 핵심 공급사입니다. 반도체 호황기에는 폭발적 주가 상승을 보이지만 불황기에는 낙폭이 클 수 있는 고변동성 주식입니다.'
   },
   {
-    id: 'stock_hyundai',
-    name: '개별주: 글로벌 완성차 제조기업',
-    category: 'equity',
-    expectedReturn: 7.5,
-    volatility: 20,
-    liquidityScore: 9,
-    riskScore: 6,
-    description: '세계 3위권 완성차 제조 그룹으로, 전기차·하이브리드 및 주주환원 밸류업 모멘텀을 지닌 가치주입니다.',
-    educationTip: '글로벌 완성차 제조기업은 전 세계 자동차 시장 점유율과 고배당 혜택을 갖춘 대형 가치주입니다. 경기 변동 및 글로벌 환율 흐름의 영향을 받습니다.'
-  },
-  {
     id: 'stock_apple',
     name: '개별주: 미국 시가총액 1위 IT 대장주',
     category: 'equity',
@@ -100,6 +100,28 @@ export const ASSETS: Asset[] = [
     riskScore: 6,
     description: '스마트폰과 독보적 서비스 생태계로 전 세계 시가총액 1위를 다투는 미국 대표 글로벌 IT 기업입니다.',
     educationTip: '미국 시가총액 1위 IT 대장주는 독보적인 브랜드 충성도와 플랫폼 생태계를 갖춘 글로벌 주식입니다. 상대적으로 낮은 변동성 대비 꾸준한 장기 우상향 추세를 보여왔습니다.'
+  },
+  {
+    id: 'stock_blackberry',
+    name: '개별주: 북미 비즈니스 모바일 테크 챔피언',
+    category: 'equity',
+    expectedReturn: 21.0,
+    volatility: 35,
+    liquidityScore: 8,
+    riskScore: 9,
+    description: '독보적인 보안 플랫폼과 전용 키패드로 기업용 비즈니스 스마트폰 시장을 독점 중인 초고성장 테크 기업입니다.',
+    educationTip: '북미 비즈니스 모바일 테크 챔피언은 고성장 기업처럼 보이지만, 기술 경쟁에서 밀릴 경우 투자 원금이 0에 가깝게 고꾸라지는 상장폐지 위험을 경험할 수 있습니다.'
+  },
+  {
+    id: 'stock_hyundai',
+    name: '개별주: 글로벌 완성차 제조기업',
+    category: 'equity',
+    expectedReturn: 7.5,
+    volatility: 20,
+    liquidityScore: 9,
+    riskScore: 6,
+    description: '세계 3위권 완성차 제조 그룹으로, 전기차·하이브리드 및 주주환원 밸류업 모멘텀을 지닌 가치주입니다.',
+    educationTip: '글로벌 완성차 제조기업은 전 세계 자동차 시장 점유율과 고배당 혜택을 갖춘 대형 가치주입니다. 경기 변동 및 글로벌 환율 흐름의 영향을 받습니다.'
   },
   {
     id: 'stock_nvidia',

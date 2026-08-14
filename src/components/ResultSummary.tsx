@@ -5,15 +5,17 @@ import { GlassCard } from './GlassCard';
 import { HeroBackground } from './HeroBackground';
 import { MetricCard } from './MetricCard';
 import { EducationNotice } from './EducationNotice';
-import { Check, RefreshCw, BarChart2, Share2, Clipboard, Wallet, TrendingUp, AlertTriangle, Printer, Users } from 'lucide-react';
+import { Check, RefreshCw, BarChart2, Share2, Clipboard, Wallet, TrendingUp, AlertTriangle, Printer, Users, FileDown } from 'lucide-react';
 import { audioManager } from '../utils/audioManager';
 import { AnimatedCharacterGuide } from './AnimatedCharacterGuide';
+import { exportReportToHtml } from '../utils/exportHtml';
 
 export const ResultSummary: React.FC = () => {
   const { state, resetGame } = useGame();
   const { scores, nickname, simulationLength } = state;
   const [copiedQuestions, setCopiedQuestions] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [downloadedHtml, setDownloadedHtml] = useState(false);
 
   // 결과 화면 도달 시 성공음 연동
   useEffect(() => {
@@ -170,13 +172,28 @@ ${archetype.emoji} ${archetype.name}
         className="rounded-3xl shadow-xl overflow-hidden animate-fade-in-up"
       >
         <div className="flex flex-col justify-between h-full w-full z-10 text-white gap-4">
-          <div>
-            <span className="text-[10px] text-blue-200 font-extrabold uppercase tracking-widest bg-white/10 px-2.5 py-1 rounded-full border border-white/10 select-none">
-              🎓 시뮬레이션 수료 리포트
-            </span>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-black mt-3 select-text">
-              {nickname}님의 {simulationLength}년 자산관리 실험 결과
-            </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-[10px] text-blue-200 font-extrabold uppercase tracking-widest bg-white/10 px-2.5 py-1 rounded-full border border-white/10 select-none">
+                🎓 시뮬레이션 수료 리포트
+              </span>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-black mt-2 select-text">
+                {nickname}님의 {simulationLength}년 자산관리 실험 결과
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                audioManager.playSound('click');
+                exportReportToHtml(state);
+                setDownloadedHtml(true);
+                setTimeout(() => setDownloadedHtml(false), 2500);
+              }}
+              className="flex items-center justify-center gap-1.5 text-xs font-extrabold px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg transition transform active:scale-95 cursor-pointer border border-emerald-400 no-print flex-shrink-0"
+            >
+              {downloadedHtml ? <Check size={14} /> : <FileDown size={14} />}
+              {downloadedHtml ? '리포트 저장 완료!' : '결과 리포트 다운로드'}
+            </button>
           </div>
           
           {/* 최종 자산관리 유형 카드 */}
@@ -363,7 +380,20 @@ ${archetype.emoji} ${archetype.name}
             <h3 className="text-xs sm:text-sm font-bold text-slate-800 select-none">📝 수업용 회고(성찰) 질문지</h3>
             <p className="text-[10px] text-slate-400 mt-0.5 select-none">결과 보고서와 회고 질문을 복사해 과제(구글 클래스룸 등)로 제출하거나 모둠 토론에 사용하세요.</p>
           </div>
-          <div className="flex items-center gap-2 select-none no-print">
+          <div className="flex items-center gap-2 select-none no-print flex-wrap">
+            <button
+              type="button"
+              onClick={() => {
+                audioManager.playSound('click');
+                exportReportToHtml(state);
+                setDownloadedHtml(true);
+                setTimeout(() => setDownloadedHtml(false), 2500);
+              }}
+              className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 bg-emerald-600 border border-emerald-500 text-white rounded-lg hover:bg-emerald-700 transition shadow-sm cursor-pointer"
+            >
+              {downloadedHtml ? <Check size={12} /> : <FileDown size={12} />}
+              {downloadedHtml ? '리포트 저장 완료!' : '결과 리포트 저장'}
+            </button>
             {/* 결과 리포트 인쇄하기 버튼 */}
             <button
               type="button"

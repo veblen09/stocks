@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HeroBackground } from './HeroBackground';
 import { GlassCard } from './GlassCard';
-import { BookOpen, Clock, Lightbulb, Users, HelpCircle, ArrowRight } from 'lucide-react';
+import { BookOpen, Clock, Lightbulb, Users, HelpCircle, ArrowRight, FileDown, Check } from 'lucide-react';
+import { exportTeacherGuideToHtml } from '../utils/exportHtml';
+import { audioManager } from '../utils/audioManager';
 
 export const TeacherGuide: React.FC = () => {
+  const [downloaded, setDownloaded] = useState(false);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-fade-in-up">
       {/* 1. 교사용 가이드 히어로 배너 */}
@@ -13,11 +17,26 @@ export const TeacherGuide: React.FC = () => {
         className="rounded-3xl shadow-xl overflow-hidden"
       >
         <div className="flex flex-col justify-between h-full w-full z-10 text-white select-none">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-white/20 backdrop-blur-md rounded-lg text-white">
-              <BookOpen size={16} />
+          <div className="flex justify-between items-center w-full">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-white/20 backdrop-blur-md rounded-lg text-white">
+                <BookOpen size={16} />
+              </div>
+              <span className="text-xs font-black tracking-wider uppercase">교수자 자료실</span>
             </div>
-            <span className="text-xs font-black tracking-wider uppercase">교수자 자료실</span>
+            <button
+              type="button"
+              onClick={() => {
+                audioManager.playSound('click');
+                exportTeacherGuideToHtml();
+                setDownloaded(true);
+                setTimeout(() => setDownloaded(false), 2500);
+              }}
+              className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-md transition transform active:scale-95 cursor-pointer border border-emerald-400 no-print"
+            >
+              {downloaded ? <Check size={14} /> : <FileDown size={14} />}
+              {downloaded ? 'HTML 저장됨' : 'HTML 지도안 다운로드'}
+            </button>
           </div>
           
           <div className="mt-4">

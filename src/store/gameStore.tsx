@@ -36,6 +36,9 @@ interface GameContextType {
   repayLoan: (type: 'credit' | 'mortgage', amount: number) => void;
   liquidateHousing: () => void;
   toggleHousingActive: () => void;
+  sellHouse: () => void;
+  buyHouse: (region: 'gangnam' | 'mapo' | 'bundang' | 'gyeonggi_outer', price: number) => void;
+  clearLastEventResult: () => void;
   resetGame: () => void;
 }
 
@@ -208,9 +211,56 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // A. 대출 반기 이자 비용 지출 연산 (신용대출: 반기 3.0%, 담보대출: 반기 1.75% 복합 연산)
     const interestCost = parseFloat(((state.loans.credit * 0.030) + (state.loans.mortgage * 0.0175)).toFixed(2));
+    let unpaidInterestDeficit = 0;
+    let liquidatedAssetsForInterestText = '';
+
     if (interestCost > 0) {
-      const currentEmergencyCash = updatedAllocations['cash'] || 0;
-      updatedAllocations['cash'] = parseFloat(Math.max(0, currentEmergencyCash - interestCost).toFixed(2));
+      let currentEmergencyCash = updatedAllocations['cash'] || 0;
+      if (currentEmergencyCash >= interestCost) {
+        updatedAllocations['cash'] = parseFloat((currentEmergencyCash - interestCost).toFixed(2));
+      } else {
+        // 비상금이 이자보다 부족한 경우: 기존 보유 투자 자산을 순차 자동 매각하여 이자 충당!
+        let needed = parseFloat((interestCost - currentEmergencyCash).toFixed(2));
+        updatedAllocations['cash'] = 0;
+
+        // 유동성 점수(liquidityScore) 내림차순 정렬 (유동성이 가장 높은 자산부터 우선 매도하여 대출 이자 상환)
+        const sortedAssets = [...ASSETS]
+          .filter(a => a.id !== 'cash' && a.id !== 'house' && a.id !== 'rent_deposit' && a.id !== 'housing')
+          .sort((a, b) => b.liquidityScore - a.liquidityScore);
+
+        const soldDetails: string[] = [];
+
+        for (const assetObj of sortedAssets) {
+          if (needed <= 0) break;
+          const assetId = assetObj.id;
+          const currentBal = updatedAllocations[assetId] || 0;
+          if (currentBal > 0) {
+            const sellAmt = Math.min(currentBal, needed);
+            updatedAllocations[assetId] = parseFloat((currentBal - sellAmt).toFixed(2));
+            needed = parseFloat((needed - sellAmt).toFixed(2));
+            soldDetails.push(`${assetObj.name} ${formatMoney(sellAmt)}`);
+          }
+        }
+
+        if (soldDetails.length > 0) {
+          liquidatedAssetsForInterestText = ` (부족한 이자를 위해 ${soldDetails.join(', ')} 자산을 매각함)`;
+        }
+
+        if (needed > 0) {
+          // 모든 금융 자산을 다 매각해도 부족한 남아있는 이자 부족액
+          unpaidInterestDeficit = needed;
+        }
+      }
+    }
+
+    // 미납 대출 이자를 연체 가산금(5%)과 함께 신용대출 원금에 복리로 가산!
+    let nextLoans = { ...state.loans };
+    let overdueCompoundedText = '';
+    if (unpaidInterestDeficit > 0) {
+      const overduePenalty = parseFloat((unpaidInterestDeficit * 0.05).toFixed(2));
+      const compoundedAmount = parseFloat((unpaidInterestDeficit + overduePenalty).toFixed(2));
+      nextLoans.credit = parseFloat((nextLoans.credit + compoundedAmount).toFixed(2));
+      overdueCompoundedText = ` (미납 이자 ${formatMoney(unpaidInterestDeficit)} + 연체 가산금 ${formatMoney(overduePenalty)} = 총 ${formatMoney(compoundedAmount)}이 신용대출 원금에 가산됨)`;
     }
 
     // B. 주택청약 자동 납입 연산 (활성화 상태일 경우 매 턴 비상금에서 60만 원 자동 이체)
@@ -235,9 +285,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const simResult = runTurnSimulation(tempState, rng);
 
     // 4. 새로운 현금 잔고 계산
-    // 다음 턴에 새로 배분할 가용 예산은 다음 연령에 맞게 보정된 동적 저축액으로 설정합니다.
     const nextAge = state.currentAge + 0.5;
-    const nextCashToAllocate = getSavingsForAge(nextAge, state.halfYearSavings);
+    const baseNextCash = getSavingsForAge(nextAge, state.halfYearSavings);
+    const nextCashToAllocate = parseFloat(Math.max(0, baseNextCash).toFixed(2));
     
     // 다음 턴 allocations 기본 세팅
     const finalAllocationsForNextTurn = { ...simResult.newAllocations };
@@ -252,8 +302,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    const currentLoansTotal = state.loans.credit + state.loans.mortgage;
+    const currentLoansTotal = nextLoans.credit + nextLoans.mortgage;
     const newNetWorth = parseFloat((totalAssetsVal - currentLoansTotal).toFixed(2));
+
+    // 🚨 파산 (Bankruptcy) 조건 검사: 순자산 0 이하 (자본 잠식 및 부채가 총자산 초과)
+    const isBankrupt = newNetWorth <= 0 || (unpaidInterestDeficit > 0 && totalAssetsVal <= 0);
 
     const previousNetWorth = state.history[state.history.length - 1]?.netWorth || state.initialAsset;
     const turnReturnRate = parseFloat((((newNetWorth - previousNetWorth) / previousNetWorth) * 100).toFixed(2));
@@ -275,24 +328,41 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // 시나리오 우선 이벤트 리스트 정의
     const SCENARIO_EVENTS: { [key: string]: string[] } = {
-      inflation: ['inflation_shock', 'rate_up', 'exchange_spike', 'gold_rush', 'rate_down', 'lease_raise', 'pension_tax_refund', 'tax_reform'],
-      bubble: ['korea_bull', 'global_crash', 'stock_crash_one', 'crypto_craze', 'patience_test', 'theme_stock', 'rate_down', 'rate_up'],
-      turbulent: ['job_promotion', 'medical_emergency', 'buy_car', 'independent_living', 'voice_phishing', 'scam_offer', 'housing_subscription_chance', 'lease_raise']
+      inflation: ['inflation_shock', 'rate_up', 'exchange_spike', 'gold_rush', 'oil_price_surge', 'rate_down', 'lease_raise', 'pension_tax_refund', 'tax_reform', 'overseas_stock_tax_notice'],
+      bubble: ['korea_bull', 'global_crash', 'stock_crash_one', 'crypto_craze', 'ai_revolution', 'dividend_payout', 'semiconductor_downcycle', 'unlisted_stock_scam', 'sns_fomo_luxury', 'patience_test', 'theme_stock', 'rate_down', 'rate_up'],
+      turbulent: ['job_promotion', 'medical_emergency', 'appliance_breakdown', 'side_hustle_success', 'marriage_expense', 'child_education_planning', 'mortgage_refinancing_chance', 'isa_tax_exemption', 'bank_failure_panic', 'buy_car', 'independent_living', 'voice_phishing', 'scam_offer', 'housing_subscription_chance', 'lease_raise', 'jeonse_fraud_prevention']
     };
 
     if (hasEvent) {
+      const hasHouse = (finalAllocationsForNextTurn['house'] || 0) > 0;
+      const tenantOnlyEventIds = ['independent_living', 'lease_raise', 'housing_subscription_chance', 'buy_house_opportunity', 'jeonse_fraud_prevention'];
+      
+      // 주택 소유 여부 판별에 따른 기본 이벤트 풀 구성
+      const basePool = hasHouse
+        ? EVENTS.filter((e) => !tenantOnlyEventIds.includes(e.id))
+        : EVENTS;
+
       const usedEventTitles = state.history
         .map((h) => h.event?.title)
         .filter(Boolean);
       
-      let availableEvents = EVENTS.filter((e) => !usedEventTitles.includes(e.title));
-      
-      // 주택 소유 여부 판별 (이미 집을 매입했는지 확인)
-      const hasHouse = (finalAllocationsForNextTurn['house'] || 0) > 0;
-      if (hasHouse) {
-        // 이미 주택을 보유 중인 경우 전세 독립, 전세금 인상, 신도시 청약 당첨, 직접 매입 등 무주택용 주거 계약 관련 이벤트 원천 배제
-        const tenantOnlyEventIds = ['independent_living', 'lease_raise', 'housing_subscription_chance', 'buy_house_opportunity'];
-        availableEvents = availableEvents.filter((e) => !tenantOnlyEventIds.includes(e.id));
+      // 아직 한 번도 등장하지 않은 이벤트 검색
+      let availableEvents = basePool.filter((e) => !usedEventTitles.includes(e.title));
+
+      // 15~16년차(약 30턴) 이후 모든 이벤트가 1회 이상 소진된 경우: 최근 8턴(4년) 이내 등장한 이벤트만 제외하여 연속 중복 방지
+      if (availableEvents.length === 0) {
+        const recentEventTitles = state.history
+          .slice(-8)
+          .map((h) => h.event?.title)
+          .filter(Boolean);
+
+        availableEvents = basePool.filter((e) => !recentEventTitles.includes(e.title));
+
+        // 혹시 8턴 이내에도 남은 이벤트가 부족하면 직전 턴 이벤트라도 연속으로 뜨지 않도록 방지
+        if (availableEvents.length === 0 && state.history.length > 0) {
+          const lastTitle = state.history[state.history.length - 1]?.event?.title;
+          availableEvents = basePool.filter((e) => e.title !== lastTitle);
+        }
       }
       
       const selectedScenario = state.scenario || 'standard';
@@ -307,11 +377,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (availableEvents.length > 0) {
         triggeredEvent = rng.choice(availableEvents);
       } else {
-        // 백업 무주택 필터링 풀
-        const filteredAllEvents = hasHouse
-          ? EVENTS.filter(e => !['independent_living', 'lease_raise', 'housing_subscription_chance', 'buy_house_opportunity'].includes(e.id))
-          : EVENTS;
-        triggeredEvent = rng.choice(filteredAllEvents.length > 0 ? filteredAllEvents : EVENTS);
+        triggeredEvent = rng.choice(basePool.length > 0 ? basePool : EVENTS);
       }
     }
 
@@ -329,15 +395,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       event: null
     };
 
-    const isNextGameOver = nextTurnIndex >= state.simulationLength * 2;
+    const isNextGameOver = isBankrupt || (nextTurnIndex >= state.simulationLength * 2);
 
     // 자동 정산 피드백 텍스트 생성
     let autoResultText = '';
+    if (isBankrupt) {
+      autoResultText += `🚨 [금융 파산 (Bankruptcy) 발생] 대출 이자 미납 및 누적으로 총부채(${formatMoney(currentLoansTotal)})가 총자산(${formatMoney(totalAssetsVal)})을 초과하여 파산 상태에 도달했습니다. 재정이 파산함에 따라 모의 시뮬레이션이 조기 종료됩니다. `;
+    }
     if (penaltyFee > 0) {
       autoResultText += `• 예적금 중도해지 수수료 ${formatMoney(penaltyFee)}가 차감되었습니다. `;
     }
     if (interestCost > 0) {
-      autoResultText += `• 이번 반기 대출 이자비용 ${formatMoney(interestCost)}가 비상금에서 자동 출금되었습니다. `;
+      if (unpaidInterestDeficit > 0) {
+        autoResultText += `• 🚨 이번 반기 대출 이자비용(${formatMoney(interestCost)})을 상환할 비상금 및 보유 자산이 부족하여,${overdueCompoundedText} 신용대출 원금에 복리로 가산되었습니다! (다음 턴 이자 부담 증가) `;
+      } else if (liquidatedAssetsForInterestText) {
+        autoResultText += `• 💡 이번 반기 대출 이자비용 ${formatMoney(interestCost)} 납부를 위해${liquidatedAssetsForInterestText}이 정상 출금되었습니다. `;
+      } else {
+        autoResultText += `• 이번 반기 대출 이자비용 ${formatMoney(interestCost)}가 비상금 통장에서 자동 출금되었습니다. `;
+      }
     }
     if (autoHousingDeducted) {
       autoResultText += `• 주택청약 자동 납입액 60만 원이 비상금 통장에서 저축되었습니다. `;
@@ -732,6 +807,129 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     audioManager.playSound('click');
   };
 
+  // 실물 주택 매도 (시세 매도, 담보대출 자동 전액 상환 및 순 매도금 비상금 입금)
+  const sellHouse = () => {
+    const updatedAllocations = { ...state.allocations };
+    const currentHouseVal = updatedAllocations['house'] || 0;
+    if (currentHouseVal <= 0) return;
+
+    const mortgageLoan = state.loans.mortgage || 0;
+    const netProceeds = parseFloat(Math.max(0, currentHouseVal - mortgageLoan).toFixed(2));
+
+    updatedAllocations['house'] = 0;
+    updatedAllocations['cash'] = parseFloat(((updatedAllocations['cash'] || 0) + netProceeds).toFixed(2));
+
+    const nextLoans = {
+      ...state.loans,
+      mortgage: 0
+    };
+
+    const nextState: GameState = {
+      ...state,
+      allocations: updatedAllocations,
+      loans: nextLoans,
+      lastEventResult: {
+        title: '🏠 실물 주택 매도 완료',
+        choiceText: '소유 주택 시세 매도 및 현금화',
+        resultText: `소유하신 주택(시세 ${formatMoney(currentHouseVal)})을 성공적으로 매도했습니다.${mortgageLoan > 0 ? ` 주택담보대출 ${formatMoney(mortgageLoan)}이 전액 상환되었으며,` : ''} 순 매도금 ${formatMoney(netProceeds)}이 비상금 통장으로 전액 입금되었습니다.`
+      }
+    };
+
+    const updatedHistory = [...state.history];
+    if (updatedHistory.length > 0) {
+      const lastIndex = updatedHistory.length - 1;
+      const lastHistoryItem = updatedHistory[lastIndex];
+      const newHistoryAllocation = { ...lastHistoryItem.allocation };
+      Object.keys(updatedAllocations).forEach((id) => {
+        newHistoryAllocation[id] = updatedAllocations[id];
+      });
+
+      const totalAssets = Object.values(updatedAllocations).reduce((a, b) => a + b, 0);
+      const totalLoans = nextLoans.credit + nextLoans.mortgage;
+
+      updatedHistory[lastIndex] = {
+        ...lastHistoryItem,
+        netWorth: parseFloat((totalAssets - totalLoans).toFixed(2)),
+        cash: updatedAllocations['cash'],
+        invested: parseFloat(Object.keys(updatedAllocations).filter(k => k !== 'cash').reduce((sum, k) => sum + updatedAllocations[k], 0).toFixed(2)),
+        allocation: newHistoryAllocation,
+        loans: nextLoans
+      };
+      nextState.history = updatedHistory;
+    }
+
+    setState(nextState);
+    audioManager.playSound('success');
+  };
+
+  // 실물 주택 매입 (내 집 마련: LTV 60% 담보대출 + 자기자본 40%)
+  const buyHouse = (region: 'gangnam' | 'mapo' | 'bundang' | 'gyeonggi_outer', price: number) => {
+    const updatedAllocations = { ...state.allocations };
+    const currentEmergencyCash = updatedAllocations['cash'] || 0;
+    
+    const downPayment = parseFloat((price * 0.4).toFixed(2));
+    const mortgageAmount = parseFloat((price * 0.6).toFixed(2));
+
+    if (currentEmergencyCash < downPayment) return;
+
+    updatedAllocations['cash'] = parseFloat((currentEmergencyCash - downPayment).toFixed(2));
+    updatedAllocations['house'] = price;
+
+    const nextLoans = {
+      ...state.loans,
+      mortgage: parseFloat((state.loans.mortgage + mortgageAmount).toFixed(2))
+    };
+
+    const regionNames: { [k: string]: string } = {
+      gangnam: '강남 대형 아파트',
+      mapo: '마포·용산 역세권 아파트',
+      bundang: '분당·판교 신도시 아파트',
+      gyeonggi_outer: '경기 외곽 아파트'
+    };
+
+    const nextState: GameState = {
+      ...state,
+      allocations: updatedAllocations,
+      loans: nextLoans,
+      houseRegion: region,
+      lastEventResult: {
+        title: '🏠 실물 주택 매입 (내 집 마련) 성공',
+        choiceText: `${regionNames[region] || '주택'} 매입`,
+        resultText: `${regionNames[region] || '주택'} (매수가 ${formatMoney(price)})을 성공적으로 매입했습니다. 자기자본 ${formatMoney(downPayment)}이 출금되고 주택담보대출 ${formatMoney(mortgageAmount)}이 실행되었습니다.`
+      }
+    };
+
+    const updatedHistory = [...state.history];
+    if (updatedHistory.length > 0) {
+      const lastIndex = updatedHistory.length - 1;
+      const lastHistoryItem = updatedHistory[lastIndex];
+      const newHistoryAllocation = { ...lastHistoryItem.allocation };
+      Object.keys(updatedAllocations).forEach((id) => {
+        newHistoryAllocation[id] = updatedAllocations[id];
+      });
+
+      const totalAssets = Object.values(updatedAllocations).reduce((a, b) => a + b, 0);
+      const totalLoans = nextLoans.credit + nextLoans.mortgage;
+
+      updatedHistory[lastIndex] = {
+        ...lastHistoryItem,
+        netWorth: parseFloat((totalAssets - totalLoans).toFixed(2)),
+        cash: updatedAllocations['cash'],
+        invested: parseFloat(Object.keys(updatedAllocations).filter(k => k !== 'cash').reduce((sum, k) => sum + updatedAllocations[k], 0).toFixed(2)),
+        allocation: newHistoryAllocation,
+        loans: nextLoans
+      };
+      nextState.history = updatedHistory;
+    }
+
+    setState(nextState);
+    audioManager.playSound('success');
+  };
+
+  const clearLastEventResult = () => {
+    setState((prev) => ({ ...prev, lastEventResult: null }));
+  };
+
   // 게임 초기화
   const resetGame = () => {
     setState(initialGameState);
@@ -750,6 +948,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         repayLoan,
         liquidateHousing,
         toggleHousingActive,
+        sellHouse,
+        buyHouse,
+        clearLastEventResult,
         resetGame
       }}
     >

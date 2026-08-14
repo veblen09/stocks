@@ -24,51 +24,29 @@ export function AnimatedCharacterGuide({
   useSprite = false,
 }: AnimatedCharacterGuideProps) {
   const [isHovered, setIsHovered] = React.useState(false);
-  const [staticGuideSrc, setStaticGuideSrc] = React.useState<string>('');
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const img = new Image();
-      img.src = '/images/character-guide.gif';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          try {
-            setStaticGuideSrc(canvas.toDataURL('image/png'));
-          } catch (e) {
-            console.error('Failed to extract GIF first frame:', e);
-          }
-        }
-      };
-    }
-  }, []);
 
   const isEvent = mood === 'event' || mood === 'warning';
   const isSuccess = mood === 'success';
 
   // 나이대별 이미지 결정 (반신 늙어가는 모드용)
-  let characterImg = '/images/character-guide.gif'; // 25세
+  let characterImg = 'images/character-guide.gif'; // 25세
   if (age !== undefined) {
     if (age >= 55) {
-      characterImg = '/images/character-guide-60s.png'; // 은퇴 준비 / 은퇴 생활 (50~60대 이상)
+      characterImg = 'images/character-guide-60s.png'; // 은퇴 준비 / 은퇴 생활 (50~60대 이상)
     } else if (age >= 30) {
-      characterImg = '/images/character-guide-30s.png'; // 배우자 / 자녀 등장 / 가족 재무관리 (30~40대)
+      characterImg = 'images/character-guide-30s.png'; // 배우자 / 자녀 등장 / 가족 재무관리 (30~40대)
     }
   }
 
   // 나이대별 전신 이미지 결정 (생애 변화 및 가족/목표 변화 탭용)
-  let fullBodyImg = '/images/character-avatar.png'; // 25세 -> 사회초년생
+  let fullBodyImg = 'images/character-avatar.png'; // 25세 -> 사회초년생
   if (age !== undefined) {
     if (age >= 55) {
-      fullBodyImg = '/images/character-avatar-30s.png'; // 55세 이상 -> 은퇴 준비 및 은퇴 생활 (부부만 남음)
+      fullBodyImg = 'images/character-avatar-30s.png'; // 55세 이상 -> 은퇴 준비 및 은퇴 생활 (부부만 남음)
     } else if (age >= 35) {
-      fullBodyImg = '/images/character-avatar-35s.png'; // 35세 -> 자녀 등장 및 가족 재무관리 (부부+자녀)
+      fullBodyImg = 'images/character-avatar-35s.png'; // 35세 -> 자녀 등장 및 가족 재무관리 (부부+자녀)
     } else if (age >= 30) {
-      fullBodyImg = '/images/character-avatar-30s.png'; // 30세 -> 배우자 등장 (부부)
+      fullBodyImg = 'images/character-avatar-30s.png'; // 30세 -> 배우자 등장 (부부)
     }
   }
 
@@ -179,9 +157,9 @@ export function AnimatedCharacterGuide({
                   ].join(' ')}
                 />
               ) : (
-                /* 예전 반신 이미지 늙어가는 버전 렌더링 */
+                /* 예전 반신 이미지 늙어가는 버전 렌더링 (마우스 호버 시에만 움직이는 GIF로 전환) */
                 <img
-                  src={characterImg === '/images/character-guide.gif' && !isHovered && staticGuideSrc ? staticGuideSrc : characterImg}
+                  src={isHovered ? characterImg : (characterImg === 'images/character-guide.gif' ? 'images/character-guide.png' : characterImg)}
                   alt="머니트랙 자산관리 가이드 캐릭터"
                   className={[
                     compact ? 'h-56' : 'h-80',
@@ -392,11 +370,17 @@ const CharacterStyles: React.FC = () => (
     }
 
     .character-pulse-ring {
-      animation: softPulseRing 1.8s ease-out infinite;
       transform-origin: center;
+      opacity: 0;
+    }
+    .group:hover .character-pulse-ring {
+      animation: softPulseRing 1.8s ease-out infinite;
     }
 
     .character-sparkle {
+      opacity: 0.2;
+    }
+    .group:hover .character-sparkle {
       animation: sparkleFade 1.6s ease-in-out infinite;
     }
     .character-sparkle.delay-200 {
@@ -415,6 +399,9 @@ const CharacterStyles: React.FC = () => (
     }
 
     .animate-satie-sweat {
+      opacity: 0;
+    }
+    .group:hover .animate-satie-sweat {
       animation: satieSweat 2.2s infinite ease-in-out;
     }
 
@@ -422,7 +409,7 @@ const CharacterStyles: React.FC = () => (
       0%, 100% { opacity: 0.35; transform: scale(0.95); }
       50% { opacity: 0.65; transform: scale(1.05); }
     }
-    .animate-pulse-slow {
+    .group:hover .animate-pulse-slow {
       animation: pulse-slow 6s ease-in-out infinite;
     }
 

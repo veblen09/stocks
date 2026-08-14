@@ -242,7 +242,7 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
                           <thead className="bg-slate-50 text-[9px] uppercase font-bold text-slate-400 border-b border-slate-100 select-none">
                             <tr>
                               <th className="py-2 px-3">자산군 명칭</th>
-                              <th className="py-2 px-3 text-center">연 환산 수익률</th>
+                              <th className="py-2 px-3 text-center">연 환산 수익률 (CAGR)</th>
                               <th className="py-2 px-3 text-center">누적 수익률</th>
                               <th className="py-2 px-3 text-right">현재 보유 잔액</th>
                             </tr>
@@ -253,9 +253,16 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
                               const cumReturn = getAssetCumulativeReturn(asset.id);
                               
                               const yearsElapsed = currentTurn * 0.5;
-                              const annualizedReturn = yearsElapsed > 0 
-                                ? parseFloat((cumReturn / yearsElapsed).toFixed(2)) 
-                                : 0;
+                              let annualizedReturn = 0;
+                              if (yearsElapsed > 0) {
+                                const multiplier = 1 + cumReturn / 100;
+                                if (multiplier > 0) {
+                                  const cagr = (Math.pow(multiplier, 1 / yearsElapsed) - 1) * 100;
+                                  annualizedReturn = parseFloat(cagr.toFixed(2));
+                                } else {
+                                  annualizedReturn = -100;
+                                }
+                              }
                               
                               return (
                                 <tr key={asset.id} className="hover:bg-slate-50/50">

@@ -123,7 +123,9 @@ export function calculateFinalScores(state: GameState): Scores {
   const pensionAvg = avgAllocationPercent['pension'] || 0;
 
   // 유형 분류 조건
-  if (stockAvg >= 30) {
+  if (finalNetWorth <= 0) {
+    archetype = ARCHETYPES.bankrupt; // 대출연체 파산자 (순자산 음수 및 부채 과다)
+  } else if (stockAvg >= 30) {
     archetype = ARCHETYPES.speculative; // 테마주 과몰입형 (개별주 비중 30% 이상)
   } else if (stockAvg + globalEtfAvg + koreaEtfAvg >= 65) {
     archetype = ARCHETYPES.adventure; // 위험추구형 모험가 (전체 주식형 비중 65% 이상)
@@ -229,6 +231,17 @@ export const ARCHETYPES = {
     questions: [
       '돈이 모두 투자 자산에 묶여 있을 때, 돌발 지출을 메우기 위해 어떤 손해를 감수해야 했나요?',
       '‘유동성(환금성)’이 자산관리에서 수익률만큼 중요한 이유는 무엇일까요?'
+    ]
+  },
+  bankrupt: {
+    name: '대출연체 파산자',
+    emoji: '🚨',
+    description: '대출 이자를 감당하지 못해 미납 연체 이자가 원금에 복리로 누적되고, 결국 총부채가 총자산을 초과하여 금융 파산에 도달한 유형입니다.',
+    pros: '파산이라는 무서운 금융 경험을 통해 대출 이자 복리의 위력과 비상금 포트폴리오의 절실함을 생생하게 체득했습니다.',
+    cons: '대출 이자를 갚을 유동성과 비상금을 확보하지 못해 보유 자산이 전액 몰수되고 최종 파산 처리되었습니다.',
+    questions: [
+      '대출 이자가 미납되어 원금에 복리로 누적되는 과정에서 어떤 위험을 느꼈나요?',
+      '다시 도전한다면 대출 규모와 비상금 비중을 어떻게 조절하여 재정 안정성을 지키고 싶나요?'
     ]
   }
 };
