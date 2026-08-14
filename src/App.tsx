@@ -6,6 +6,7 @@ import { GamePage } from './pages/GamePage';
 import { ResultPage } from './pages/ResultPage';
 import { TeacherPage } from './pages/TeacherPage';
 import { AudioController } from './components/AudioController';
+import { AppModeBanner } from './components/AppModeBanner';
 import { audioManager } from './utils/audioManager';
 
 function App() {
@@ -49,6 +50,9 @@ function App() {
   return (
     <GameProvider>
       <div className="min-h-screen flex flex-col justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
+        {/* QR 접속 어플 모드 상단 배너 및 어플 설치 안내 */}
+        <AppModeBanner onStartGame={() => setCurrentPage('setup')} />
+
         {/* 글로벌 오디오 설정 제어기 */}
         <AudioController />
 

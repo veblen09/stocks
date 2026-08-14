@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { HeroBackground } from './HeroBackground';
 import { GlassCard } from './GlassCard';
-import { BookOpen, Clock, Lightbulb, Users, HelpCircle, ArrowRight, FileDown, Check } from 'lucide-react';
+import { BookOpen, Clock, Lightbulb, Users, HelpCircle, ArrowRight, FileDown, Check, QrCode } from 'lucide-react';
 import { exportTeacherGuideToHtml } from '../utils/exportHtml';
 import { audioManager } from '../utils/audioManager';
+import { QRCodeModal } from './QRCodeModal';
 
 export const TeacherGuide: React.FC = () => {
   const [downloaded, setDownloaded] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-fade-in-up">
@@ -24,19 +26,34 @@ export const TeacherGuide: React.FC = () => {
               </div>
               <span className="text-xs font-black tracking-wider uppercase">교수자 자료실</span>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                audioManager.playSound('click');
-                exportTeacherGuideToHtml();
-                setDownloaded(true);
-                setTimeout(() => setDownloaded(false), 2500);
-              }}
-              className="flex items-center gap-1.5 text-xs font-extrabold px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-md transition transform active:scale-95 cursor-pointer border border-emerald-400 no-print"
-            >
-              {downloaded ? <Check size={14} /> : <FileDown size={14} />}
-              {downloaded ? 'HTML 저장됨' : 'HTML 지도안 다운로드'}
-            </button>
+
+            <div className="flex items-center gap-2 no-print">
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playSound('click');
+                  setShowQRModal(true);
+                }}
+                className="flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition transform active:scale-95 cursor-pointer border border-indigo-400"
+              >
+                <QrCode size={14} />
+                <span>📱 학생용 QR코드 열기</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playSound('click');
+                  exportTeacherGuideToHtml();
+                  setDownloaded(true);
+                  setTimeout(() => setDownloaded(false), 2500);
+                }}
+                className="flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-md transition transform active:scale-95 cursor-pointer border border-emerald-400"
+              >
+                {downloaded ? <Check size={14} /> : <FileDown size={14} />}
+                {downloaded ? 'HTML 저장됨' : 'HTML 지도안 다운로드'}
+              </button>
+            </div>
           </div>
           
           <div className="mt-4">
@@ -187,6 +204,9 @@ export const TeacherGuide: React.FC = () => {
           </div>
         </div>
       </GlassCard>
+
+      {/* QR Code Modal */}
+      <QRCodeModal isOpen={showQRModal} onClose={() => setShowQRModal(false)} />
     </div>
   );
 };
