@@ -33,7 +33,7 @@ export const HeroBackground: React.FC<HeroBackgroundProps> = ({
   return (
     <div
       className={`relative w-full overflow-hidden bg-cover bg-[position:center_right] sm:bg-center bg-no-repeat transition-all duration-300 ${height} ${className}`}
-      style={{ backgroundImage: "url('/images/finance-hero-bg.png')" }}
+      style={{ backgroundImage: "url('./images/finance-hero-bg.png')" }}
     >
       {/* Semi-transparent Overlay */}
       <div className={`absolute inset-0 z-0 transition-opacity duration-300 ${overlayStyles[overlay]}`} />

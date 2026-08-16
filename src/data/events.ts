@@ -1,7 +1,7 @@
 import type { GameEvent } from '../types/finance';
+import { MIDLIFE_AND_RETIREMENT_EVENTS } from './midlifeEvents';
 
-
-export const EVENTS: GameEvent[] = [
+const RAW_BASE_EVENTS: GameEvent[] = [
   {
     id: 'rate_up',
     title: '한국은행 기준금리 인상!',
@@ -1076,4 +1076,56 @@ export const EVENTS: GameEvent[] = [
     discussionQuestion: 'SNS 과시 문화 속에서 타인과의 비교에 흔들리지 않고 나의 소비 원칙을 지키는 방법은 무엇일까요?'
   }
 ];
+
+const BASE_EVENT_METADATA: { [id: string]: Partial<GameEvent> } = {
+  rate_up: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  rate_down: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  korea_bull: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  global_crash: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  exchange_spike: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  inflation_shock: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  voice_phishing: { minAge: 25, maxAge: 35, lifeStage: 'early_career' },
+  scam_offer: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  theme_stock: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  medical_emergency: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  lease_raise: { minAge: 25, maxAge: 40, lifeStage: 'early_career' },
+  buy_car: { minAge: 25.5, maxAge: 33, lifeStage: 'early_career' },
+  independent_living: { minAge: 25, maxAge: 29.5, lifeStage: 'early_career', isMilestone: true },
+  patience_test: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  housing_subscription_chance: { minAge: 31, maxAge: 44, lifeStage: 'marriage', isMilestone: true },
+  buy_house_opportunity: { minAge: 30, maxAge: 45, lifeStage: 'marriage' },
+  pension_tax_refund: { minAge: 26, maxAge: 52, lifeStage: 'early_career' },
+  job_promotion: { minAge: 26.5, maxAge: 48, lifeStage: 'early_career' },
+  gold_rush: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  stock_crash_one: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  crypto_craze: { minAge: 25, maxAge: 45, lifeStage: 'general' },
+  tax_reform: { minAge: 28, maxAge: 55, lifeStage: 'general' },
+  tech_disruption_crash: { minAge: 26, maxAge: 55, lifeStage: 'general' },
+  ai_revolution: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  dividend_payout: { minAge: 27, maxAge: 55, lifeStage: 'general' },
+  side_hustle_success: { minAge: 26, maxAge: 46, lifeStage: 'early_career' },
+  jeonse_fraud_prevention: { minAge: 26.5, maxAge: 40, lifeStage: 'early_career' },
+  bank_failure_panic: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  marriage_expense: { minAge: 29, maxAge: 34.5, lifeStage: 'marriage', isMilestone: true },
+  unlisted_stock_scam: { minAge: 26.5, maxAge: 55, lifeStage: 'general' },
+  isa_tax_exemption: { minAge: 28, maxAge: 50, lifeStage: 'early_career' },
+  oil_price_surge: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  mortgage_refinancing_chance: { minAge: 31, maxAge: 55, lifeStage: 'general' },
+  overseas_stock_tax_notice: { minAge: 27.5, maxAge: 55, lifeStage: 'general' },
+  appliance_breakdown: { minAge: 26, maxAge: 55, lifeStage: 'general' },
+  child_education_planning: { minAge: 35, maxAge: 46, lifeStage: 'child_care', isMilestone: true },
+  semiconductor_downcycle: { minAge: 25, maxAge: 55, lifeStage: 'general' },
+  sns_fomo_luxury: { minAge: 25, maxAge: 34, lifeStage: 'early_career' }
+};
+
+const ENRICHED_BASE_EVENTS: GameEvent[] = RAW_BASE_EVENTS.map(event => ({
+  ...event,
+  ...(BASE_EVENT_METADATA[event.id] || { minAge: 25, maxAge: 55, lifeStage: 'general' })
+}));
+
+export const EVENTS: GameEvent[] = [
+  ...ENRICHED_BASE_EVENTS,
+  ...MIDLIFE_AND_RETIREMENT_EVENTS
+];
+
 

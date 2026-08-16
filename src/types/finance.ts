@@ -43,6 +43,10 @@ export interface GameEvent {
   choices: Choice[];
   lesson: string; // 이 이벤트로부터 배울 점
   discussionQuestion: string; // 수업 토론용 발문
+  minAge?: number; // 이벤트 발생 최소 나이 (기본 25세)
+  maxAge?: number; // 이벤트 발생 최대 나이 (기본 무제한)
+  lifeStage?: 'early_career' | 'marriage' | 'child_care' | 'mid_career' | 'retirement_prep' | 'general'; // 생애 단계 분류
+  isMilestone?: boolean; // 해당 나이대에 도달 시 우선 발생하는 생애 주요 마일스톤 이벤트 여부
 }
 
 export interface TurnHistory {

@@ -42,11 +42,13 @@ export function AnimatedCharacterGuide({
   let fullBodyImg = 'images/character-avatar.png'; // 25세 -> 사회초년생
   if (age !== undefined) {
     if (age >= 55) {
-      fullBodyImg = 'images/character-avatar-30s.png'; // 55세 이상 -> 은퇴 준비 및 은퇴 생활 (부부만 남음)
+      fullBodyImg = 'images/character-avatar-60s.png'; // 55세 이상 -> 은퇴 준비 및 은퇴 생활 (평안한 노후 부부)
+    } else if (age >= 45) {
+      fullBodyImg = 'images/character-avatar-45s.png'; // 45세 -> 성장한 첫째 + 둘째 아이 + 40대 부부 (학령기 4인 가족)
     } else if (age >= 35) {
-      fullBodyImg = 'images/character-avatar-35s.png'; // 35세 -> 자녀 등장 및 가족 재무관리 (부부+자녀)
+      fullBodyImg = 'images/character-avatar-35s.png'; // 35세 -> 첫 자녀 출산 (부부 + 첫째 아기)
     } else if (age >= 30) {
-      fullBodyImg = 'images/character-avatar-30s.png'; // 30세 -> 배우자 등장 (부부)
+      fullBodyImg = 'images/character-avatar-30s.png'; // 30세 -> 배우자 등장 (신혼부부)
     }
   }
 

@@ -5,7 +5,10 @@ import { formatMoney } from '../utils/formatMoney';
 import { AssetCard } from './AssetCard';
 import { AssetEducationModal } from './AssetEducationModal';
 import { EducationNotice } from './EducationNotice';
-import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { AssetMosaicTile, type MosaicCategoryData } from './AssetMosaicTile';
+import { StockPortfolioModal } from './StockPortfolioModal';
+import { AssetCategoryDetailModal } from './AssetCategoryDetailModal';
+import { CheckCircle, AlertTriangle, LayoutGrid, ListFilter, Sparkles } from 'lucide-react';
 import { audioManager } from '../utils/audioManager';
 
 // 개별 대출 상환용 인라인 폼 컴포넌트
@@ -65,7 +68,12 @@ export const AssetAllocationPanel: React.FC = () => {
 
   const totalAvailableCash = cash;
   const [changes, setChanges] = useState<{ [assetId: string]: number }>({});
+  const [viewMode, setViewMode] = useState<'mosaic' | 'list'>('mosaic');
+  
+  // 모달 제어 상태
   const [activeTipAssetId, setActiveTipAssetId] = useState<string | null>(null);
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+  const [activeCategoryModalId, setActiveCategoryModalId] = useState<string | null>(null);
 
   useEffect(() => {
     const initialChanges: { [assetId: string]: number } = {};
@@ -134,6 +142,10 @@ export const AssetAllocationPanel: React.FC = () => {
       ...prev,
       [assetId]: clampedVal
     }));
+  };
+
+  const handleBatchChanges = (newChanges: { [assetId: string]: number }) => {
+    setChanges(newChanges);
   };
 
   // 예적금 중도해지 페널티 확인용 상태값
@@ -212,14 +224,98 @@ export const AssetAllocationPanel: React.FC = () => {
     setChanges(newChanges);
   };
 
+  // 총 순자산 합산 (모자이크 비율 계산용)
+  const totalAssetsSum = Object.values(allocations).reduce((sum, val) => sum + val, 0);
+
+  // 9대 모자이크 카테고리 데이터 가공
+  const getCategoryData = (
+    id: string,
+    title: string,
+    subtitle: string,
+    assetIds: string[],
+    theme: MosaicCategoryData['colorTheme'],
+    expectedReturnText: string,
+    riskScore: number,
+    badgeText?: string,
+    isSpecialAction?: boolean
+  ): MosaicCategoryData => {
+    const totalValue = assetIds.reduce((sum, aid) => sum + (allocations[aid] || 0), 0);
+    const totalChange = assetIds.reduce((sum, aid) => sum + (changes[aid] || 0), 0);
+    const percentage = totalAssetsSum > 0 ? (totalValue / totalAssetsSum) * 100 : 0;
+    
+    return {
+      id,
+      title,
+      subtitle,
+      assetIds,
+      totalValue,
+      totalChange,
+      percentage,
+      expectedReturnText,
+      riskScore,
+      colorTheme: theme,
+      badgeText,
+      itemCount: assetIds.length,
+      isSpecialAction
+    };
+  };
+
+  // 개별 주식 활성 보유 개수 파악
+  const stockAssetIds = ASSETS.filter(a => a.id.startsWith('stock_')).map(a => a.id);
+  const heldStockCount = stockAssetIds.filter(id => (allocations[id] || 0) > 0).length;
+  const stockBadgeText = heldStockCount > 0 ? `${heldStockCount}개 종목 보유 중` : '8개 종목 구성';
+
+  const mosaicCategories: MosaicCategoryData[] = [
+    getCategoryData('cash', '비상금·입출금', '수시 입출금 및 긴급 방어 자금', ['cash'], 'teal', '연 1.5%', 1),
+    getCategoryData('savings', '안전 저축 (예적금)', '정기예금 & 규칙적 적금', ['deposit', 'saving'], 'cyan', '연 3.5%~4.0%', 1, '원금보장 5천만'),
+    getCategoryData('etf', '시장 지수형 ETF', '국내 KOSPI 및 글로벌 성장기업 ETF', ['korea_etf', 'global_etf'], 'blue', '연 6.0%~7.5%', 6, '대표 지수 분산'),
+    getCategoryData('stocks', '🚀 개별 주식 (통합)', '삼성전자·SK하이닉스·엔비디아·애플 등', stockAssetIds, 'purple', '연 7.5%~28.0%', 8, stockBadgeText),
+    getCategoryData('debt', '국채·채권형 펀드', '국가 및 우량 기업 채권', ['bond'], 'slate', '연 4.5%', 3, '안정적 이자'),
+    getCategoryData('gold', '실물 금 (골드)', '인플레이션 방어 안전 실물', ['gold'], 'amber', '연 3.0%', 4, '물가 헤지'),
+    getCategoryData('pension', '연금저축·IRP', '매년 세액공제 및 노후 연금', ['pension'], 'emerald', '연 5.0%', 3, '연말정산 절세'),
+    getCategoryData('housing', '주택청약 종합저축', '새 아파트 분양권 및 청약 가점', ['housing'], 'pink', '연 2.5%', 1, state.isHousingActive ? '자동납입 중' : '납입 유예'),
+    getCategoryData('real_estate', '부동산 자산', '전월세 보증금 및 실물 주택', ['rent_deposit', 'house'], 'indigo', '연 0%~4.0%', 3, allocations['house'] > 0 ? '자가 주택 소유' : '임차/무주택', true),
+  ];
+
+  const lastHistory = state.history[state.history.length - 1];
+
   return (
     <div className="bg-white/85 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-slate-100/80 shadow-sm animate-fade-in-up relative select-none">
       {/* 배분 요약 헤더 배너 */}
-      <div className="bg-slate-50/50 p-4 sm:p-5 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div className="bg-slate-50/60 p-4 sm:p-5 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
         <div>
-          <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-            💼 이번 턴 자산 배분 <span className="text-xs text-slate-400 font-normal">({state.currentTurn + 1}번째 설계)</span>
-          </h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+              💼 이번 턴 자산 배분 <span className="text-xs text-slate-400 font-normal">({state.currentTurn + 1}번째 설계)</span>
+            </h2>
+
+            {/* 뷰 모드 전환 버튼 */}
+            <div className="flex items-center bg-slate-200/60 p-0.5 rounded-xl border border-slate-200 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => { audioManager.playSound('click'); setViewMode('mosaic'); }}
+                className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${
+                  viewMode === 'mosaic' 
+                    ? 'bg-white text-blue-600 shadow-xs' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <LayoutGrid size={12} /> 모자이크 뷰
+              </button>
+              <button
+                type="button"
+                onClick={() => { audioManager.playSound('click'); setViewMode('list'); }}
+                className={`px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${
+                  viewMode === 'list' 
+                    ? 'bg-white text-blue-600 shadow-xs' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <ListFilter size={12} /> 전체 펼쳐보기
+              </button>
+            </div>
+          </div>
+
           <p className="text-xs text-slate-400 mt-1 select-text">
             {state.currentAge >= 65 ? (
               <span className="text-rose-500 font-extrabold">👴 은퇴 완료 (새로운 반기 저축액이 발생하지 않습니다)</span>
@@ -235,6 +331,7 @@ export const AssetAllocationPanel: React.FC = () => {
               </span>
             )}
           </p>
+
           {interestCost > 0 && (
             <div className="mt-2 text-xs font-semibold text-rose-600 bg-rose-50/80 px-3.5 py-2.5 rounded-xl border border-rose-100 flex flex-col gap-1.5 select-text">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -266,6 +363,7 @@ export const AssetAllocationPanel: React.FC = () => {
             </div>
           )}
         </div>
+
         <div className="flex flex-wrap gap-3 text-xs">
           <div className="bg-white px-3 py-1.5 rounded-xl border border-slate-100/60 shadow-sm">
             <span className="text-slate-400 font-medium">이번 턴 투자 가능:</span>{' '}
@@ -278,34 +376,63 @@ export const AssetAllocationPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* 11가지 자산 리스트 */}
-      <div className="space-y-4 max-h-[480px] overflow-y-auto pr-2 mb-6">
-        {ASSETS.map((asset) => {
-          const currentVal = allocations[asset.id] || 0;
-          const change = changes[asset.id] || 0;
-          
-          const lastHistory = state.history[state.history.length - 1];
-          const actualReturn = lastHistory?.actualReturns?.[asset.id];
+      {/* VIEW 1: 자산 모자이크 그리드 뷰 (기본 권장) */}
+      {viewMode === 'mosaic' ? (
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-black text-slate-600 flex items-center gap-1.5">
+              <Sparkles size={14} className="text-purple-600" /> 자산 모자이크 대시보드 (클릭하여 세부 비중 조절)
+            </span>
+            <span className="text-[10px] text-slate-400 font-semibold">
+              총 {mosaicCategories.length}개 자산 카테고리
+            </span>
+          </div>
 
-          return (
-            <AssetCard
-              key={asset.id}
-              asset={asset}
-              currentVal={currentVal}
-              change={change}
-              remainingCash={remainingCash}
-              onSliderChange={(val) => handleSliderChange(asset.id, val)}
-              onValueChange={(delta) => handleValueChange(asset.id, delta)}
-              actualReturn={actualReturn}
-              onInfoClick={() => {
-                audioManager.playSound('click');
-                setActiveTipAssetId(asset.id);
-                markAssetAsViewed(asset.id);
-              }}
-            />
-          );
-        })}
-      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[500px] overflow-y-auto pr-1">
+            {mosaicCategories.map((cat) => (
+              <AssetMosaicTile
+                key={cat.id}
+                category={cat}
+                onClick={() => {
+                  audioManager.playSound('click');
+                  if (cat.id === 'stocks') {
+                    setIsStockModalOpen(true);
+                  } else {
+                    setActiveCategoryModalId(cat.id);
+                  }
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* VIEW 2: 전체 펼쳐보기 리스트 뷰 */
+        <div className="space-y-4 max-h-[480px] overflow-y-auto pr-2 mb-6">
+          {ASSETS.map((asset) => {
+            const currentVal = allocations[asset.id] || 0;
+            const change = changes[asset.id] || 0;
+            const actualReturn = lastHistory?.actualReturns?.[asset.id];
+
+            return (
+              <AssetCard
+                key={asset.id}
+                asset={asset}
+                currentVal={currentVal}
+                change={change}
+                remainingCash={remainingCash}
+                onSliderChange={(val) => handleSliderChange(asset.id, val)}
+                onValueChange={(delta) => handleValueChange(asset.id, delta)}
+                actualReturn={actualReturn}
+                onInfoClick={() => {
+                  audioManager.playSound('click');
+                  setActiveTipAssetId(asset.id);
+                  markAssetAsViewed(asset.id);
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
 
       {/* 💳 대출 관리 및 중도 상환 패널 */}
       {(loans.credit > 0 || loans.mortgage > 0) && (
@@ -376,6 +503,41 @@ export const AssetAllocationPanel: React.FC = () => {
         {/* 교육용 고지 배너 */}
         <EducationNotice className="mt-2" />
       </div>
+
+      {/* 🚀 개별 주식 전용 세부 설정 모달 */}
+      <StockPortfolioModal
+        isOpen={isStockModalOpen}
+        onClose={() => setIsStockModalOpen(false)}
+        allocations={allocations}
+        changes={changes}
+        remainingCash={remainingCash}
+        totalAvailableCash={totalAvailableCash}
+        onSliderChange={handleSliderChange}
+        onValueChange={handleValueChange}
+        onOpenEducationTip={(assetId) => {
+          setActiveTipAssetId(assetId);
+          markAssetAsViewed(assetId);
+        }}
+        lastHistoryReturns={lastHistory?.actualReturns}
+        setBatchChanges={handleBatchChanges}
+      />
+
+      {/* 📊 기타 자산군 세부 설정 모달 */}
+      <AssetCategoryDetailModal
+        categoryId={activeCategoryModalId}
+        onClose={() => setActiveCategoryModalId(null)}
+        allocations={allocations}
+        changes={changes}
+        remainingCash={remainingCash}
+        totalAvailableCash={totalAvailableCash}
+        onSliderChange={handleSliderChange}
+        onValueChange={handleValueChange}
+        onOpenEducationTip={(assetId) => {
+          setActiveTipAssetId(assetId);
+          markAssetAsViewed(assetId);
+        }}
+        lastHistoryReturns={lastHistory?.actualReturns}
+      />
 
       {/* 교육용 자산 정보 팝업 모달 */}
       <AssetEducationModal

@@ -21,9 +21,12 @@ export const CharacterGuideCard: React.FC = () => {
   if (currentAge >= 55) {
     stageTag = '50대 이상 부부';
     stageRole = '은퇴/노후 준비기';
-  } else if (currentAge >= 35) {
-    stageTag = '35~54세 가정';
+  } else if (currentAge >= 45) {
+    stageTag = '45~54세 4인 가족';
     stageRole = '학령기 자녀/자산 성숙기';
+  } else if (currentAge >= 35) {
+    stageTag = '35~44세 3인 가족';
+    stageRole = '영유아 자녀/자산 형성기';
   } else if (currentAge >= 30) {
     stageTag = '30대 신혼부부';
     stageRole = '결혼/주택 마련기';

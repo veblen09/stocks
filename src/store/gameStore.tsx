@@ -329,56 +329,88 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // 시나리오 우선 이벤트 리스트 정의
     const SCENARIO_EVENTS: { [key: string]: string[] } = {
-      inflation: ['inflation_shock', 'rate_up', 'exchange_spike', 'gold_rush', 'oil_price_surge', 'rate_down', 'lease_raise', 'pension_tax_refund', 'tax_reform', 'overseas_stock_tax_notice'],
-      bubble: ['korea_bull', 'global_crash', 'stock_crash_one', 'crypto_craze', 'ai_revolution', 'dividend_payout', 'semiconductor_downcycle', 'unlisted_stock_scam', 'sns_fomo_luxury', 'patience_test', 'theme_stock', 'rate_down', 'rate_up'],
-      turbulent: ['job_promotion', 'medical_emergency', 'appliance_breakdown', 'side_hustle_success', 'marriage_expense', 'child_education_planning', 'mortgage_refinancing_chance', 'isa_tax_exemption', 'bank_failure_panic', 'buy_car', 'independent_living', 'voice_phishing', 'scam_offer', 'housing_subscription_chance', 'lease_raise', 'jeonse_fraud_prevention']
+      inflation: ['inflation_shock', 'rate_up', 'exchange_spike', 'gold_rush', 'oil_price_surge', 'rate_down', 'lease_raise', 'pension_tax_refund', 'tax_reform', 'overseas_stock_tax_notice', 'real_estate_upgrade_or_payoff', 'pension_annuity_start_prep', 'elderly_parents_care'],
+      bubble: ['korea_bull', 'global_crash', 'stock_crash_one', 'crypto_craze', 'ai_revolution', 'dividend_payout', 'semiconductor_downcycle', 'unlisted_stock_scam', 'sns_fomo_luxury', 'patience_test', 'theme_stock', 'rate_down', 'rate_up', 'retirement_rebalancing_prep', 'retirement_franchise_temptation', 'peak_wage_or_early_retirement'],
+      turbulent: ['job_promotion', 'medical_emergency', 'appliance_breakdown', 'side_hustle_success', 'marriage_expense', 'child_education_planning', 'mortgage_refinancing_chance', 'isa_tax_exemption', 'bank_failure_panic', 'buy_car', 'independent_living', 'voice_phishing', 'scam_offer', 'housing_subscription_chance', 'lease_raise', 'jeonse_fraud_prevention', 'child_college_tuition', 'child_marriage_support', 'health_screening_alert', 'family_impersonation_scam', 'midlife_burnout_sabbatical', 'national_pension_timing_choice']
     };
 
     if (hasEvent) {
       const hasHouse = (finalAllocationsForNextTurn['house'] || 0) > 0;
       const tenantOnlyEventIds = ['independent_living', 'lease_raise', 'housing_subscription_chance', 'buy_house_opportunity', 'jeonse_fraud_prevention'];
+      const homeownerOnlyEventIds = ['mortgage_refinancing_chance', 'real_estate_upgrade_or_payoff'];
       
-      // 주택 소유 여부 판별에 따른 기본 이벤트 풀 구성
-      const basePool = hasHouse
-        ? EVENTS.filter((e) => !tenantOnlyEventIds.includes(e.id))
-        : EVENTS;
+      // 1. 주택 소유 여부 판별에 따른 기본 이벤트 풀 구성
+      let basePool = EVENTS.filter((e) => {
+        if (hasHouse && tenantOnlyEventIds.includes(e.id)) return false;
+        if (!hasHouse && homeownerOnlyEventIds.includes(e.id)) return false;
+        return true;
+      });
+
+      // 2. 현재 나이(nextAge)에 맞는 생애주기 필터링 (minAge, maxAge 엄격 적용)
+      basePool = basePool.filter((e) => {
+        const minAge = e.minAge ?? 25;
+        const maxAge = e.maxAge ?? 55;
+        return nextAge >= minAge && nextAge <= maxAge;
+      });
 
       const usedEventTitles = state.history
         .map((h) => h.event?.title)
-        .filter(Boolean);
+        .filter(Boolean) as string[];
       
-      // 아직 한 번도 등장하지 않은 이벤트 검색
+      // 3. 아직 한 번도 등장하지 않은 해당 연령대 적합 이벤트 검색
       let availableEvents = basePool.filter((e) => !usedEventTitles.includes(e.title));
 
-      // 15~16년차(약 30턴) 이후 모든 이벤트가 1회 이상 소진된 경우: 최근 8턴(4년) 이내 등장한 이벤트만 제외하여 연속 중복 방지
-      if (availableEvents.length === 0) {
-        const recentEventTitles = state.history
-          .slice(-8)
-          .map((h) => h.event?.title)
-          .filter(Boolean);
+      // 4. 해당 생애주기 도달 시 최우선 발생해야 하는 미등장 마일스톤 이벤트 확인
+      const pendingMilestones = availableEvents.filter(e => e.isMilestone);
+      if (pendingMilestones.length > 0) {
+        availableEvents = pendingMilestones;
+      } else {
+        // 5. 미등장 이벤트가 모두 소진되었거나 없는 경우
+        if (availableEvents.length === 0 && basePool.length > 0) {
+          // 중복 방지 강화: 최근 16턴(8년) 이내 등장했던 이벤트는 강력 제외
+          const cooldownTurns = Math.min(16, Math.max(4, Math.floor(state.history.length * 0.6)));
+          const recentEventTitles = state.history
+            .slice(-cooldownTurns)
+            .map((h) => h.event?.title)
+            .filter(Boolean) as string[];
 
-        availableEvents = basePool.filter((e) => !recentEventTitles.includes(e.title));
+          availableEvents = basePool.filter((e) => !recentEventTitles.includes(e.title));
 
-        // 혹시 8턴 이내에도 남은 이벤트가 부족하면 직전 턴 이벤트라도 연속으로 뜨지 않도록 방지
-        if (availableEvents.length === 0 && state.history.length > 0) {
-          const lastTitle = state.history[state.history.length - 1]?.event?.title;
-          availableEvents = basePool.filter((e) => e.title !== lastTitle);
+          // 여전히 없으면 가장 오래전에 등장했던 이벤트 순으로 정렬하여 선택 (가장 오랫동안 안 본 이벤트)
+          if (availableEvents.length === 0) {
+            const eventLastTurnMap = new Map<string, number>();
+            state.history.forEach((h, idx) => {
+              if (h.event?.title) {
+                eventLastTurnMap.set(h.event.title, idx);
+              }
+            });
+            const sortedByOldest = [...basePool].sort((a, b) => {
+              const aTurn = eventLastTurnMap.get(a.title) ?? -1;
+              const bTurn = eventLastTurnMap.get(b.title) ?? -1;
+              return aTurn - bTurn;
+            });
+            const poolSize = Math.max(1, Math.min(3, Math.floor(sortedByOldest.length / 2)));
+            availableEvents = sortedByOldest.slice(0, poolSize);
+          }
         }
-      }
-      
-      const selectedScenario = state.scenario || 'standard';
-      if (selectedScenario !== 'standard' && SCENARIO_EVENTS[selectedScenario]) {
-        const priorityIds = SCENARIO_EVENTS[selectedScenario];
-        const priorityEvents = availableEvents.filter(e => priorityIds.includes(e.id));
-        if (priorityEvents.length > 0) {
-          availableEvents = priorityEvents;
+        
+        // 6. 시나리오 가중치 적용
+        const selectedScenario = state.scenario || 'standard';
+        if (selectedScenario !== 'standard' && SCENARIO_EVENTS[selectedScenario]) {
+          const priorityIds = SCENARIO_EVENTS[selectedScenario];
+          const priorityEvents = availableEvents.filter(e => priorityIds.includes(e.id));
+          if (priorityEvents.length > 0) {
+            availableEvents = priorityEvents;
+          }
         }
       }
 
       if (availableEvents.length > 0) {
         triggeredEvent = rng.choice(availableEvents);
+      } else if (basePool.length > 0) {
+        triggeredEvent = rng.choice(basePool);
       } else {
-        triggeredEvent = rng.choice(basePool.length > 0 ? basePool : EVENTS);
+        triggeredEvent = rng.choice(EVENTS);
       }
     }
 
