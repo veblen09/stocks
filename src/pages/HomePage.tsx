@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Landmark, Compass, HelpCircle, BookOpen, ChevronRight, X, QrCode } from 'lucide-react';
+import { Landmark, Compass, HelpCircle, BookOpen, ChevronRight, X } from 'lucide-react';
 import { GlassCard } from '../components/GlassCard';
 import { HeroBackground } from '../components/HeroBackground';
 import { EducationNotice } from '../components/EducationNotice';
 import { audioManager } from '../utils/audioManager';
 import { AnimatedCharacterGuide } from '../components/AnimatedCharacterGuide';
-import { QRCodeModal } from '../components/QRCodeModal';
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
@@ -13,7 +12,6 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [showGuide, setShowGuide] = useState(false);
-  const [showQRModal, setShowQRModal] = useState(false);
 
   return (
     <HeroBackground
@@ -70,16 +68,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <BookOpen size={16} /> 수업 모드
                 </span>
                 <ChevronRight size={16} className="transform group-hover:translate-x-1 transition" />
-              </button>
-
-              <button
-                onClick={() => { audioManager.playSound('click'); setShowQRModal(true); }}
-                className="w-full py-2.5 px-5 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-900 font-extrabold rounded-2xl border border-indigo-200/80 transition flex items-center justify-between group transform active:scale-98 text-xs cursor-pointer shadow-sm"
-              >
-                <span className="flex items-center gap-2">
-                  <QrCode size={16} className="text-indigo-600 animate-pulse" /> 📱 스마트폰 어플 접속 QR코드
-                </span>
-                <ChevronRight size={14} className="text-indigo-500 transform group-hover:translate-x-1 transition" />
               </button>
 
               <button
@@ -160,9 +148,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </GlassCard>
         </div>
       )}
-
-      {/* QR Code Modal for Mobile App Mode */}
-      <QRCodeModal isOpen={showQRModal} onClose={() => setShowQRModal(false)} />
     </HeroBackground>
   );
 };
