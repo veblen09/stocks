@@ -12,7 +12,6 @@ import {
   Calendar,
   AlertTriangle,
   HelpCircle,
-  TrendingUp,
   ShoppingCart,
   Layers,
 } from 'lucide-react';
@@ -460,25 +459,25 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                   <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
                     <div className="text-xs text-slate-400 mb-1">직전 1년 수익률</div>
                     <div className={`text-base font-bold ${stats.last1YrReturn !== null && stats.last1YrReturn >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
-                      {formatPercent(stats.last1YrReturn)}
+                      {stats.last1YrReturn === null ? '-' : formatPercent(stats.last1YrReturn)}
                     </div>
                   </div>
                   <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
                     <div className="text-xs text-slate-400 mb-1">과거 3년 CAGR</div>
                     <div className={`text-base font-bold ${stats.past3YrCAGR !== null && stats.past3YrCAGR >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
-                      {formatPercent(stats.past3YrCAGR)}
+                      {stats.past3YrCAGR === null ? '-' : formatPercent(stats.past3YrCAGR)}
                     </div>
                   </div>
                   <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
                     <div className="text-xs text-slate-400 mb-1">과거 연간 변동성</div>
                     <div className="text-base font-bold text-slate-200">
-                      {formatPercent(stats.historicalVolatility)}
+                      {stats.historicalVolatility === null ? '-' : formatPercent(stats.historicalVolatility)}
                     </div>
                   </div>
                   <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
                     <div className="text-xs text-slate-400 mb-1">과거 최대낙폭 (MDD)</div>
                     <div className="text-base font-bold text-amber-400">
-                      {formatPercent(stats.historicalMDD)}
+                      {stats.historicalMDD === null ? '-' : formatPercent(stats.historicalMDD)}
                     </div>
                   </div>
                 </div>

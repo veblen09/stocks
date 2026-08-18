@@ -145,8 +145,6 @@ export function getCompanyOverviewAtYear(
 ): CompanyOverviewAtYear {
   const stock = STOCKS_BY_ID[canonicalCompanyId];
   const aliases = getCompanyAliases(canonicalCompanyId);
-  const cutoff = getDecisionCutoffDate(year);
-
   // Find active alias at year Y
   const yDate = `${year}-01-01`;
   const activeAlias = aliases.find(a => {

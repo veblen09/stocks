@@ -404,6 +404,15 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
 interface StockGameContextType {
   state: StockGameState;
   dispatch: React.Dispatch<Action>;
+  startNewGame: (settings: GameSettings) => void;
+  buyStock: (canonicalId: string, amountKRW: number, rationale?: Partial<TradeRationale>) => void;
+  sellStock: (canonicalId: string, shares: number, rationale?: Partial<TradeRationale>) => void;
+  stepOneYear: () => void;
+  runAutoInvest: (rule: AutoInvestRule, years: 5 | 10 | 'ALL') => void;
+  saveAutoInvestRule: (rule: AutoInvestRule) => void;
+  deleteAutoInvestRule: (id: string) => void;
+  undoYear: () => void;
+  resetGame: () => void;
 }
 
 const StockGameContext = createContext<StockGameContextType | undefined>(undefined);
@@ -445,8 +454,66 @@ export function StockGameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state]);
 
+  const startNewGame = (settings: GameSettings) => {
+    dispatch({ type: 'START_GAME', payload: settings });
+  };
+
+  const buyStock = (
+    canonicalId: string,
+    amountKRW: number,
+    rationale?: Partial<TradeRationale>
+  ) => {
+    dispatch({ type: 'BUY_STOCK', payload: { canonicalId, amountKRW, rationale } });
+  };
+
+  const sellStock = (
+    canonicalId: string,
+    shares: number,
+    rationale?: Partial<TradeRationale>
+  ) => {
+    dispatch({ type: 'SELL_STOCK', payload: { canonicalId, shares, rationale } });
+  };
+
+  const stepOneYear = () => {
+    dispatch({ type: 'STEP_ONE_YEAR' });
+  };
+
+  const runAutoInvest = (rule: AutoInvestRule, years: 5 | 10 | 'ALL') => {
+    dispatch({ type: 'RUN_AUTO_INVEST', payload: { rule, years } });
+  };
+
+  const saveAutoInvestRule = (rule: AutoInvestRule) => {
+    dispatch({ type: 'SAVE_AUTO_INVEST_RULE', payload: rule });
+  };
+
+  const deleteAutoInvestRule = (id: string) => {
+    dispatch({ type: 'DELETE_AUTO_INVEST_RULE', payload: id });
+  };
+
+  const undoYear = () => {
+    dispatch({ type: 'UNDO_YEAR' });
+  };
+
+  const resetGame = () => {
+    dispatch({ type: 'RESET_GAME' });
+  };
+
   return (
-    <StockGameContext.Provider value={{ state, dispatch }}>
+    <StockGameContext.Provider
+      value={{
+        state,
+        dispatch,
+        startNewGame,
+        buyStock,
+        sellStock,
+        stepOneYear,
+        runAutoInvest,
+        saveAutoInvestRule,
+        deleteAutoInvestRule,
+        undoYear,
+        resetGame,
+      }}
+    >
       {children}
     </StockGameContext.Provider>
   );

@@ -27,7 +27,7 @@ export const NeutralNewsAnalysisModal: React.FC<NeutralNewsAnalysisModalProps> =
 }) => {
   if (!newsItem) return null;
 
-  const { neutralAnalysis, sourceName, sourceUrl, sourceType, evidenceLevel, publishedAt, titleKo } = newsItem;
+  const { neutralAnalysis, sourceName, sourceUrl, evidenceLevel, publishedAt, titleKo } = newsItem;
 
   return (
     <div
