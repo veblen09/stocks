@@ -26,6 +26,13 @@ export interface Choice {
     credit?: number;   // 신용대출 변화량 (만 원)
     mortgage?: number; // 담보대출 변화량 (만 원)
   };
+  liquidateAssets?: string[]; // 전액 매도/현금화할 자산 ID 목록
+  liquidateCategory?: 'equity' | 'savings' | 'all'; // 전액 매도/현금화할 카테고리 (예: 모든 주식/ETF)
+  transferAllocation?: {
+    from: string[]; // 인출할 자산 ID 목록
+    to: { [targetAssetId: string]: number }; // 분배 배분할 자산 및 가중치 비율
+    ratio?: number; // 이동시킬 비율 (기본 0.5 = 50%)
+  };
   houseRegion?: string; // 신규: 구입한 지역 (예: 'gangnam', 'mapo' 등)
   scoreChange?: {
     emergency?: number; // 비상금 점수 영향

@@ -273,7 +273,7 @@ export const AssetAllocationPanel: React.FC = () => {
     getCategoryData('debt', '국채·채권형 펀드', '국가 및 우량 기업 채권', ['bond'], 'slate', '연 4.5%', 3, '안정적 이자'),
     getCategoryData('gold', '실물 금 (골드)', '인플레이션 방어 안전 실물', ['gold'], 'amber', '연 3.0%', 4, '물가 헤지'),
     getCategoryData('pension', '연금저축·IRP', '매년 세액공제 및 노후 연금', ['pension'], 'emerald', '연 5.0%', 3, '연말정산 절세'),
-    getCategoryData('housing', '주택청약 종합저축', '새 아파트 분양권 및 청약 가점', ['housing'], 'pink', '연 2.5%', 1, state.isHousingActive ? '자동납입 중' : '납입 유예'),
+    getCategoryData('housing', '주택청약 종합저축', allocations['house'] > 0 ? '청약 당첨 완료 (내 집 마련 성공)' : '새 아파트 분양권 및 청약 가점', ['housing'], 'pink', '연 2.5%', 1, allocations['house'] > 0 ? '당첨 완료(해지)' : state.isHousingActive ? '자동납입 중' : '납입 유예'),
     getCategoryData('real_estate', '부동산 자산', '전월세 보증금 및 실물 주택', ['rent_deposit', 'house'], 'indigo', '연 0%~4.0%', 3, allocations['house'] > 0 ? '자가 주택 소유' : '임차/무주택', true),
   ];
 

@@ -1,5 +1,6 @@
 import type { Scores, GameState } from '../types/finance';
-
+import { calculateTotalInvested, calculateCumulativeReturn } from '../utils/financeCalculations';
+import { EVENTS } from '../data/events';
 
 /**
  * 게임 종료 후 학생의 투자 점수 및 자산관리 유형을 진단하는 로직
@@ -8,14 +9,14 @@ export function calculateFinalScores(state: GameState): Scores {
   const { history, initialAsset } = state;
   const lastTurn = history[history.length - 1];
   const finalNetWorth = lastTurn.netWorth;
-  const startNetWorth = initialAsset;
+  const totalInvested = calculateTotalInvested(state);
   
-  // 1. 누적 수익률 (%)
-  const cumulativeReturn = parseFloat((((finalNetWorth - startNetWorth) / startNetWorth) * 100).toFixed(2));
+  // 1. 누적 수익률 (%) - 총 투입 원금 대비 순자산 성장률
+  const cumulativeReturn = calculateCumulativeReturn(finalNetWorth, totalInvested);
   
   // 2. 최대 낙폭 MDD (%)
   // 턴별 최고 순자산 대비 낙폭 계산
-  let peak = startNetWorth;
+  let peak = initialAsset;
   let maxDrawdown = 0;
   history.forEach((h) => {
     if (h.netWorth > peak) {
@@ -34,7 +35,6 @@ export function calculateFinalScores(state: GameState): Scores {
   let cashSafeTurns = 0;
   const emergencyThreshold = 300; // 300만 원 (비상금 하한선)
   history.forEach((h) => {
-    // h.allocation['cash'] 가 300만원 이상인지 확인
     const cashVal = h.allocation['cash'] || 0;
     if (cashVal >= emergencyThreshold) {
       cashSafeTurns++;
@@ -56,17 +56,11 @@ export function calculateFinalScores(state: GameState): Scores {
     totalHhi += hhi;
   });
   const avgHhi = totalHhi / history.length;
-  // HHI가 0.2 이하(매우 균등)면 100점, 0.8 이상(한 자산 몰빵)이면 20점 수준으로 맵핑
-  // 분산투자 점수 = (1 - avgHhi) * 120. (최대 100점 제한)
+  // 분산투자 점수 = (1 - avgHhi) * 130 (최대 100점 제한)
   const diversificationScore = Math.max(0, Math.min(100, Math.round((1 - avgHhi) * 130)));
 
   // 5. 장기투자 점수 (0 ~ 100)
-  // - 연금저축/IRP를 유지했는지 (기여 비중 및 해지 안 했는지)
-  // - 주택청약을 중도 해지하지 않고 꾸준히 유지했는지
-  // - 주식 시장 폭락 시 뇌동매매를 참아냈는지 (이벤트 선택지 가중치 합산)
   let longTermVal = 60; // 기본 60점 출발
-  
-  // 연금저축 및 청약의 종말 시점 존재 여부 및 평균 비중 확인
   let pensionSum = 0;
   let housingSum = 0;
   history.forEach((h) => {
@@ -79,20 +73,23 @@ export function calculateFinalScores(state: GameState): Scores {
 
   if (avgPension > 0) longTermVal += 15;
   if (avgHousing > 0) longTermVal += 15;
-  
-
-
-  // 최종 장기투자 점수
   const longTermScore = Math.max(0, Math.min(100, longTermVal));
 
-
-
-  // 자산관리 유형(아키타입) 판정 로직
-  let archetype = ARCHETYPES.balanced; // 기본은 균형 잡힌 자산관리자
+  // 6. 현명한 금융 의사결정 점수 (0 ~ 100)
+  let sumDecision = 50;
+  history.forEach((h) => {
+    if (h.event?.choiceMade) {
+      const eventMatch = EVENTS.find(e => e.title === h.event?.title);
+      const choiceMatch = eventMatch?.choices.find(c => c.text === h.event?.choiceMade);
+      if (choiceMatch?.scoreChange?.decision) {
+        sumDecision += choiceMatch.scoreChange.decision;
+      }
+    }
+  });
+  const decisionScore = Math.max(0, Math.min(100, sumDecision));
 
   // 각 자산군의 평균 비중 연산
   const avgAllocationPercent: { [assetId: string]: number } = {};
-  
   let totalSumOfAllTurns = 0;
   const sumAllocations: { [assetId: string]: number } = {};
   
@@ -114,34 +111,42 @@ export function calculateFinalScores(state: GameState): Scores {
                    (avgAllocationPercent['stock_hyundai'] || 0) +
                    (avgAllocationPercent['stock_apple'] || 0) +
                    (avgAllocationPercent['stock_nvidia'] || 0) +
-                   (avgAllocationPercent['stock_tesla'] || 0);
+                   (avgAllocationPercent['stock_tesla'] || 0) +
+                   (avgAllocationPercent['stock_nokia'] || 0) +
+                   (avgAllocationPercent['stock_blackberry'] || 0);
   const koreaEtfAvg = avgAllocationPercent['korea_etf'] || 0;
   const globalEtfAvg = avgAllocationPercent['global_etf'] || 0;
   const cashAvg = avgAllocationPercent['cash'] || 0;
   const savingAvg = avgAllocationPercent['saving'] || 0;
   const depositAvg = avgAllocationPercent['deposit'] || 0;
   const pensionAvg = avgAllocationPercent['pension'] || 0;
+  const houseAvg = avgAllocationPercent['house'] || 0;
 
-  // 유형 분류 조건
+  // 자산관리 유형(아키타입) 판정 로직
+  let archetype = ARCHETYPES.balanced;
+
   if (finalNetWorth <= 0) {
-    archetype = ARCHETYPES.bankrupt; // 대출연체 파산자 (순자산 음수 및 부채 과다)
+    archetype = ARCHETYPES.bankrupt; // 🚨 대출연체 파산자 (순자산 음수 및 부채 과다)
+  } else if (houseAvg >= 45 || (houseAvg >= 25 && diversificationScore <= 35)) {
+    archetype = ARCHETYPES.realestate_allin; // 🏢 부동산 영끌 집중형 (부동산 비중 과다 및 분산력 결여)
+  } else if (decisionScore <= 35) {
+    archetype = ARCHETYPES.impulsive; // ⚡ 충동적 승부사형 (반복된 충동 소비/위험 선택)
   } else if (stockAvg >= 30) {
-    archetype = ARCHETYPES.speculative; // 테마주 과몰입형 (개별주 비중 30% 이상)
-  } else if (stockAvg + globalEtfAvg + koreaEtfAvg >= 65) {
-    archetype = ARCHETYPES.adventure; // 위험추구형 모험가 (전체 주식형 비중 65% 이상)
-  } else if (cashAvg + savingAvg + depositAvg >= 70) {
-    archetype = ARCHETYPES.safe; // 안정적 계획가 (현금+예적금 비중 70% 이상)
+    archetype = ARCHETYPES.speculative; // 🔥 테마주 과몰입형 (개별주 비중 30% 이상)
+  } else if (stockAvg + globalEtfAvg + koreaEtfAvg >= 60) {
+    archetype = ARCHETYPES.adventure; // 🚀 위험추구형 모험가 (전체 주식형 비중 60% 이상)
+  } else if (cashAvg + savingAvg + depositAvg >= 65) {
+    archetype = ARCHETYPES.safe; // 🛡️ 안정적 계획가 (현금+예적금 비중 65% 이상)
   } else if (cashAvg <= 5 && emergencyFundScore < 40) {
-    archetype = ARCHETYPES.cashless; // 현금부족형 투자자 (평균 현금 비중 5% 이하)
-  } else if (koreaEtfAvg + globalEtfAvg + pensionAvg >= 45 && longTermScore >= 75) {
-    archetype = ARCHETYPES.growth; // 장기투자형 성장가 (ETF 및 연금 45% 이상 및 장기투자 고점)
-  } else if (cashAvg >= 30 && emergencyFundScore >= 80) {
-    archetype = ARCHETYPES.cushion; // 비상금 탄탄형 (현금성 자산 30% 이상)
+    archetype = ARCHETYPES.cashless; // 💸 현금부족형 투자자 (평균 현금 비중 5% 이하)
+  } else if (koreaEtfAvg + globalEtfAvg + pensionAvg >= 40 && longTermScore >= 70 && decisionScore >= 60) {
+    archetype = ARCHETYPES.growth; // 🌳 장기투자형 성장가 (ETF 및 연금 40% 이상 및 장기투자/의사결정 우수)
+  } else if (cashAvg >= 25 && emergencyFundScore >= 80) {
+    archetype = ARCHETYPES.cushion; // 🏦 비상금 탄탄형 (현금성 자산 25% 이상)
   } else {
-    archetype = ARCHETYPES.balanced; // 균형 잡힌 자산관리자
+    archetype = ARCHETYPES.balanced; // ⚖️ 균형 잡힌 자산관리자
   }
 
-  // 최종 누적 결정점수 보정 (gameStore에서 추적하므로 임시 대입 후 스토어 데이터로 오버라이드 예정)
   return {
     finalNetWorth: Math.round(finalNetWorth),
     cumulativeReturn,
@@ -149,12 +154,12 @@ export function calculateFinalScores(state: GameState): Scores {
     emergencyFundScore,
     diversificationScore,
     longTermScore,
-    decisionScore: 50, // 스토어의 누적값으로 최종 보정됨
+    decisionScore,
     archetype
   };
 }
 
-// 7가지 한국형 학생 자산관리 아키타입 정의
+// 9가지 한국형 학생 자산관리 아키타입 정의
 export const ARCHETYPES = {
   balanced: {
     name: '균형 잡힌 자산관리자',
@@ -165,6 +170,28 @@ export const ARCHETYPES = {
     questions: [
       '나만의 자산 배분 기준(예: 안전자산 vs 투자자산 비율)은 무엇이었나요?',
       '포트폴리오의 안정성이 심리적으로 어떤 도움을 주었나요?'
+    ]
+  },
+  realestate_allin: {
+    name: '부동산 영끌 집중형',
+    emoji: '🏢',
+    description: '자산의 대부분을 부동산(주택) 한 채에 집중하여 큰 자산을 형성했으나, 현금 유동성과 분산투자가 매우 취약한 외줄타기형 자산가입니다.',
+    pros: '부동산 상승장에서 강력한 레버리지와 시세 차익을 거두며 단숨에 자산 규모를 비약적으로 불리는 데 성공했습니다.',
+    cons: '자산의 대부분이 부동산에 묶여 있어 급한 유동성 위기(세금, 대출이자, 의료비)에 취약하며, 부동산 하락장이나 금리 급등 시 막대한 원리금 상환 압박과 원금 손실 위험에 노출됩니다.',
+    questions: [
+      '자산의 대부분이 부동산에 묶여 있을 때, 돌발적인 현금 지출 상황이 발생하면 어떻게 대처할 수 있을까요?',
+      '‘부동산 불패’ 이면에 숨겨진 ‘환금성(유동성) 부족’과 ‘금리 인상 리스크’를 어떻게 관리해야 할까요?'
+    ]
+  },
+  impulsive: {
+    name: '충동적 승부사형',
+    emoji: '⚡',
+    description: '충동적인 소비, 세금 체납, 무리한 영끌 베팅, 장기 상품 중도 해지 등 위험한 금융 의사결정을 반복한 고위험 승부사입니다.',
+    pros: '운이 따라줄 때는 과감한 베팅으로 높은 수익을 얻지만, 금융 기본기 부족으로 언제든 위기에 처할 수 있습니다.',
+    cons: '비상금 관리 실패, 장기 금융상품 중도 해지 페널티, 가산세 부담 등으로 인해 불필요한 자산 누수가 심각합니다.',
+    questions: [
+      '충동적인 소비나 세금 미납, 장기 저축 해지 등이 장기 복리 효과를 어떻게 갉아먹었나요?',
+      '감정에 휘둘리지 않고 원칙에 기반한 합리적 금융 의사결정을 내리려면 어떤 규칙이 필요할까요?'
     ]
   },
   safe: {

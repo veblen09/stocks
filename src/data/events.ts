@@ -10,7 +10,12 @@ const RAW_BASE_EVENTS: GameEvent[] = [
     choices: [
       {
         text: '정기예금과 적금 비중을 늘려 안정적인 이자 수익을 노린다.',
-        resultDescription: '예적금 자산 가치가 안정적으로 늘어나며, 금리 상승으로 인한 안전자산 선호가 반영됩니다. 한편, 금리 인상으로 주택담보대출 이자 부담이 커지면서 부동산 매수 심리가 얼어붙어 주택 가치가 하락했습니다.',
+        resultDescription: '투자 자산 및 현금의 30%를 정기예금(60%)과 적금(40%)으로 안전하게 이동시켰습니다. 금리 상승에 따라 예적금 자산 가치가 안정적으로 늘어나며 안전자산 비중을 확충했습니다.',
+        transferAllocation: {
+          from: ['cash', 'korea_etf', 'global_etf', 'bond'],
+          to: { deposit: 0.6, saving: 0.4 },
+          ratio: 0.3
+        },
         impact: {
           deposit: 0.02,
           saving: 0.01,
@@ -19,7 +24,7 @@ const RAW_BASE_EVENTS: GameEvent[] = [
           global_etf: -0.03,
           house: -0.05 // 금리 인상으로 주택 가격 하락
         },
-        scoreChange: { decision: 10, diversification: 5 }
+        scoreChange: { decision: 10, diversification: 10 }
       },
       {
         text: '주식이 많이 떨어졌으니 주식 ETF를 더 저렴하게 추가 매수(물타기)한다.',
@@ -45,14 +50,19 @@ const RAW_BASE_EVENTS: GameEvent[] = [
     choices: [
       {
         text: '낮아진 예금 대신 주식형 ETF와 채권형 펀드로 자금을 이동시킨다.',
-        resultDescription: '유동성 유입에 힘입어 주식형 ETF와 채권형 펀드의 평가액이 호조를 보입니다. 또한, 대출 금리가 인하됨에 따라 부동산 레버리지 수요가 늘어 소유한 주택 가치가 동반 상승했습니다.',
+        resultDescription: '예적금 및 유휴 현금 자산의 50%를 국내 ETF(40%), 글로벌 ETF(40%), 채권형 펀드(20%)로 이동하여 분산 매수했습니다. 유동성 유입에 힘입어 주식형 ETF와 채권형 펀드의 평가액이 호조를 보이며, 대출 금리 인하로 소유한 주택 가치도 동반 상승했습니다.',
+        transferAllocation: {
+          from: ['deposit', 'saving', 'cash'],
+          to: { korea_etf: 0.4, global_etf: 0.4, bond: 0.2 },
+          ratio: 0.5
+        },
         impact: {
           bond: 0.04, // 금리가 내리면 채권 가격 상승
           korea_etf: 0.06,
           global_etf: 0.05,
           house: 0.08 // 금리 인하로 자산(부동산) 가격 상승
         },
-        scoreChange: { decision: 10, diversification: 5 }
+        scoreChange: { decision: 10, diversification: 15 }
       },
       {
         text: '수익률이 낮아지더라도 원금이 보장되는 정기예금을 그대로 고수한다.',
@@ -123,15 +133,19 @@ const RAW_BASE_EVENTS: GameEvent[] = [
       },
       {
         text: '불안감을 견디지 못하고 주식 자산을 모두 매도하여 현금화한다.',
-        resultDescription: '큰 손실 상태에서 자산을 매도하여 손실이 확정되었습니다. 금융 위기 확산으로 대출 연체 리스크 및 자산 매각 수요가 늘면서 실물 주택 가치도 급락했습니다.',
+        resultDescription: '큰 손실 상태에서 보유 주식과 ETF를 모두 매도(손절)하여 손실이 확정되었고, 매도 대금은 비상금/현금 통장으로 이체되었습니다. 금융 위기 확산으로 대출 연체 리스크 및 자산 매각 수요가 늘면서 실물 주택 가치도 급락했습니다.',
         impact: {
           korea_etf: -0.20,
           global_etf: -0.22,
           stock_samsung: -0.25,
           stock_nvidia: -0.38,
           stock_tesla: -0.42,
+          stock_apple: -0.20,
+          stock_hyundai: -0.20,
+          stock_skhynix: -0.30,
           house: -0.08
         },
+        liquidateCategory: 'equity',
         scoreChange: { longTerm: -20, decision: -10 }
       }
     ],
@@ -255,13 +269,14 @@ const RAW_BASE_EVENTS: GameEvent[] = [
       },
       {
         text: '인생 한 방이다! 기회를 놓치면 나만 벼락거지가 될 것 같아 현금의 대부분을 고위험 개별 주식에 쏟아붓는다.',
-        resultDescription: '매수 직후 뉴스가 허위로 밝혀지며 주가가 하한가를 쳤습니다. 고위험 개별 주식 자산이 크게 폭락하는 아픔을 겪습니다.',
+        resultDescription: '현금 300만 원을 털어 급등 테마주를 무리하게 매수했으나, 매수 직후 뉴스가 허위로 밝혀지며 주가가 하한가를 쳐 투자금(-300만 원)을 고스란히 날렸습니다. 또한 고위험 개별 기술주 자산들도 동반 급락하는 큰 타격을 입었습니다.',
+        cashChange: -300,
         impact: {
           stock_skhynix: -0.30,
           stock_nvidia: -0.40,
           stock_tesla: -0.45
         },
-        scoreChange: { decision: -25, diversification: -20, longTerm: -15 }
+        scoreChange: { decision: -25, diversification: -20, longTerm: -15, emergency: -10 }
       }
     ],
     lesson: '신뢰할 수 없는 정보나 루머에 흔들려 남을 따라 사는 매매 행동을 "뇌동매매"라고 합니다. 테마주는 급격히 오르는 만큼 순식간에 폭락하여 막대한 원금 손실을 유발하므로 철저한 경계가 필요합니다.',
@@ -382,7 +397,7 @@ const RAW_BASE_EVENTS: GameEvent[] = [
         scoreChange: { longTerm: 20, decision: 10 }
       },
       {
-        text: '기다리는 것이 너무 지루하다. 주식을 정리하고 변동성이 매우 큰 고위험 개별주로 몰빵 이직한다.',
+        text: '기다리는 것이 너무 지루하다. 우량주를 정리하고 변동성이 매우 큰 고위험 개별주로 전액 갈아탄다.',
         resultDescription: '시장의 급등락에 하루하루 심장이 뛰고 불면증에 시달립니다. 잦은 매매로 수수료만 지출됩니다.',
         impact: {
           stock_nvidia: -0.20,
@@ -396,13 +411,13 @@ const RAW_BASE_EVENTS: GameEvent[] = [
   },
   {
     id: 'housing_subscription_chance',
-    title: '3기 신도시 로또 아파트 청약 도전 및 당첨!',
-    description: '축하합니다! 그동안 집을 소유하지 않고 유지해 오신 무주택 기간, 나이와 생애주기에 따른 가점(30대 결혼 배우자 가점 + 35세 자녀 부양가족 가점), 그리고 꾸준히 납입해 오신 주택청약 종합저축 통장 실적(84점 만점 고득점)이 모두 인정되어 3기 신도시 아파트 청약에 최종 당첨되었습니다! 청약 분양 특혜로 주변 시세보다 20%~30% 저렴한 "분양가 상한제" 특혜 가격에 내 집을 마련하여 억대 시세 차익 혜택을 누릴 대박 기회입니다. 아래 지역 중 어느 곳의 아파트를 분양받으시겠습니까?',
+    title: '신규 분양 아파트 청약 당첨 및 계약 기회',
+    description: '그동안 집을 소유하지 않고 무주택 기간과 부양가족 가점을 유지하며, 주택청약종합저축 통장을 꾸준히 납입해 온 결과 신규 아파트 청약에 최종 당첨되었습니다! 분양가와 주변 시세, 본인의 대출 상환 여력을 종합적으로 고려하여 분양 계약을 체결할 지역을 선택하십시오.',
     affectedAssets: ['housing', 'cash', 'house', 'rent_deposit'],
     choices: [
       {
-        text: '[서울 강남 3기 신도시] 분양가 6.0억 원 (주변 시세 8.5억 대비 2.5억 시세 차익 혜택!)',
-        resultDescription: '대한민국 최선호 입지 서울 강남 분양권을 취득했습니다! 주변 시세 8억 5,000만 원 대비 2억 5,000만 원 저렴한 6.0억 원 분양가로 매입하여 당첨 즉시 2.5억 원의 시세 차익 혜택을 획득했습니다. (주택청약 통장은 자동 해지되어 본금 전액 자금에 충당되었으며, 주택담보대출 4.2억, 신용대출 1.0억이 실행되었습니다)',
+        text: '[서울 강남권 분양] 분양가 6.0억 원 (주변 시세 8.5억 원 수준)',
+        resultDescription: '서울 강남권 분양권을 취득했습니다. 분양가 6.0억 원으로 매입하여 입주 권리를 확보했습니다. (주택청약 통장은 자동 해지되어 본금 전액이 계약금에 충당되었으며, 주택담보대출 4.2억, 신용대출 1.0억이 실행되었습니다)',
         flatAssetChange: {
           house: 85000,
           rent_deposit: -99999,
@@ -416,8 +431,8 @@ const RAW_BASE_EVENTS: GameEvent[] = [
         scoreChange: { decision: 30, longTerm: 25 }
       },
       {
-        text: '[서울 마포/성동] 분양가 3.8억 원 (주변 시세 5.2억 대비 1.4억 시세 차익 혜택!)',
-        resultDescription: '도심 접근성이 뛰어난 서울 마포 아파트를 취득했습니다! 주변 시세 5억 2,000만 원 대비 1억 4,000만 원 저렴한 3.8억 원 분양가로 당첨되어 시세 차익 혜택을 확보했습니다. (주택청약 통장은 해지 후 자금에 충당되었으며, 주택담보대출 2.6억, 신용대출 6,000만 원이 실행되었습니다)',
+        text: '[서울 마포/성동 분양] 분양가 3.8억 원 (주변 시세 5.2억 원 수준)',
+        resultDescription: '서울 마포/성동 아파트 분양권을 취득했습니다. 분양가 3.8억 원으로 매입하여 도심권 내 집 마련을 달성했습니다. (주택청약 통장은 해지 후 자금에 충당되었으며, 주택담보대출 2.6억, 신용대출 6,000만 원이 실행되었습니다)',
         flatAssetChange: {
           house: 52000,
           rent_deposit: -99999,
@@ -431,8 +446,8 @@ const RAW_BASE_EVENTS: GameEvent[] = [
         scoreChange: { decision: 25, longTerm: 20 }
       },
       {
-        text: '[경기 분당/판교] 분양가 2.6억 원 (주변 시세 3.6억 대비 1.0억 시세 차익 혜택!)',
-        resultDescription: '주거 만족도가 높은 1기 신도시 경기 분당 아파트를 취득했습니다! 주변 시세 3억 6,000만 원 대비 1억 원 저렴한 2.6억 원 분양가에 당첨되어 시세 차익을 거두었습니다. (주택담보대출 1.8억, 신용대출 4,000만 원 실행)',
+        text: '[경기 1기 신도시 (분당/판교)] 분양가 2.6억 원 (주변 시세 3.6억 원 수준)',
+        resultDescription: '경기 분당/판교 아파트 분양권을 취득했습니다. 분양가 2.6억 원으로 신도시 내 집 마련에 성공했습니다. (주택청약 통장은 해지 후 자금에 충당되었으며, 주택담보대출 1.8억, 신용대출 4,000만 원이 실행되었습니다)',
         flatAssetChange: {
           house: 36000,
           rent_deposit: -99999,
@@ -446,8 +461,8 @@ const RAW_BASE_EVENTS: GameEvent[] = [
         scoreChange: { decision: 20, longTerm: 15 }
       },
       {
-        text: '[경기 외곽 신도시] 분양가 1.5억 원 (주변 시세 2.0억 대비 5,000만 시세 차익 혜택!)',
-        resultDescription: '자금 부담이 가장 적은 경기 외곽 아파트를 취득했습니다! 주변 시세 2억 원 대비 5,000만 원 저렴한 1.5억 원 분양가로 매입하여 주거 안정을 달성했습니다. (주택담보대출 1.0억, 신용대출 2,000만 원 실행)',
+        text: '[수도권 3기 신도시 공공분양] 분양가 1.5억 원 (주변 시세 2.0억 원 수준)',
+        resultDescription: '수도권 3기 신도시 공공분양 아파트를 취득했습니다. 분양가 1.5억 원으로 안정적인 보금자리를 마련했습니다. (주택청약 통장은 해지 후 자금에 충당되었으며, 주택담보대출 1.0억, 신용대출 2,000만 원이 실행되었습니다)',
         flatAssetChange: {
           house: 20000,
           rent_deposit: -99999,
@@ -461,13 +476,13 @@ const RAW_BASE_EVENTS: GameEvent[] = [
         scoreChange: { decision: 15, longTerm: 10 }
       },
       {
-        text: '대출 이자 부담과 자금 여력이 불안하므로 이번 청약 당첨 기회를 포기한다.',
-        resultDescription: '청약 당첨 기회를 미루고 가점과 청약 통장 잔액을 그대로 보전합니다.',
+        text: '대출 이자 부담과 자금 여력을 고려하여 이번 청약 당첨을 포기한다.',
+        resultDescription: '대출 상환 부담을 고려하여 이번 청약 당첨을 포기하고 기존 저축·투자 상태를 유지합니다.',
         scoreChange: { decision: 5, longTerm: -5 }
       }
     ],
-    lesson: '주택청약 종합저축은 무주택 서민에게 주변 시세보다 20%~30% 이상 저렴한 "분양가 상한제" 특혜 가격으로 새 아파트를 우선 분양해 주는 대한민국 고유의 내 집 마련 제도입니다. 집을 사지 않은 무주택 기간이 길어지고, 나이가 들며 결혼 및 자녀(부양가족)가 생길수록 청약 가점(84점 만점)이 상승하여 핵심 입지 분양 당첨 확률과 억대 시세 차익 혜택이 극대화됩니다.',
-    discussionQuestion: '무주택 기간과 부양가족(결혼, 자녀)에 따라 청약 가점을 부여하는 한국의 주택 청약 제도는 왜 도입되었을까요?'
+    lesson: '주택청약 종합저축은 무주택자에게 시세 대비 경쟁력 있는 분양가로 새 아파트를 우선 분양받을 수 있도록 돕는 대한민국 고유의 내 집 마련 제도입니다. 무주택 기간, 납입 횟수, 부양가족 수 등에 따라 가점이 산정되며, 분양 당첨 시 자기자본과 대출 상환 여력을 신중히 계산하여 계약을 결정해야 합니다.',
+    discussionQuestion: '무주택 기간과 부양가족 수에 따라 청약 가점을 부여하는 한국의 주택청약 제도는 가계 안정에 어떤 의미가 있을까요?'
   },
   {
     id: 'buy_house_opportunity',
@@ -561,25 +576,25 @@ const RAW_BASE_EVENTS: GameEvent[] = [
   },
   {
     id: 'job_promotion',
-    title: '우수 사원 선정 및 급여 인상!',
-    description: '회사에서 성과를 인정받아 급여가 영구적으로 인상되었습니다. 매 분기 들어오는 고정 소득이 늘어나 투자 여력이 크게 확장되었습니다.',
+    title: '우수 사원 선정 및 특별 성과급(보너스) 지급!',
+    description: '회사에서 뛰어난 업무 성과를 인정받아 특별 인센티브 성과급 200만 원이 지급되었습니다! 뜻밖의 보너스 목돈이 생겼을 때, 이 자금을 어떻게 활용하시겠습니까?',
     affectedAssets: ['cash'],
     choices: [
       {
-        text: '증가한 소득의 70%는 눈감고 바로 저축 및 정기 투자금으로 자동 이체 설정한다.',
-        resultDescription: '늘어난 소득이 소비로 이어지지 않고 고스란히 자산 불리기의 시드머니로 연결되어 스노볼이 굴러갑니다.',
+        text: '성과급 200만 원 전액을 소비하지 않고 시드머니(비상금/투자금)로 고스란히 저축·투자한다.',
+        resultDescription: '특별 성과급 200만 원이 비상금 통장으로 전액 입금되었습니다. 라이프스타일 인플레이션(소비 팽창)을 억제하고 자산 스노볼을 굴리는 훌륭한 결정을 내렸습니다.',
         cashChange: 200,
         scoreChange: { decision: 15, longTerm: 15 }
       },
       {
-        text: '고생한 나를 위한 보상! 명품 가방을 사고 매달 외식비를 늘려 품위 유지를 한다.',
-        resultDescription: '일시적인 짜릿함은 있었으나 소비 기준이 한 단계 높아져 저축액은 급여 인상 전과 거의 동일해졌습니다.',
+        text: '고생한 나를 위한 보상! 명품 구매와 외식비로 150만 원을 소비하고 남은 50만 원만 입금한다.',
+        resultDescription: '성과급 200만 원 중 150만 원을 소비하여 일시적 만족을 누렸으나, 자산을 불릴 소중한 시드머니 기회를 소진했습니다. (50만 원만 비상금 입금)',
         cashChange: 50,
         scoreChange: { decision: -10, longTerm: -10 }
       }
     ],
-    lesson: '소득이 늘어남에 따라 소비 수준도 같이 높이는 현상을 "라이프스타일 인플레이션"이라고 합니다. 소비 수준을 통제하고 증가한 소득 대부분을 투자로 직행시키는 것이 자산 형성 속도를 몇 배로 빠르게 만드는 비결입니다.',
-    discussionQuestion: '소득이 올라갔을 때 생활 수준을 그대로 유지하는 것은 왜 극도로 어려울까요?'
+    lesson: '성과급이나 보너스 같은 비정기적 특별 소득이 생겼을 때, 이를 곧바로 소비 수준을 높이는 데 쓰지 않고 자산 증식의 시드머니로 활용하는 규율이 부의 축적 속도를 결정합니다. (라이프스타일 인플레이션 방지)',
+    discussionQuestion: '보너스나 성과급 같은 목돈이 생겼을 때 소비 충동을 통제하는 가장 좋은 방법은 무엇일까요?'
   },
   {
     id: 'gold_rush',
@@ -689,12 +704,18 @@ const RAW_BASE_EVENTS: GameEvent[] = [
     choices: [
       {
         text: '개별 기업의 비체계적 위험을 인정하고, 몰락하는 기업 주식을 즉시 과감히 전액 손절하여 시장 ETF 및 안전자산으로 리밸런싱한다.',
-        resultDescription: '기술 도태 기업의 추가 폭락(-95%) 전 손실을 고통스럽게 확정 짓고, 시장 지수 ETF로 분산 이동하여 남은 시드머니를 지켰습니다.',
+        resultDescription: '기술 도태 기업의 추가 폭락(-95%) 전 손실을 고통스럽게 확정 짓고, 남은 시드머니를 글로벌 ETF로 분산 이동하여 지켰습니다.',
         impact: {
           stock_nokia: -0.60,
           stock_blackberry: -0.65,
           global_etf: 0.05
         },
+        transferAllocation: {
+          from: ['stock_nokia', 'stock_blackberry'],
+          to: { global_etf: 0.7, korea_etf: 0.3 },
+          ratio: 1.0
+        },
+        liquidateAssets: ['stock_nokia', 'stock_blackberry'],
         scoreChange: { decision: 20, diversification: 25, longTerm: 15 }
       },
       {
@@ -826,12 +847,14 @@ const RAW_BASE_EVENTS: GameEvent[] = [
       },
       {
         text: '불안감에 휩싸여 정기예금과 주식 자산을 모두 중도 해지/손절하고 현금으로 인출한다.',
-        resultDescription: '손실을 확정 짓고 아까운 예금이자를 포기하여 공포에 의한 실수를 저질렀습니다.',
+        resultDescription: '손실을 확정 짓고 아까운 예금이자를 포기하여 공포에 의한 실수를 저질렀습니다. 해지금 및 매도 대금은 비상금/현금 통장으로 이체되었습니다.',
         impact: {
           korea_etf: -0.12,
           global_etf: -0.10
         },
-        cashChange: -100,
+        liquidateCategory: 'equity',
+        liquidateAssets: ['deposit'],
+        cashChange: -100, // 중도해지 페널티
         scoreChange: { decision: -20, longTerm: -15 }
       }
     ],
@@ -921,11 +944,12 @@ const RAW_BASE_EVENTS: GameEvent[] = [
       },
       {
         text: '유가 폭등으로 경제가 망할 것 같다는 뉴스 보도에 주식을 헐값에 모두 손절 매도한다.',
-        resultDescription: '원자재 파동의 일시적 충격을 견디지 못하고 손실을 최고조에서 확정 짓는 우를 범했습니다.',
+        resultDescription: '원자재 파동의 일시적 충격을 견디지 못하고 손실을 최고조에서 확정 짓는 우를 범했습니다. 매도된 주식 자금은 비상금/현금 통장으로 이체되었습니다.',
         impact: {
           korea_etf: -0.15,
           stock_hyundai: -0.18
         },
+        liquidateCategory: 'equity',
         scoreChange: { decision: -15, longTerm: -15 }
       }
     ],
@@ -1043,11 +1067,12 @@ const RAW_BASE_EVENTS: GameEvent[] = [
       },
       {
         text: '주가가 계속 떨어질 것 같은 공포에 견디지 못하고 최저점 구간에서 손절매를 단행한다.',
-        resultDescription: '공포심에 주식을 최저점에서 팔아 치워 향후 업황 회복 시 다가올 상승 혜택을 스스로 포기했습니다.',
+        resultDescription: '공포심에 반도체 주식을 최저점에서 전량 매도(손절)하여 매도 대금이 비상금/현금 통장으로 이체되었습니다. 향후 업황 회복 시 다가올 상승 혜택을 스스로 포기했습니다.',
         impact: {
           stock_samsung: -0.18,
           stock_skhynix: -0.25
         },
+        liquidateAssets: ['stock_samsung', 'stock_skhynix'],
         scoreChange: { longTerm: -20, decision: -15 }
       }
     ],

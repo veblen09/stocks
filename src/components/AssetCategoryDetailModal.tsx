@@ -370,43 +370,55 @@ export const AssetCategoryDetailModal: React.FC<AssetCategoryDetailModalProps> =
                     </div>
                   )
                 ) : asset.id === 'housing' ? (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5 text-left">
-                    <div className="flex justify-between items-center text-xs font-bold">
-                      <span className="text-slate-700">🎯 청약 자동 납입 관리</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${isHousingActive ? 'bg-emerald-100 text-emerald-700 font-bold' : 'bg-slate-200 text-slate-600'}`}>
-                        {isHousingActive ? '매월 10만 원 자동 납입 중' : '자동 납입 일시 정지됨'}
-                      </span>
+                  (state.allocations['house'] || 0) > 0 ? (
+                    <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2 text-left">
+                      <div className="flex justify-between items-center text-xs font-bold">
+                        <span className="text-emerald-800">🏠 청약 당첨 완료 (통장 해지)</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold">내 집 마련 성공</span>
+                      </div>
+                      <p className="text-xs text-slate-650 font-medium leading-relaxed">
+                        이미 아파트 청약에 당첨되어 내 집을 마련하셨습니다. 청약 통장 원금은 분양 계약금으로 전액 충당 및 효력이 종료되어 자동 납입이 완료(해지)되었습니다.
+                      </p>
                     </div>
+                  ) : (
+                    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5 text-left">
+                      <div className="flex justify-between items-center text-xs font-bold">
+                        <span className="text-slate-700">🎯 청약 자동 납입 관리</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${isHousingActive ? 'bg-emerald-100 text-emerald-700 font-bold' : 'bg-slate-200 text-slate-600'}`}>
+                          {isHousingActive ? '매월 10만 원 자동 납입 중' : '자동 납입 일시 정지됨'}
+                        </span>
+                      </div>
 
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={toggleHousingActive}
-                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition shadow-sm cursor-pointer ${
-                          isHousingActive 
-                            ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                            : 'bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-700'
-                        }`}
-                      >
-                        {isHousingActive ? '납입 일시 정지' : currentVal === 0 ? '청약 가입하기' : '자동 납입 재개'}
-                      </button>
-
-                      {currentVal > 0 && (
+                      <div className="flex gap-2">
                         <button
                           type="button"
-                          onClick={() => {
-                            if (window.confirm('🚨 청약 통장을 중도 해지하시겠습니까? 누적 금액은 환원되지만 청약 가점 점수는 완전히 소멸합니다.')) {
-                              liquidateHousing();
-                              onClose();
-                            }
-                          }}
-                          className="flex-1 py-2 px-3 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+                          onClick={toggleHousingActive}
+                          className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition shadow-sm cursor-pointer ${
+                            isHousingActive 
+                              ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                              : 'bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-700'
+                          }`}
                         >
-                          청약 전액 해지
+                          {isHousingActive ? '납입 일시 정지' : currentVal === 0 ? '청약 가입하기' : '자동 납입 재개'}
                         </button>
-                      )}
+
+                        {currentVal > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm('🚨 청약 통장을 중도 해지하시겠습니까? 누적 금액은 환원되지만 청약 가점 점수는 완전히 소멸합니다.')) {
+                                liquidateHousing();
+                                onClose();
+                              }
+                            }}
+                            className="flex-1 py-2 px-3 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+                          >
+                            청약 전액 해지
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )
                 ) : (
                   /* Normal Sliders & Controls */
                   <div className="space-y-2 pt-1">

@@ -1,6 +1,7 @@
 import type { GameState } from '../types/finance';
 import { calculateFinalScores } from '../engine/scoring';
 import { formatMoney } from './formatMoney';
+import { calculateTotalInvested, calculatePeerWorth } from './financeCalculations';
 
 /**
  * 브라우저에서 HTML 문자열을 파일로 다운로드합니다.
@@ -25,13 +26,8 @@ export function exportReportToHtml(state: GameState) {
   const { finalNetWorth, cumulativeReturn, maxDrawdown, emergencyFundScore, diversificationScore, longTermScore, decisionScore, archetype } = scores;
 
   // 원금 및 또래 평균 연산
-  const totalInvested = state.initialAsset + (state.currentTurn * state.halfYearSavings);
-  
-  let peerWorth = state.initialAsset;
-  for (let i = 0; i < state.currentTurn; i++) {
-    peerWorth = (peerWorth + state.halfYearSavings) * 1.0175;
-  }
-  const finalPeerWorth = Math.round(peerWorth);
+  const totalInvested = calculateTotalInvested(state);
+  const finalPeerWorth = calculatePeerWorth(state);
 
   // 엔딩 판단
   const richThreshold = Math.round(finalPeerWorth * 1.25);
@@ -47,11 +43,28 @@ export function exportReportToHtml(state: GameState) {
   let endingTag = '';
   let endingColorClass = '';
 
+  const peerDiffPercent = finalPeerWorth > 0 
+    ? Math.round(((finalNetWorth - finalPeerWorth) / finalPeerWorth) * 100)
+    : 0;
+
   if (finalNetWorth >= richThreshold || cumulativeReturn >= 40) {
-    endingTag = '👑 시장 초과 달성';
-    endingTitle = '경제적 자유 부자 엔딩';
-    endingDesc = `같은 또래 평균 자산(${formatMoney(finalPeerWorth)}) 대비 25% 이상 초과 달성하거나 누적 40% 이상의 높은 성과를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 철저한 자산 배분 원칙과 포트폴리오 리밸런싱을 바탕으로 장기 복리 효과의 과실을 완벽히 수확하셨습니다.`;
-    endingColorClass = '#059669';
+    const peerPerformanceText = peerDiffPercent > 0
+      ? `같은 또래 평균 자산(${formatMoney(finalPeerWorth)}) 대비 +${peerDiffPercent.toLocaleString()}%를 초과 달성하고 누적 +${cumulativeReturn}%의 성과`
+      : `누적 +${cumulativeReturn}%의 성과`;
+
+    const hasExtremeRisk = diversificationScore <= 35 || decisionScore <= 35 || emergencyFundScore <= 20;
+
+    if (hasExtremeRisk) {
+      endingTag = '👑 고수익 달성 (주의 요망)';
+      endingTitle = '위험 집중형 부자 엔딩';
+      endingDesc = `${peerPerformanceText}를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 다만 포트폴리오 분산력(${diversificationScore}점)과 금융 의사결정(${decisionScore}점), 비상금 관리(${emergencyFundScore}점) 면에서 극단적인 위험을 감수했습니다. 이번 시뮬레이션에서는 시장 환경과 시세 차익의 행운이 따랐으나, 현실에서는 하락장이나 금리 급등, 돌발 위기 시 심각한 유동성 경색과 원금 손실을 겪을 수 있습니다. 장기적으로 안전한 부를 지키기 위해선 분산 투자와 비상금 방어벽을 반드시 병행해야 합니다!`;
+      endingColorClass = '#d97706';
+    } else {
+      endingTag = '👑 시장 초과 달성';
+      endingTitle = '경제적 자유 부자 엔딩';
+      endingDesc = `${peerPerformanceText}를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 철저한 자산 배분 원칙과 포트폴리오 리밸런싱, 건전한 금융 의사결정을 바탕으로 장기 복리 효과의 과실을 완벽히 수확하셨습니다.`;
+      endingColorClass = '#059669';
+    }
   } else if (safeAssetPercent >= 75 && cumulativeReturn < 10) {
     endingTag = '💸 인플레이션 벼락거지';
     endingTitle = '보이지 않는 세금 손실 엔딩';

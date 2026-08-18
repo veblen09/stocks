@@ -43,6 +43,11 @@ export const CharacterGuideCard: React.FC = () => {
   const safeAssetVal = cashVal + depositVal + savingVal + housingVal;
   const safeAssetPercent = totalNetWorth > 0 ? (safeAssetVal / totalNetWorth) * 100 : 100;
 
+  // 대출 이자 계산
+  const totalLoanCredit = loans?.credit || 0;
+  const totalLoanMortgage = loans?.mortgage || 0;
+  const interestCost = parseFloat(((totalLoanCredit * 0.030) + (totalLoanMortgage * 0.0175)).toFixed(2));
+
   // 포트폴리오 위험 가중치
   let weightedRisk = 0;
   if (totalNetWorth > 0) {
@@ -57,25 +62,76 @@ export const CharacterGuideCard: React.FC = () => {
   const activeAssetsCount = Object.keys(allocations).filter(id => allocations[id] > 0 && id !== 'cash').length;
 
   // 피드백 메시지 생성
-  let adviceMessage = '이번 턴에는 남은 현금을 어디에 배분할지 생각해 볼까요? 오늘의 선택이 장기적으로 어떤 결과를 만들지 살펴봅시다.';
+  let adviceMessage = '이번 턴에는 가용 자금을 어디에 배분할지 신중하게 결정해 볼까요? 오늘의 선택이 장기 복리의 기초가 됩니다.';
   let currentMood: CharacterMood = 'idle';
 
+  const lastResult = state.lastEventResult;
+
   if (state.currentTurn > 0) {
-    if (emergencyMonths < 2) {
-      adviceMessage = '잠깐, 이 선택의 위험도 함께 생각해 볼까요? 비상금은 예상치 못한 지출에 대비하는 안전판이에요.';
-      currentMood = 'warning';
-    } else if (riskScore > 75) {
-      adviceMessage = '포트폴리오의 투자 위험도가 상당히 높습니다. 한 자산에만 몰리면 위험이 커질 수 있어요. 손실 가능성도 함께 생각해 보는 것이 중요해요.';
-      currentMood = 'warning';
-    } else if (safeAssetPercent > 90) {
-      adviceMessage = '이번 선택은 안정성을 높이는 데 도움이 될 수 있어요. 하지만 오늘의 선택이 장기적으로 어떤 결과를 만들지 살펴봅시다.';
-      currentMood = 'thinking';
-    } else if (activeAssetsCount <= 1 && totalNetWorth > 0) {
-      adviceMessage = '한 자산에만 몰리면 위험이 커질 수 있어요. 조금 더 분산하면 위험을 나누는 데 도움이 될 수 있어요.';
-      currentMood = 'thinking';
-    } else {
-      adviceMessage = '훌륭한 자산 포트폴리오를 구성하고 계십니다! 조금 더 분산하면 위험을 나누는 데 도움이 될 수 있어요. 장기적으로 살펴봅시다.';
-      currentMood = 'success';
+    // 1순위: 직전 이벤트 의사결정에 대한 입체적 맞춤 실시간 피드백
+    if (lastResult) {
+      const title = (lastResult.title || '').toLowerCase();
+      const choice = (lastResult.choiceText || '').toLowerCase();
+      const result = (lastResult.resultText || '').toLowerCase();
+
+      if (title.includes('차') || choice.includes('차') || choice.includes('suv') || choice.includes('계약')) {
+        currentMood = 'warning';
+        adviceMessage = '🚗 자동차 할부 구입으로 목돈(600만 원)과 매달 고정 지출이 늘어났네요! 자산 형성 초기에는 소비 지출을 방어하고 저축 여력을 지키는 것이 가장 중요해요.';
+      } else if (title.includes('사기') || title.includes('피싱') || title.includes('다단계') || choice.includes('사기') || choice.includes('혹하여')) {
+        if (result.includes('손실') || result.includes('날렸') || result.includes('지출')) {
+          currentMood = 'warning';
+          adviceMessage = '🥺 뼈아픈 손실이 발생했네요! "세상에 공짜 점심이나 원금보장 고수익은 없다"는 원칙을 교훈 삼아, 남은 종잣돈을 안전하게 재정비해 봐요.';
+        } else {
+          currentMood = 'success';
+          adviceMessage = '🛡️ 유사수신 사기 유혹을 훌륭하게 거절하셨어요! 원금을 지키는 것이 투자의 제1원칙입니다.';
+        }
+      } else if (title.includes('테마주') || choice.includes('테마주') || choice.includes('쏟아붓') || choice.includes('몰빵')) {
+        currentMood = 'warning';
+        adviceMessage = '⚡ 검증되지 않은 급등 테마주나 몰빵 투자는 치명적인 원금 손실을 부릅니다. 시장의 소음에 흔들리지 않는 원칙 투자가 필요해요.';
+      } else if (choice.includes('손절') || choice.includes('패닉') || choice.includes('헐값') || choice.includes('매도')) {
+        currentMood = 'warning';
+        adviceMessage = '📉 공포에 질려 최저점에서 손실을 확정 짓는 투매를 하셨군요. 우량 지수 자산이라면 하락장에서도 인내하며 장기적인 관점을 지켜야 해요.';
+      } else if (choice.includes('명품') || choice.includes('허세') || choice.includes('외식') || choice.includes('소비')) {
+        currentMood = 'thinking';
+        adviceMessage = '🛍️ 소비의 순간적 달콤함 뒤에는 시드머니 축적의 기회비용이 줄어들게 됩니다. 이번 턴에는 저축과 투자 자산에 먼저 배분해 볼까요?';
+      } else if (title.includes('청약') || title.includes('분양') || title.includes('내 집')) {
+        if (choice.includes('포기')) {
+          currentMood = 'thinking';
+          adviceMessage = '💡 대출 부담을 고려해 신중하게 청약을 보류하셨군요. 무리한 영끌을 피하고 시드머니를 더 모으는 것도 훌륭한 전략입니다.';
+        } else {
+          currentMood = 'event';
+          adviceMessage = '🏠 내 집 마련에 성공하셨네요! 축하드려요. 이제 매 턴 나가는 대출 이자 지출과 비상금 유동성 관리에 각별히 신경 써야 해요.';
+        }
+      } else if (choice.includes('물타기') || choice.includes('영끌')) {
+        currentMood = 'warning';
+        adviceMessage = '⚠️ 악재가 발생한 개별 종목에 비상금을 털어 물타기를 감행하는 것은 위험해요. 비체계적 위험을 피하려면 분산 투자가 필수입니다.';
+      } else if (result.includes('사수') || result.includes('방어') || result.includes('복리') || result.includes('인내') || result.includes('절세') || result.includes('지켰')) {
+        currentMood = 'success';
+        adviceMessage = '👏 탁월한 금융 의사결정이었습니다! 위기 앞에서도 원칙을 지키는 습관이 쌓여 장기 복리의 놀라운 열매를 만듭니다.';
+      }
+    }
+
+    // 2순위: 직전 이벤트 피드백이 기본값인 경우, 현재 포트폴리오 위험 상태 점검
+    if (adviceMessage.startsWith('이번 턴에는 가용 자금')) {
+      if (interestCost > 0 && cashVal < interestCost) {
+        currentMood = 'warning';
+        adviceMessage = `🚨 비상금 통장 잔액이 이번 턴 대출 이자(${formatMoney(interestCost)})보다 부족합니다! 이자가 연체되면 원금에 복리로 불어나 파산할 수 있으니 자산 매각이나 비상금 확충이 시급해요.`;
+      } else if (emergencyMonths < 2) {
+        currentMood = 'warning';
+        adviceMessage = `🛡️ 비상금이 부족합니다(현재 ${emergencyMonths}개월분). 돌발 의료비나 사고 발생 시 투자 자산을 헐값에 깨야 하니 비상금 통장부터 채워주세요.`;
+      } else if (riskScore > 75) {
+        currentMood = 'warning';
+        adviceMessage = '⚡ 포트폴리오의 고위험 개별주 비중이 너무 높습니다. 하락장이 오면 큰 타격을 입을 수 있으니 지수 ETF나 안전자산으로 나누어 담으세요.';
+      } else if (safeAssetPercent > 85) {
+        currentMood = 'thinking';
+        adviceMessage = '💰 자산의 대부분이 예적금과 현금에 묶여 있어요. 원금은 안전하지만 물가 상승(인플레이션)으로 실질 구매력이 줄어드니 우량 ETF 투자도 고려해 보세요.';
+      } else if (activeAssetsCount <= 1 && totalNetWorth > 0) {
+        currentMood = 'thinking';
+        adviceMessage = '💡 한두 가지 자산에만 집중되어 있어요. "계란을 한 바구니에 담지 말라"는 격언처럼 자산을 골고루 분산해 보세요.';
+      } else {
+        currentMood = 'success';
+        adviceMessage = '✨ 균형 잡힌 자산 포트폴리오를 잘 유지하고 계십니다! 시장 변동에 일희일비하지 않고 장기적인 목표를 향해 나아가 봅시다.';
+      }
     }
   }
 

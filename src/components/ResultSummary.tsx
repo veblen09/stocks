@@ -9,6 +9,7 @@ import { Check, RefreshCw, BarChart2, Share2, Clipboard, Wallet, TrendingUp, Ale
 import { audioManager } from '../utils/audioManager';
 import { AnimatedCharacterGuide } from './AnimatedCharacterGuide';
 import { exportReportToHtml } from '../utils/exportHtml';
+import { calculateTotalInvested, calculatePeerWorth } from '../utils/financeCalculations';
 
 export const ResultSummary: React.FC = () => {
   const { state, resetGame } = useGame();
@@ -27,13 +28,8 @@ export const ResultSummary: React.FC = () => {
   const { finalNetWorth, cumulativeReturn, maxDrawdown, emergencyFundScore, diversificationScore, longTermScore, decisionScore, archetype } = scores;
 
   // 원금 및 또래 평균 연산
-  const totalInvested = state.initialAsset + (state.currentTurn * state.halfYearSavings);
-  
-  let peerWorth = state.initialAsset;
-  for (let i = 0; i < state.currentTurn; i++) {
-    peerWorth = (peerWorth + state.halfYearSavings) * 1.0175;
-  }
-  const finalPeerWorth = Math.round(peerWorth);
+  const totalInvested = calculateTotalInvested(state);
+  const finalPeerWorth = calculatePeerWorth(state);
 
   // 특별 엔딩 판정 로직 (또래 평균 자산 및 투자 원금을 기준으로 자동 계산)
   const getEndingDetails = () => {
@@ -47,11 +43,31 @@ export const ResultSummary: React.FC = () => {
     const safeAssetVal = cashVal + depositVal + savingVal + housingVal;
     const safeAssetPercent = finalNetWorth > 0 ? (safeAssetVal / finalNetWorth) * 100 : 0;
 
+    const peerDiffPercent = finalPeerWorth > 0 
+      ? Math.round(((finalNetWorth - finalPeerWorth) / finalPeerWorth) * 100)
+      : 0;
+
     if (finalNetWorth >= richThreshold || cumulativeReturn >= 40) {
+      const peerPerformanceText = peerDiffPercent > 0
+        ? `같은 또래 평균 자산(${formatMoney(finalPeerWorth)}) 대비 +${peerDiffPercent.toLocaleString()}%를 초과 달성하고 누적 +${cumulativeReturn}%의 성과`
+        : `누적 +${cumulativeReturn}%의 성과`;
+
+      const hasExtremeRisk = diversificationScore <= 35 || decisionScore <= 35 || emergencyFundScore <= 20;
+
+      if (hasExtremeRisk) {
+        return {
+          id: 'rich_high_risk',
+          title: '👑 고수익 달성! 위험 집중형 부자 엔딩 (주의 요망)',
+          description: `축하합니다! ${peerPerformanceText}를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 다만, 포트폴리오 분산력(${diversificationScore}점)과 금융 의사결정(${decisionScore}점), 비상금 관리(${emergencyFundScore}점) 면에서 극단적인 위험을 감수했습니다. 이번 시뮬레이션에서는 시장 환경과 시세 차익의 행운이 따라주었으나, 현실에서는 하락장이나 금리 급등, 돌발 위기 시 심각한 유동성 경색과 원금 손실을 겪을 수 있습니다. 장기적으로 안전한 부를 지키기 위해선 분산 투자와 비상금 방어벽을 반드시 병행해야 합니다!`,
+          bg: 'from-amber-50/95 via-amber-100/30 to-emerald-50/70 border-amber-300 text-amber-950',
+          characterMood: 'warning' as const
+        };
+      }
+
       return {
         id: 'rich',
         title: '👑 시장 초과 달성! 경제적 자유 부자 엔딩',
-        description: `축하합니다! 같은 또래 평균 자산(${formatMoney(finalPeerWorth)}) 대비 25% 이상 초과 달성하거나 누적 40% 이상의 높은 성과를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 철저한 자산 배분 원칙과 포트폴리오 리밸런싱을 바탕으로 장기 복리 효과의 과실을 완벽히 수확하셨습니다. 현실에서도 재정적 자유(FIRE)를 이뤄낼 대단한 투자 감각을 지니셨음을 입증했습니다!`,
+        description: `축하합니다! ${peerPerformanceText}를 올리며, 최종적으로 ${formatMoney(finalNetWorth)}의 거대한 자산을 형성하는 데 성공했습니다. 철저한 자산 배분 원칙과 포트폴리오 리밸런싱, 건전한 금융 의사결정을 바탕으로 장기 복리 효과의 과실을 완벽히 수확하셨습니다. 현실에서도 재정적 자유(FIRE)를 이뤄낼 대단한 투자 감각을 지니셨음을 입증했습니다!`,
         bg: 'from-emerald-50/90 via-emerald-100/20 to-teal-50/70 border-emerald-200 text-emerald-950',
         characterMood: 'success' as const
       };

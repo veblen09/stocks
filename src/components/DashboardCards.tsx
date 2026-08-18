@@ -5,14 +5,14 @@ import { formatMoney } from '../utils/formatMoney';
 import { MetricCard } from './MetricCard';
 import { Wallet, Landmark, TrendingUp, AlertTriangle, Shield, TrendingDown, X } from 'lucide-react';
 import { audioManager } from '../utils/audioManager';
-import { getSavingsForAge } from '../store/gameStore';
+import { calculateTotalInvested, calculateCumulativeReturn } from '../utils/financeCalculations';
 
 interface DashboardCardsProps {
   state: GameState;
 }
 
 export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
-  const { allocations, initialAsset, history, currentTurn, halfYearSavings, loans } = state;
+  const { allocations, initialAsset, history, currentTurn, loans } = state;
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   
   // 1. 총자산 (보유한 모든 현금 및 금융, 부동산 자산 합산)
@@ -48,18 +48,10 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
   };
 
   // 총 투자 원금 (초기 자산 + 연령대별 누적 자동 저축금 합산)
-  let totalInvested = initialAsset;
-  history.forEach((h) => {
-    if (h.turn > 0) {
-      const ageAtTurnStart = h.age - 0.5;
-      totalInvested += getSavingsForAge(ageAtTurnStart, halfYearSavings);
-    }
-  });
+  const totalInvested = calculateTotalInvested(state);
 
   // 누적 수익률 계산 (투자원금 대비 순자산 성장률)
-  const cumulativeReturn = totalInvested > 0 
-    ? parseFloat((((netWorth - totalInvested) / totalInvested) * 100).toFixed(2)) 
-    : 0;
+  const cumulativeReturn = calculateCumulativeReturn(netWorth, totalInvested);
 
   // 최대 낙폭 (MDD) 찾기 (순자산 기준)
   let mdd = 0;

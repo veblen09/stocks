@@ -7,16 +7,9 @@ import { runTurnSimulation } from '../engine/simulation';
 import { calculateFinalScores } from '../engine/scoring';
 import { formatMoney } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
+import { getSavingsForAge } from '../utils/financeCalculations';
 
-// 나이대별 저축액 계산 헬퍼 함수
-export function getSavingsForAge(age: number, baseSavings: number): number {
-  if (age < 30) return baseSavings; // 25~29세: 1.0배 (사회초년생)
-  if (age < 35) return Math.round(baseSavings * 1.8); // 30~34세: 1.8배 (승진/소득 상승)
-  if (age < 45) return Math.round(baseSavings * 2.5); // 35~44세: 2.5배 (맞벌이/소득 전성기)
-  if (age < 55) return Math.round(baseSavings * 1.8); // 45~54세: 1.8배 (교육비 피크 지출 증가)
-  if (age < 65) return Math.round(baseSavings * 1.2); // 55~64세: 1.2배 (임금피크/은퇴 준비)
-  return 0; // 65세 이상: 0원 (은퇴 생활기)
-}
+export { getSavingsForAge };
 
 interface GameContextType {
   state: GameState;
@@ -265,9 +258,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // B. 주택청약 자동 납입 연산 (활성화 상태일 경우 매 턴 비상금에서 60만 원 자동 이체)
+    // 단, 이미 주택을 소유 중인 유주택자(house > 0)는 청약 자동 납입 중단 및 통장 해지 상태
+    const hasHouse = (updatedAllocations['house'] || 0) > 0;
     let autoHousingDeducted = false;
     let autoHousingFailed = false;
-    if (state.isHousingActive !== false) {
+    if (state.isHousingActive !== false && !hasHouse) {
       const currentEmergencyCash = updatedAllocations['cash'] || 0;
       if (currentEmergencyCash >= 60) {
         updatedAllocations['cash'] = parseFloat((currentEmergencyCash - 60).toFixed(2));
@@ -483,20 +478,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     if (isNextGameOver) {
-      const finalScores = calculateFinalScores(nextState);
-      
-      let sumDecision = 50;
-      nextState.history.forEach((h) => {
-        if (h.event?.choiceMade) {
-          const eventMatch = EVENTS.find(e => e.title === h.event?.title);
-          const choiceMatch = eventMatch?.choices.find(c => c.text === h.event?.choiceMade);
-          if (choiceMatch?.scoreChange?.decision) {
-            sumDecision += choiceMatch.scoreChange.decision;
-          }
-        }
-      });
-      finalScores.decisionScore = Math.max(0, Math.min(100, sumDecision));
-      nextState.scores = finalScores;
+      nextState.scores = calculateFinalScores(nextState);
     }
 
     setState(nextState);
@@ -509,6 +491,47 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const currentEventName = state.currentEvent.title;
     const updatedAllocations = { ...state.allocations };
     let cashChangeVal = choice.cashChange || 0;
+
+    // 자산 간 자금 자동 이동 (리밸런싱/포트폴리오 전환) 처리
+    if (choice.transferAllocation) {
+      const { from, to, ratio = 0.5 } = choice.transferAllocation;
+      let totalTransferred = 0;
+
+      // 1. from 자산들에서 비율만큼 인출
+      from.forEach((fromId) => {
+        const currentVal = updatedAllocations[fromId] || 0;
+        if (currentVal > 0) {
+          const moveAmount = parseFloat((currentVal * ratio).toFixed(2));
+          updatedAllocations[fromId] = parseFloat((currentVal - moveAmount).toFixed(2));
+          totalTransferred += moveAmount;
+        }
+      });
+
+      // 2. to 자산들로 가중치에 맞춰 분배 입금
+      if (totalTransferred > 0) {
+        const totalWeight = Object.values(to).reduce((sum, w) => sum + w, 0) || 1;
+        Object.keys(to).forEach((toId) => {
+          const weight = to[toId];
+          const allocatedAmount = parseFloat((totalTransferred * (weight / totalWeight)).toFixed(2));
+          updatedAllocations[toId] = parseFloat(((updatedAllocations[toId] || 0) + allocatedAmount).toFixed(2));
+        });
+      }
+    }
+
+    // 정량 자산 변화량 적용 (예: 주식 200만 원 추가 매수, 보증금 증액 등)
+    if (choice.flatAssetChange) {
+      Object.keys(choice.flatAssetChange).forEach((assetId) => {
+        const currentVal = updatedAllocations[assetId] || 0;
+        const flatChange = choice.flatAssetChange![assetId];
+        if (flatChange < 0) {
+          const actualReduction = Math.min(currentVal, -flatChange);
+          cashChangeVal += actualReduction;
+          updatedAllocations[assetId] = parseFloat((currentVal - actualReduction).toFixed(2));
+        } else {
+          updatedAllocations[assetId] = parseFloat((currentVal + flatChange).toFixed(2));
+        }
+      });
+    }
 
     // 자산 가치 변화 적용 (예: 주식 -40% 폭락 등)
     if (choice.impact) {
@@ -526,17 +549,33 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     }
 
-    // 정량 자산 변화량 적용
-    if (choice.flatAssetChange) {
-      Object.keys(choice.flatAssetChange).forEach((assetId) => {
-        const currentVal = updatedAllocations[assetId] || 0;
-        const flatChange = choice.flatAssetChange![assetId];
-        if (flatChange < 0) {
-          const actualReduction = Math.min(currentVal, -flatChange);
-          cashChangeVal += actualReduction;
-          updatedAllocations[assetId] = parseFloat((currentVal - actualReduction).toFixed(2));
-        } else {
-          updatedAllocations[assetId] = parseFloat((currentVal + flatChange).toFixed(2));
+    // 자산 전액 매도 및 현금화 처리 (카테고리별 or 자산 목록별)
+    const equityAssetIds = ASSETS.filter(a => a.category === 'equity').map(a => a.id);
+
+    if (choice.liquidateCategory === 'equity') {
+      equityAssetIds.forEach((id) => {
+        const bal = updatedAllocations[id] || 0;
+        if (bal > 0) {
+          cashChangeVal += bal;
+          updatedAllocations[id] = 0;
+        }
+      });
+    } else if (choice.liquidateCategory === 'savings') {
+      ASSETS.filter(a => a.category === 'savings').forEach((a) => {
+        const bal = updatedAllocations[a.id] || 0;
+        if (bal > 0) {
+          cashChangeVal += bal;
+          updatedAllocations[a.id] = 0;
+        }
+      });
+    }
+
+    if (choice.liquidateAssets && choice.liquidateAssets.length > 0) {
+      choice.liquidateAssets.forEach((id) => {
+        const bal = updatedAllocations[id] || 0;
+        if (bal > 0) {
+          cashChangeVal += bal;
+          updatedAllocations[id] = 0;
         }
       });
     }
@@ -613,6 +652,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
+    const hasHouseNow = (updatedAllocations['house'] || 0) > 0;
+    let nextIsHousingActive = state.isHousingActive;
+    if (hasHouseNow) {
+      nextIsHousingActive = false;
+      updatedAllocations['housing'] = 0; // 청약통장 효력 소멸 및 계약금 전액 충당
+    }
+
     const nextState: GameState = {
       ...state,
       cash: newCash < 0 ? 0 : newCash,
@@ -620,6 +666,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loans: nextLoans,
       history: updatedHistory,
       houseRegion: choice.houseRegion !== undefined ? choice.houseRegion : state.houseRegion,
+      isHousingActive: nextIsHousingActive,
       lastEventResult: {
         title: currentEventName,
         choiceText: choice.text,
@@ -629,20 +676,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     if (state.isGameOver) {
-      const finalScores = calculateFinalScores(nextState);
-      
-      let sumDecision = 50;
-      updatedHistory.forEach((h) => {
-        if (h.event?.choiceMade) {
-          const eventMatch = EVENTS.find(e => e.title === h.event?.title);
-          const choiceMatch = eventMatch?.choices.find(c => c.text === h.event?.choiceMade);
-          if (choiceMatch?.scoreChange?.decision) {
-            sumDecision += choiceMatch.scoreChange.decision;
-          }
-        }
-      });
-      finalScores.decisionScore = Math.max(0, Math.min(100, sumDecision));
-      nextState.scores = finalScores;
+      nextState.scores = calculateFinalScores(nextState);
     }
 
     setState(nextState);

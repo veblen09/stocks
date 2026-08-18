@@ -168,7 +168,8 @@ export const EventModal: React.FC = () => {
         Object.keys(selectedChoice.impact).forEach((assetId) => {
           const val = state.allocations[assetId] || 0;
           const multiplier = selectedChoice.impact![assetId];
-          if (multiplier > 0 && val <= 0 && assetId !== 'cash') {
+          const isTransferred = selectedChoice.transferAllocation?.to[assetId] !== undefined;
+          if (multiplier > 0 && val <= 0 && assetId !== 'cash' && !isTransferred) {
             missedAssets.push(assetId);
           }
         });
@@ -218,123 +219,152 @@ export const EventModal: React.FC = () => {
         </div>
 
         {/* 모달 본문 - 2열 구조 (데스크톱) */}
-        <div className="p-5 md:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 overflow-y-auto flex-grow items-stretch">
-          
-          {/* 좌측 열: 뉴스 내용 및 선택 버튼 */}
-          <div className="md:col-span-7 flex flex-col justify-between space-y-5">
-            {!selectedChoice ? (
-              /* 1단계: 상황 설명 및 선택지 카드 선택 */
-              <div className="space-y-5">
-                <div className="text-xs sm:text-sm text-slate-655 leading-relaxed bg-slate-50/50 p-5 rounded-2xl border border-slate-150 font-medium select-text">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-start">
+            
+            {/* 좌측 열: 이벤트 내용 및 선택지 / 피드백 결과 */}
+            <div className="md:col-span-7 flex flex-col gap-4">
+              
+              {/* 상황 설명 카드 */}
+              <div className="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5 select-none">
+                  상황 브리핑
+                </span>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-semibold select-text">
                   {currentEvent.description}
-                </div>
+                </p>
+              </div>
 
-                {/* 영향받는 자산군 목록 */}
-                {currentEvent.affectedAssets.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 select-none">
-                    <span className="text-[10px] text-slate-400 font-extrabold">영향받는 주요 자산군:</span>
-                    {currentEvent.affectedAssets.map((assetId) => (
-                      <span
-                        key={assetId}
-                        className="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-blue-100/30"
-                      >
-                        {getAssetLabel(assetId)}
-                      </span>
-                    ))}
+              {/* 1단계: 선택지 목록 */}
+              {!selectedChoice && (
+                <div className="space-y-2.5">
+                  <div className="text-[11px] font-black uppercase text-slate-500 tracking-wider mb-2 flex items-center gap-1.5 select-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> 나의 대응 선택 (하나를 선택하세요)
                   </div>
-                )}
-
-                {/* 선택 카드 목록 */}
-                <div className="space-y-3.5">
-                  <div className="text-[10px] font-bold text-slate-400 select-none">의사결정 리스트 (카드를 눌러 선택)</div>
-                  {currentEvent.choices.map((choice, i) => (
+                  
+                  {currentEvent.choices.map((choice, index) => (
                     <button
-                      key={i}
+                      key={index}
                       onClick={() => handleChoiceClick(choice)}
-                      className="w-full text-left p-4 bg-white/70 hover:bg-blue-50/30 border border-slate-200/60 hover:border-blue-300 hover:shadow-md rounded-2xl transition duration-150 flex items-start gap-3 group cursor-pointer"
+                      className="w-full text-left p-3.5 sm:p-4 rounded-2xl border border-slate-200 bg-white hover:border-blue-500 hover:bg-blue-50/40 hover:shadow-md transition-all group flex items-start gap-3 cursor-pointer select-none transform active:scale-[0.99]"
                     >
-                      <div className="w-5 h-5 rounded-full bg-white border border-slate-350 group-hover:border-blue-500 flex items-center justify-center text-[10px] font-black text-slate-500 group-hover:text-blue-500 group-hover:bg-blue-50 transition flex-shrink-0 mt-0.5">
-                        {i + 1}
+                      <div className="w-6 h-6 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center font-black text-xs text-slate-650 flex-shrink-0 mt-0.5 transition-colors">
+                        {index + 1}
                       </div>
-                      <span className="text-xs font-bold text-slate-705 group-hover:text-blue-900 leading-snug select-text">
-                        {choice.text}
-                      </span>
+                      <div className="flex-1">
+                        <p className="text-xs sm:text-sm font-extrabold text-slate-800 group-hover:text-blue-900 leading-snug">
+                          {choice.text}
+                        </p>
+                      </div>
                     </button>
                   ))}
                 </div>
-              </div>
-            ) : (
-              /* 2단계: 선택에 따른 의사결정의 입체적 피드백 */
-              <div className="space-y-4 animate-fade-in-up">
-                {/* 선택 요약 */}
-                <div className="p-4 bg-blue-50/30 border border-blue-100/50 rounded-2xl">
-                  <div className="text-[10px] font-bold text-blue-700 mb-1 flex items-center gap-1.5 select-none">
-                    <Check size={12} /> 나의 의사결정
-                  </div>
-                  <p className="text-xs font-extrabold text-slate-800 leading-relaxed select-text">{selectedChoice.text}</p>
-                </div>
+              )}
 
-                {/* 이 사건이 내 자산에 미치는 영향 */}
-                <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
-                  <div className="text-[10px] font-bold text-slate-500 mb-1 select-none">📉 이 사건이 내 자산에 미치는 영향</div>
-                  <p className="text-xs text-slate-600 leading-relaxed font-bold select-text">{selectedChoice.resultDescription}</p>
-                </div>
-
-                {/* 실질 지출/손실 혹은 이득에 대한 강렬한 시각적 알림 카드 */}
-                {selectedChoice.cashChange !== undefined && selectedChoice.cashChange !== 0 && (
-                  <div className={`p-5 rounded-2xl border-2 flex items-center gap-4 select-none ${
-                    selectedChoice.cashChange < 0 
-                      ? 'bg-rose-50 border-rose-300 text-rose-900 animate-pulse' 
-                      : 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                  }`}>
-                    <div className={`w-10 h-10 rounded-2xl text-white ${selectedChoice.cashChange < 0 ? 'bg-rose-600 shadow-rose-300' : 'bg-emerald-600 shadow-emerald-300'} shadow-lg flex items-center justify-center text-lg font-black select-none`}>
-                      ₩
+              {/* 2단계: 선택 완료 후 피드백 및 레슨 표시 */}
+              {selectedChoice && (
+                <div className="space-y-4 animate-fade-in">
+                  
+                  {/* 나의 의사결정 고지 */}
+                  <div className="p-4 bg-blue-50/30 border border-blue-100/50 rounded-2xl">
+                    <div className="text-[10px] font-bold text-blue-700 mb-1 flex items-center gap-1.5 select-none">
+                      <Check size={12} /> 나의 의사결정
                     </div>
-                    <div>
-                      <span className="text-[11px] uppercase font-black block tracking-widest text-slate-500">
-                        {selectedChoice.cashChange < 0 ? '🚨 실질 지출/손실 발생' : '💰 투자 지원금/현금 유입'}
-                      </span>
-                      <span className="text-sm sm:text-base font-black">
-                        {selectedChoice.cashChange < 0 ? '내 자산에서 ' : '내 자산에 '}
-                        <span className={`text-base sm:text-lg font-black px-1.5 py-0.5 rounded-lg text-white ${selectedChoice.cashChange < 0 ? 'bg-rose-600' : 'bg-emerald-600'}`}>
-                          {selectedChoice.cashChange < 0 ? '-' : '+'}{Math.abs(selectedChoice.cashChange)}만 원
+                    <p className="text-xs font-extrabold text-slate-800 leading-relaxed select-text">{selectedChoice.text}</p>
+                  </div>
+
+                  {/* 이 사건이 내 자산에 미치는 영향 */}
+                  <div className="p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
+                    <div className="text-[10px] font-bold text-slate-500 mb-1 select-none">📉 이 사건이 내 자산에 미치는 영향</div>
+                    <p className="text-xs text-slate-600 leading-relaxed font-bold select-text">{selectedChoice.resultDescription}</p>
+                  </div>
+
+                  {/* 자산 자동 이동(리밸런싱) 피드백 카드 */}
+                  {selectedChoice.transferAllocation && (
+                    <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center gap-3 select-none">
+                      <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-base font-bold shadow-md">
+                        🔄
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-[11px] font-black text-indigo-900 tracking-wide">포트폴리오 자금 자동 이동 (리밸런싱)</div>
+                        <div className="text-xs text-indigo-700 font-semibold mt-0.5">
+                          예적금/현금 자산의 {Math.round((selectedChoice.transferAllocation.ratio || 0.5) * 100)}%가 주식형 ETF 및 채권으로 즉시 분산 이동되어 매수되었습니다.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 주식/자산 전액 매도 피드백 카드 */}
+                  {selectedChoice.liquidateCategory === 'equity' && (
+                    <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 select-none">
+                      <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center text-base font-bold shadow-md">
+                        📉
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-[11px] font-black text-rose-900 tracking-wide">보유 주식·ETF 전액 매도 (손절 및 현금화)</div>
+                        <div className="text-xs text-rose-700 font-semibold mt-0.5">
+                          보유 중이던 모든 주식과 ETF가 전량 매도되어 매도 대금이 비상금/현금 통장으로 이체되었습니다.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 실질 지출/손실 혹은 이득에 대한 강렬한 시각적 알림 카드 */}
+                  {selectedChoice.cashChange !== undefined && selectedChoice.cashChange !== 0 && (
+                    <div className={`p-5 rounded-2xl border-2 flex items-center gap-4 select-none ${
+                      selectedChoice.cashChange < 0 
+                        ? 'bg-rose-50 border-rose-300 text-rose-900 animate-pulse' 
+                        : 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                    }`}>
+                      <div className={`w-10 h-10 rounded-2xl text-white ${selectedChoice.cashChange < 0 ? 'bg-rose-600 shadow-rose-300' : 'bg-emerald-600 shadow-emerald-300'} shadow-lg flex items-center justify-center text-lg font-black select-none`}>
+                        ₩
+                      </div>
+                      <div>
+                        <span className="text-[11px] uppercase font-black block tracking-widest text-slate-500">
+                          {selectedChoice.cashChange < 0 ? '🚨 실질 지출/손실 발생' : '💰 투자 지원금/현금 유입'}
                         </span>
-                        {selectedChoice.cashChange < 0 ? '이 강제 지출(차감)되었습니다!' : '이 추가 지급되었습니다!'}
-                      </span>
+                        <span className="text-sm sm:text-base font-black">
+                          {selectedChoice.cashChange < 0 ? '내 자산에서 ' : '내 자산에 '}
+                          <span className={`text-base sm:text-lg font-black px-1.5 py-0.5 rounded-lg text-white ${selectedChoice.cashChange < 0 ? 'bg-rose-600' : 'bg-emerald-600'}`}>
+                            {selectedChoice.cashChange < 0 ? '-' : '+'}{Math.abs(selectedChoice.cashChange)}만 원
+                          </span>
+                          {selectedChoice.cashChange < 0 ? '이 강제 지출(차감)되었습니다!' : '이 추가 지급되었습니다!'}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* 개별 투자 자산 가치 변동 비율 피드백 */}
-                {selectedChoice.impact && Object.keys(selectedChoice.impact).length > 0 && (
-                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-2.5">
-                    <span className="text-[10px] text-slate-400 font-extrabold uppercase select-none block">📈 이번 선택으로 변동된 내 자산 상세</span>
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {Object.keys(selectedChoice.impact).map((assetId) => {
-                        const pct = selectedChoice.impact![assetId] * 100;
-                        const isNegative = pct < 0;
-                        if (pct === 0) return null;
+                  {/* 개별 투자 자산 가치 변동 비율 피드백 */}
+                  {selectedChoice.impact && Object.keys(selectedChoice.impact).length > 0 && (
+                    <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-2.5">
+                      <span className="text-[10px] text-slate-400 font-extrabold uppercase select-none block">📈 이번 선택으로 변동된 내 자산 상세</span>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {Object.keys(selectedChoice.impact).map((assetId) => {
+                          const pct = selectedChoice.impact![assetId] * 100;
+                          const isNegative = pct < 0;
+                          if (pct === 0) return null;
 
-                        // 사용자가 이 자산을 실제로 보유하고 있는 경우(또는 현금)만 변동 결과에 표시
-                        const assetValue = state.allocations[assetId] || 0;
-                        if (assetId !== 'cash' && assetValue <= 0) return null;
+                          // 사용자가 이 자산을 실제로 보유하고 있거나 방금 자동 이동으로 매수한 경우 표시
+                          const assetValue = state.allocations[assetId] || 0;
+                          const isTransferredTo = selectedChoice.transferAllocation?.to[assetId] !== undefined;
+                          if (assetId !== 'cash' && assetValue <= 0 && !isTransferredTo) return null;
 
-                        return (
-                          <div key={assetId} className={`p-2.5 rounded-xl border flex justify-between items-center ${
-                            isNegative ? 'bg-rose-50/50 border-rose-200 text-rose-700' : 'bg-emerald-50/50 border-emerald-200 text-emerald-700'
-                          }`}>
-                            <span className="text-xs font-bold">
-                              {getAssetLabel(assetId)}
-                            </span>
-                            <span className="text-xs font-black">
-                              {pct >= 0 ? '+' : ''}{pct.toFixed(0)}% {isNegative ? '📉' : '📈'}
-                            </span>
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div key={assetId} className={`p-2.5 rounded-xl border flex justify-between items-center ${
+                              isNegative ? 'bg-rose-50/50 border-rose-200 text-rose-700' : 'bg-emerald-50/50 border-emerald-200 text-emerald-700'
+                            }`}>
+                              <span className="text-xs font-bold">
+                                {getAssetLabel(assetId)}
+                              </span>
+                              <span className="text-xs font-black">
+                                {pct >= 0 ? '+' : ''}{pct.toFixed(0)}% {isNegative ? '📉' : '📈'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* 교육적 의의 레슨 */}
                 <div className="p-4 bg-emerald-50/30 border border-emerald-100/50 rounded-2xl flex gap-3">
@@ -383,7 +413,8 @@ export const EventModal: React.FC = () => {
           </div>
 
         </div>
-      </GlassCard>
-    </div>
-  );
+      </div>
+    </GlassCard>
+  </div>
+);
 };
