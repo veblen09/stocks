@@ -16,7 +16,10 @@ import {
   Building2,
   Cpu,
   Flame,
-  Car
+  Car,
+  Coffee,
+  ShoppingBag,
+  ShieldCheck
 } from 'lucide-react';
 
 interface StockPortfolioModalProps {
@@ -89,6 +92,18 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
           tag: '자율주행·전기차 혁신',
           tagColor: 'bg-rose-50 text-rose-700 border-rose-200'
         };
+      case 'stock_cocacola':
+        return {
+          icon: <Coffee size={16} className="text-red-700" />,
+          tag: '워런버핏 필수음료·배당킹',
+          tagColor: 'bg-red-50 text-red-700 border-red-200'
+        };
+      case 'stock_costco':
+        return {
+          icon: <ShoppingBag size={16} className="text-sky-600" />,
+          tag: '글로벌 창고형 유통 챔피언',
+          tagColor: 'bg-sky-50 text-sky-700 border-sky-200'
+        };
       case 'stock_hyundai':
         return {
           icon: <Building2 size={16} className="text-slate-600" />,
@@ -117,7 +132,7 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
   };
 
   // 스마트 원클릭 프리셋 핸들러
-  const handleApplyPreset = (type: 'ai_semiconductor' | 'bigtech' | 'equal' | 'korea' | 'clear') => {
+  const handleApplyPreset = (type: 'ai_semiconductor' | 'bigtech' | 'value_buffett' | 'korea' | 'equal' | 'clear') => {
     audioManager.playSound('click');
 
     const newChanges = { ...changes };
@@ -138,10 +153,24 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
         newChanges[id] = -curVal;
       });
     } else if (type === 'equal') {
-      // 8종목 전체에 기존 주식 잔액 + 가용 현금을 1/N로 균등 리밸런싱
+      // 전체 종목에 기존 주식 잔액 + 가용 현금을 1/N로 균등 리밸런싱
       const totalPool = currentTotalStock + availableCashForStocks;
       const targetPerStock = Math.floor(totalPool / stockIds.length);
       stockIds.forEach((id) => {
+        const curVal = allocations[id] || 0;
+        newChanges[id] = targetPerStock - curVal;
+      });
+    } else if (type === 'value_buffett') {
+      // 워런 버핏형 필수소비재 & 안정 가치주 (코카콜라, 코스트코, 현대차, 애플) 집중
+      const targetIds = ['stock_cocacola', 'stock_costco', 'stock_hyundai', 'stock_apple'];
+      stockIds.forEach((id) => {
+        if (!targetIds.includes(id)) {
+          newChanges[id] = -(allocations[id] || 0);
+        }
+      });
+      const totalPool = currentTotalStock + availableCashForStocks;
+      const targetPerStock = Math.floor(totalPool / targetIds.length);
+      targetIds.forEach((id) => {
         const curVal = allocations[id] || 0;
         newChanges[id] = targetPerStock - curVal;
       });
@@ -210,7 +239,7 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
                   🚀 개별 주식 포트폴리오 세부 설정
                 </h3>
                 <span className="text-[10px] font-extrabold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full border border-purple-200">
-                  8개 대표 종목
+                  10개 대표 종목
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
@@ -222,18 +251,18 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
           <button
             type="button"
             onClick={() => { audioManager.playSound('click'); onClose(); }}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition cursor-pointer flex-shrink-0"
             aria-label="모달 닫기"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Top Sticky Summary Bar */}
+        {/* Category Summary Bar */}
         <div className="bg-slate-50/80 px-5 sm:px-6 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-1.5 font-bold">
-              <span className="text-slate-400">개별 주식 현재 총액:</span>
+              <span className="text-slate-400">개별 주식 총액:</span>
               <span className="text-slate-800 font-black">{formatMoney(currentTotalStock)}</span>
             </div>
             <div className="flex items-center gap-1.5 font-bold">
@@ -243,8 +272,8 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-1.5 font-bold">
-              <span className="text-slate-400">조정 후 예정 총액:</span>
-              <span className="text-purple-700 font-black text-sm">{formatMoney(plannedTotalStock)}</span>
+              <span className="text-slate-400">조정 후 예정:</span>
+              <span className="text-purple-600 font-black text-sm">{formatMoney(plannedTotalStock)}</span>
             </div>
           </div>
 
@@ -261,6 +290,13 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
           <span className="text-[11px] font-extrabold text-slate-500 flex items-center gap-1 mr-1">
             <Sparkles size={13} className="text-purple-600" /> 간편 테마 배분:
           </span>
+          <button
+            type="button"
+            onClick={() => handleApplyPreset('value_buffett')}
+            className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+          >
+            <ShieldCheck size={12} /> 🛡️ 워런버핏 가치·배당주
+          </button>
           <button
             type="button"
             onClick={() => handleApplyPreset('ai_semiconductor')}
@@ -287,7 +323,7 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
             onClick={() => handleApplyPreset('equal')}
             className="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
           >
-            <Scale size={12} /> ⚖️ 8종목 균등 배분
+            <Scale size={12} /> ⚖️ 10종목 균등 배분
           </button>
           <button
             type="button"

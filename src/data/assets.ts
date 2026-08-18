@@ -146,6 +146,28 @@ export const ASSETS: Asset[] = [
     educationTip: '미국 자율주행 전기차 테크기업은 CEO 이슈와 신기술 발표 소식에 따라 주가가 극적으로 널뛰는 대표적인 고변동성 주식입니다. 단기 심리적 공포를 견뎌야 합니다.'
   },
   {
+    id: 'stock_cocacola',
+    name: '개별주: 글로벌 필수음료·배당킹 기업',
+    category: 'equity',
+    expectedReturn: 8.0,
+    volatility: 10,
+    liquidityScore: 9,
+    riskScore: 4,
+    description: '전 세계 200개국에서 매일 20억 잔 이상 팔리는 독보적 음료 챔피언이자 60년 연속 배당금을 늘려온 대표 가치주입니다.',
+    educationTip: '워런 버핏의 평생 투자 종목으로 유명하며, 경기 침체기나 인플레이션 시기에도 가격 결정력(해자)과 강력한 브랜드로 꾸준한 배당과 복리 수익을 제공하는 대표적인 경기방어형 가치주입니다.'
+  },
+  {
+    id: 'stock_costco',
+    name: '개별주: 글로벌 창고형 유통 챔피언',
+    category: 'equity',
+    expectedReturn: 13.5,
+    volatility: 14,
+    liquidityScore: 9,
+    riskScore: 5,
+    description: '유료 멤버십 기반의 독보적 고객 충성도와 박리다매 구조로 불황에도 실적이 지속 성장하는 글로벌 유통 대장주입니다.',
+    educationTip: '경기 불황기에도 소비자들이 저렴한 생필품을 대량 구매하기 위해 몰려드는 강력한 비즈니스 모델로, 20년 넘게 시장 지수를 상회하며 안정적으로 우상향해 온 대표적 우량 성장 가치주입니다.'
+  },
+  {
     id: 'bond',
     name: '국채·채권형 펀드',
     category: 'debt',

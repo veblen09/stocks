@@ -228,15 +228,17 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
                     </div>
                     
                     <div>
-                      <span className="text-[10px] text-slate-400 font-extrabold block mb-2 select-none">📌 개별 자산의 누적 성과 내역</span>
+                      <span className="text-[10px] text-slate-400 font-extrabold block mb-2 select-none">
+                        📌 시장 전체 자산의 누적 성과 비교 (내가 보유하지 않은 자산의 시장 시세 변동도 함께 비교할 수 있습니다)
+                      </span>
                       <div className="overflow-x-auto rounded-xl border border-slate-100">
                         <table className="min-w-full text-xs text-left text-slate-500">
                           <thead className="bg-slate-50 text-[9px] uppercase font-bold text-slate-400 border-b border-slate-100 select-none">
                             <tr>
                               <th className="py-2 px-3">자산군 명칭</th>
-                              <th className="py-2 px-3 text-center">연 환산 수익률 (CAGR)</th>
-                              <th className="py-2 px-3 text-center">누적 수익률</th>
-                              <th className="py-2 px-3 text-right">현재 보유 잔액</th>
+                              <th className="py-2 px-3 text-center">시장 연 환산 (CAGR)</th>
+                              <th className="py-2 px-3 text-center">시장 누적 수익률</th>
+                              <th className="py-2 px-3 text-right">나의 현재 보유 잔액</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 bg-white font-semibold">
@@ -275,7 +277,13 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ state }) => {
                                       <span className="text-slate-400">-</span>
                                     )}
                                   </td>
-                                  <td className="py-2 px-3 text-right text-slate-700">{formatMoney(value)}</td>
+                                  <td className="py-2 px-3 text-right text-slate-700">
+                                    {value > 0 ? (
+                                      <span className="font-extrabold text-slate-800">{formatMoney(value)}</span>
+                                    ) : (
+                                      <span className="text-slate-400 font-normal">0원 <span className="text-[9px] bg-slate-100 px-1 py-0.5 rounded text-slate-400">미보유</span></span>
+                                    )}
+                                  </td>
                                 </tr>
                               );
                             })}
