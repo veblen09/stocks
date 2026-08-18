@@ -248,10 +248,15 @@ export const AssetCategoryDetailModal: React.FC<AssetCategoryDetailModalProps> =
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-3 text-[11px] font-bold">
+                  <div className="flex items-center gap-2.5 text-[11px] font-bold flex-wrap">
                     <span>
                       기대수익률: <strong className="text-rose-500 font-extrabold">연 {asset.expectedReturn}%</strong>
                     </span>
+                    {asset.dividendYield !== undefined && asset.dividendYield > 0 && (
+                      <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200">
+                        배당: <strong className="font-extrabold">연 {asset.dividendYield}%</strong>
+                      </span>
+                    )}
                     {asset.id === 'rent_deposit' ? (
                       <span className="text-slate-400">수익률: 0% 고정</span>
                     ) : actualReturn !== undefined ? (

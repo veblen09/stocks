@@ -80,8 +80,13 @@ export const AssetCard: React.FC<AssetCardProps> = ({
             <Info size={14} />
           </button>
         </div>
-        <div className="text-[10px] text-slate-400 font-medium">
-          기대수익률: <span className="font-semibold text-rose-500">연 {asset.expectedReturn}%</span>
+        <div className="text-[10px] text-slate-400 font-medium flex items-center gap-1.5 flex-wrap justify-end">
+          {asset.dividendYield !== undefined && asset.dividendYield > 0 && (
+            <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200 font-bold">
+              배당 연 {asset.dividendYield}%
+            </span>
+          )}
+          <span>기대수익: <strong className="font-semibold text-rose-500">연 {asset.expectedReturn}%</strong></span>
         </div>
       </div>
 

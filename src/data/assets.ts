@@ -40,6 +40,7 @@ export const ASSETS: Asset[] = [
     name: '국내 주식형 ETF (한국 대표기업 ETF)',
     category: 'equity',
     expectedReturn: 6.0, // 연 6%
+    dividendYield: 2.0, // 연 2.0% 분배금
     volatility: 12, // 중간 변동성
     liquidityScore: 8, // 3~4일 내 현금화 가능
     riskScore: 6, // 주가 하락 시 원금 손실 가능
@@ -51,6 +52,7 @@ export const ASSETS: Asset[] = [
     name: '글로벌 주식형 ETF (세계 성장기업 ETF)',
     category: 'equity',
     expectedReturn: 7.5, // 연 7.5%
+    dividendYield: 1.5, // 연 1.5% 분배금
     volatility: 15, // 다소 높은 변동성
     liquidityScore: 8,
     riskScore: 7,
@@ -62,6 +64,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 국내 반도체 1위 기업',
     category: 'equity',
     expectedReturn: 8.5,
+    dividendYield: 2.2, // 연 2.2% 분기 배당
     volatility: 22,
     liquidityScore: 9,
     riskScore: 7,
@@ -84,6 +87,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 글로벌 초고속 메모리 강자',
     category: 'equity',
     expectedReturn: 12.0,
+    dividendYield: 1.2, // 연 1.2% 배당
     volatility: 32,
     liquidityScore: 9,
     riskScore: 8,
@@ -95,6 +99,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 미국 시가총액 1위 IT 대장주',
     category: 'equity',
     expectedReturn: 14.0,
+    dividendYield: 0.6, // 연 0.6% 배당
     volatility: 18,
     liquidityScore: 9,
     riskScore: 6,
@@ -117,6 +122,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 글로벌 완성차 제조기업',
     category: 'equity',
     expectedReturn: 7.5,
+    dividendYield: 4.5, // 연 4.5% 고배당
     volatility: 20,
     liquidityScore: 9,
     riskScore: 6,
@@ -128,6 +134,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 글로벌 AI 가속기 칩 선도기업',
     category: 'equity',
     expectedReturn: 28.0,
+    dividendYield: 0.1, // 연 0.1% 미세 배당
     volatility: 45,
     liquidityScore: 9,
     riskScore: 9,
@@ -150,6 +157,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 글로벌 필수음료·배당킹 기업',
     category: 'equity',
     expectedReturn: 8.0,
+    dividendYield: 3.2, // 연 3.2% 60년 연속 배당킹
     volatility: 10,
     liquidityScore: 9,
     riskScore: 4,
@@ -161,6 +169,7 @@ export const ASSETS: Asset[] = [
     name: '개별주: 글로벌 창고형 유통 챔피언',
     category: 'equity',
     expectedReturn: 13.5,
+    dividendYield: 1.0, // 연 1.0% 배당성장
     volatility: 14,
     liquidityScore: 9,
     riskScore: 5,

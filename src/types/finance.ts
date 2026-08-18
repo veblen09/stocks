@@ -5,6 +5,7 @@ export interface Asset {
   name: string;
   category: AssetCategory;
   expectedReturn: number; // 연 평균 기대 수익률 (%)
+  dividendYield?: number; // 연 배당수익률 (%)
   volatility: number; // 연 변동성 (%)
   liquidityScore: number; // 유동성 (환금성) 점수 (1~10)
   riskScore: number; // 원금 손실 위험 수준 (1~10)

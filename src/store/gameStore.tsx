@@ -280,6 +280,32 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const tempState = { ...state, allocations: updatedAllocations };
     const simResult = runTurnSimulation(tempState, rng);
 
+    // 3-B. 배당금(Dividend) 지급 및 배당소득세(15.4%) 원천징수 연산
+    let totalGrossDividend = 0;
+    const dividendDetails: string[] = [];
+
+    ASSETS.forEach((asset) => {
+      const yieldRate = asset.dividendYield || 0;
+      const heldAmount = updatedAllocations[asset.id] || 0;
+      if (yieldRate > 0 && heldAmount > 0) {
+        // 반기 배당 = 보유 잔액 * (연 배당률 / 100) / 2
+        const semiDiv = parseFloat(((heldAmount * (yieldRate / 100)) / 2).toFixed(2));
+        if (semiDiv > 0) {
+          totalGrossDividend += semiDiv;
+          dividendDetails.push(`${asset.name} ${formatMoney(semiDiv)}`);
+        }
+      }
+    });
+
+    totalGrossDividend = parseFloat(totalGrossDividend.toFixed(2));
+    const dividendTax = parseFloat((totalGrossDividend * 0.154).toFixed(2)); // 15.4% 배당소득세 (소득세 14% + 지방소득세 1.4%)
+    const netDividend = parseFloat((totalGrossDividend - dividendTax).toFixed(2));
+
+    if (netDividend > 0) {
+      // 세후 배당금을 비상금/입출금 통장에 입금
+      simResult.newAllocations['cash'] = parseFloat(((simResult.newAllocations['cash'] || 0) + netDividend).toFixed(2));
+    }
+
     // 4. 새로운 현금 잔고 계산
     const nextAge = state.currentAge + 0.5;
     const baseNextCash = getSavingsForAge(nextAge, state.halfYearSavings);
@@ -447,6 +473,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     if (autoHousingFailed) {
       autoResultText += `• 🚨 비상금 잔액 부족으로 이번 턴 주택청약 자동 납입(60만 원)이 실패(유예)되었습니다. `;
+    }
+    if (netDividend > 0) {
+      autoResultText += `• 💰 [배당금 입금] 보유 주식·ETF에서 총 배당금 ${formatMoney(totalGrossDividend)} (배당소득세 15.4% ${formatMoney(dividendTax)} 원천징수 후 실입금 ${formatMoney(netDividend)})이 비상금 통장으로 자동 입금되었습니다. `;
     }
     
     // 저축액 변화 안내 추가

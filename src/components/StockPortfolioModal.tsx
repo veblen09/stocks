@@ -384,10 +384,15 @@ export const StockPortfolioModal: React.FC<StockPortfolioModalProps> = ({
                   <span className="text-slate-500 leading-snug">
                     {asset.description}
                   </span>
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2.5 flex-shrink-0 flex-wrap">
                     <span>
                       기대수익: <strong className="text-rose-500 font-extrabold">연 {asset.expectedReturn}%</strong>
                     </span>
+                    {asset.dividendYield !== undefined && asset.dividendYield > 0 && (
+                      <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-200">
+                        배당: <strong className="font-extrabold">연 {asset.dividendYield}%</strong>
+                      </span>
+                    )}
                     {actualReturn !== undefined && (
                       <span>
                         직전 수익: <strong className={`font-extrabold ${actualReturn > 0 ? 'text-rose-500' : actualReturn < 0 ? 'text-blue-500' : 'text-slate-500'}`}>
