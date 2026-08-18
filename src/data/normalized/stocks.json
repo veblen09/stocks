@@ -1,0 +1,982 @@
+[
+  {
+    "canonicalId": "KR_005930",
+    "market": "KR",
+    "ticker": "005930",
+    "sourceTicker": "005930.KS",
+    "nameKo": "삼성전자",
+    "nameEn": "Samsung Electronics",
+    "historicalNames": [
+      "삼성전자공업",
+      "삼성전자"
+    ],
+    "sector": "반도체 / IT",
+    "currency": "KRW",
+    "listingDate": "1975-06-11",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 1위 메모리 반도체 및 스마트폰, 가전 종합 전자 기업"
+  },
+  {
+    "canonicalId": "KR_000660",
+    "market": "KR",
+    "ticker": "000660",
+    "sourceTicker": "000660.KS",
+    "nameKo": "SK하이닉스",
+    "nameEn": "SK Hynix",
+    "historicalNames": [
+      "현대전자산업",
+      "하이닉스반도체",
+      "SK하이닉스"
+    ],
+    "sector": "반도체",
+    "currency": "KRW",
+    "listingDate": "1996-12-26",
+    "firstValidYear": 1997,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 HBM 및 DRAM, NAND 플래시 메모리 선도 기업"
+  },
+  {
+    "canonicalId": "KR_005380",
+    "market": "KR",
+    "ticker": "005380",
+    "sourceTicker": "005380.KS",
+    "nameKo": "현대차",
+    "nameEn": "Hyundai Motor",
+    "historicalNames": [
+      "현대자동차"
+    ],
+    "sector": "자동차 / 모빌리티",
+    "currency": "KRW",
+    "listingDate": "1974-06-28",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 3위 자동차 완성차 및 미래 모빌리티 그룹"
+  },
+  {
+    "canonicalId": "KR_000270",
+    "market": "KR",
+    "ticker": "000270",
+    "sourceTicker": "000270.KS",
+    "nameKo": "기아",
+    "nameEn": "Kia",
+    "historicalNames": [
+      "기아산업",
+      "기아자동차",
+      "기아"
+    ],
+    "sector": "자동차 / 모빌리티",
+    "currency": "KRW",
+    "listingDate": "1973-07-21",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 디자인 및 친환경차 중심의 글로벌 완성차 기업"
+  },
+  {
+    "canonicalId": "KR_005490",
+    "market": "KR",
+    "ticker": "005490",
+    "sourceTicker": "005490.KS",
+    "nameKo": "POSCO홀딩스",
+    "nameEn": "POSCO Holdings",
+    "historicalNames": [
+      "포항종합제철",
+      "포스코",
+      "POSCO홀딩스"
+    ],
+    "sector": "철강 / 이차전지 소재",
+    "currency": "KRW",
+    "listingDate": "1988-06-10",
+    "firstValidYear": 1989,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 경쟁력 1위 철강 기업이자 리튬/이차전지 소재 지주회사"
+  },
+  {
+    "canonicalId": "KR_051910",
+    "market": "KR",
+    "ticker": "051910",
+    "sourceTicker": "051910.KS",
+    "nameKo": "LG화학",
+    "nameEn": "LG Chem",
+    "historicalNames": [
+      "LG화학"
+    ],
+    "sector": "화학 / 신소재",
+    "currency": "KRW",
+    "listingDate": "2001-04-25",
+    "firstValidYear": 2002,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "석유화학, 첨단소재, 생명과학 종합 화학 기업"
+  },
+  {
+    "canonicalId": "KR_006400",
+    "market": "KR",
+    "ticker": "006400",
+    "sourceTicker": "006400.KS",
+    "nameKo": "삼성SDI",
+    "nameEn": "Samsung SDI",
+    "historicalNames": [
+      "삼성전관",
+      "삼성SDI"
+    ],
+    "sector": "이차전지 / 전자재료",
+    "currency": "KRW",
+    "listingDate": "1979-02-27",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "전기차 배터리, ESS, 전자재료 선도 기업"
+  },
+  {
+    "canonicalId": "KR_066570",
+    "market": "KR",
+    "ticker": "066570",
+    "sourceTicker": "066570.KS",
+    "nameKo": "LG전자",
+    "nameEn": "LG Electronics",
+    "historicalNames": [
+      "LG전자"
+    ],
+    "sector": "가전 / IT",
+    "currency": "KRW",
+    "listingDate": "2002-04-22",
+    "firstValidYear": 2003,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "프리미엄 가전, OLED TV 및 자동차 전장 솔루션 기업"
+  },
+  {
+    "canonicalId": "KR_207940",
+    "market": "KR",
+    "ticker": "207940",
+    "sourceTicker": "207940.KS",
+    "nameKo": "삼성바이오로직스",
+    "nameEn": "Samsung Biologics",
+    "historicalNames": [
+      "삼성바이오로직스"
+    ],
+    "sector": "바이오 / 제약",
+    "currency": "KRW",
+    "listingDate": "2016-11-10",
+    "firstValidYear": 2017,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 1위 바이오의약품 위탁개발생산(CDMO) 기업"
+  },
+  {
+    "canonicalId": "KR_035420",
+    "market": "KR",
+    "ticker": "035420",
+    "sourceTicker": "035420.KS",
+    "nameKo": "NAVER",
+    "nameEn": "NAVER",
+    "historicalNames": [
+      "NHN",
+      "NAVER"
+    ],
+    "sector": "인터넷 / 플랫폼",
+    "currency": "KRW",
+    "listingDate": "2002-10-29",
+    "firstValidYear": 2003,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "한국 최대 검색 포털, 커머스, 클라우드 및 AI 플랫폼 기업"
+  },
+  {
+    "canonicalId": "KR_035720",
+    "market": "KR",
+    "ticker": "035720",
+    "sourceTicker": "035720.KS",
+    "nameKo": "카카오",
+    "nameEn": "Kakao",
+    "historicalNames": [
+      "다음커뮤니케이션",
+      "다음카카오",
+      "카카오"
+    ],
+    "sector": "인터넷 / 플랫폼",
+    "currency": "KRW",
+    "listingDate": "1999-11-11",
+    "firstValidYear": 2000,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "국민 메신저 카카오톡 기반 모바일 플랫폼 및 콘텐츠 기업"
+  },
+  {
+    "canonicalId": "KR_068270",
+    "market": "KR",
+    "ticker": "068270",
+    "sourceTicker": "068270.KS",
+    "nameKo": "셀트리온",
+    "nameEn": "Celltrion",
+    "historicalNames": [
+      "셀트리온"
+    ],
+    "sector": "바이오 / 제약",
+    "currency": "KRW",
+    "listingDate": "2005-07-19",
+    "firstValidYear": 2006,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "바이오시밀러 및 자가면역/항암 바이오의약품 전문 기업"
+  },
+  {
+    "canonicalId": "KR_105560",
+    "market": "KR",
+    "ticker": "105560",
+    "sourceTicker": "105560.KS",
+    "nameKo": "KB금융",
+    "nameEn": "KB Financial Group",
+    "historicalNames": [
+      "KB금융지주"
+    ],
+    "sector": "금융 / 은행",
+    "currency": "KRW",
+    "listingDate": "2008-10-10",
+    "firstValidYear": 2009,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "KB국민은행 중심의 대한민국 대표 종합금융그룹"
+  },
+  {
+    "canonicalId": "KR_055550",
+    "market": "KR",
+    "ticker": "055550",
+    "sourceTicker": "055550.KS",
+    "nameKo": "신한지주",
+    "nameEn": "Shinhan Financial Group",
+    "historicalNames": [
+      "신한금융지주"
+    ],
+    "sector": "금융 / 은행",
+    "currency": "KRW",
+    "listingDate": "2001-09-10",
+    "firstValidYear": 2002,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "신한은행, 신한카드 중심의 대형 종합금융지주"
+  },
+  {
+    "canonicalId": "KR_086790",
+    "market": "KR",
+    "ticker": "086790",
+    "sourceTicker": "086790.KS",
+    "nameKo": "하나금융지주",
+    "nameEn": "Hana Financial Group",
+    "historicalNames": [
+      "하나금융지주"
+    ],
+    "sector": "금융 / 은행",
+    "currency": "KRW",
+    "listingDate": "2005-12-12",
+    "firstValidYear": 2006,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "하나은행, 하나증권 기반의 글로벌 금융 네트워크 그룹"
+  },
+  {
+    "canonicalId": "KR_028260",
+    "market": "KR",
+    "ticker": "028260",
+    "sourceTicker": "028260.KS",
+    "nameKo": "삼성물산",
+    "nameEn": "Samsung C&T",
+    "historicalNames": [
+      "제일모직",
+      "삼성물산"
+    ],
+    "sector": "지주 / 건설 / 상사",
+    "currency": "KRW",
+    "listingDate": "2014-12-18",
+    "firstValidYear": 2015,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "삼성그룹 실질적 지주사이자 건설, 상사, 패션, 리조트 사업체"
+  },
+  {
+    "canonicalId": "KR_032830",
+    "market": "KR",
+    "ticker": "032830",
+    "sourceTicker": "032830.KS",
+    "nameKo": "삼성생명",
+    "nameEn": "Samsung Life Insurance",
+    "historicalNames": [
+      "삼성생명보험"
+    ],
+    "sector": "금융 / 보험",
+    "currency": "KRW",
+    "listingDate": "2010-05-12",
+    "firstValidYear": 2011,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "한국 최대 생명보험사이자 삼성전자 주요 주주"
+  },
+  {
+    "canonicalId": "KR_017670",
+    "market": "KR",
+    "ticker": "017670",
+    "sourceTicker": "017670.KS",
+    "nameKo": "SK텔레콤",
+    "nameEn": "SK Telecom",
+    "historicalNames": [
+      "한국이동통신",
+      "SK텔레콤"
+    ],
+    "sector": "통신 / AI",
+    "currency": "KRW",
+    "listingDate": "1989-11-06",
+    "firstValidYear": 1990,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "한국 1위 이동통신 및 AI/데이터센터 인프라 기업"
+  },
+  {
+    "canonicalId": "KR_030200",
+    "market": "KR",
+    "ticker": "030200",
+    "sourceTicker": "030200.KS",
+    "nameKo": "KT",
+    "nameEn": "KT Corporation",
+    "historicalNames": [
+      "한국통신",
+      "KT"
+    ],
+    "sector": "통신 / IT",
+    "currency": "KRW",
+    "listingDate": "1998-12-23",
+    "firstValidYear": 1999,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "유무선 통신망, 초고속 인터넷 및 클라우드/AICT 기업"
+  },
+  {
+    "canonicalId": "KR_015760",
+    "market": "KR",
+    "ticker": "015760",
+    "sourceTicker": "015760.KS",
+    "nameKo": "한국전력",
+    "nameEn": "Korea Electric Power (KEPCO)",
+    "historicalNames": [
+      "한국전력공사"
+    ],
+    "sector": "유틸리티 / 에너지",
+    "currency": "KRW",
+    "listingDate": "1989-08-10",
+    "firstValidYear": 1990,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "대한민국 전력망 및 발전 송배전 공기업"
+  },
+  {
+    "canonicalId": "KR_012330",
+    "market": "KR",
+    "ticker": "012330",
+    "sourceTicker": "012330.KS",
+    "nameKo": "현대모비스",
+    "nameEn": "Hyundai Mobis",
+    "historicalNames": [
+      "현대정공",
+      "현대모비스"
+    ],
+    "sector": "자동차 부품",
+    "currency": "KRW",
+    "listingDate": "1989-09-05",
+    "firstValidYear": 1990,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "현대차그룹 핵심 부품사 및 전동화·자율주행 모듈 솔루션 기업"
+  },
+  {
+    "canonicalId": "KR_003490",
+    "market": "KR",
+    "ticker": "003490",
+    "sourceTicker": "003490.KS",
+    "nameKo": "대한항공",
+    "nameEn": "Korean Air",
+    "historicalNames": [
+      "대한항공"
+    ],
+    "sector": "운송 / 항공",
+    "currency": "KRW",
+    "listingDate": "1969-02-28",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "글로벌 네트워크를 보유한 대한민국 대표 대형 항공사(FSC)"
+  },
+  {
+    "canonicalId": "KR_010950",
+    "market": "KR",
+    "ticker": "010950",
+    "sourceTicker": "010950.KS",
+    "nameKo": "S-Oil",
+    "nameEn": "S-Oil",
+    "historicalNames": [
+      "쌍용정유",
+      "에쓰오일"
+    ],
+    "sector": "에너지 / 정유",
+    "currency": "KRW",
+    "listingDate": "1987-05-27",
+    "firstValidYear": 1988,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "아람코 자회사로서 정유, 윤활기유, 석유화학 종합 에너지 기업"
+  },
+  {
+    "canonicalId": "KR_000100",
+    "market": "KR",
+    "ticker": "000100",
+    "sourceTicker": "000100.KS",
+    "nameKo": "유한양행",
+    "nameEn": "Yuhan Corporation",
+    "historicalNames": [
+      "유한양행"
+    ],
+    "sector": "제약 / 헬스케어",
+    "currency": "KRW",
+    "listingDate": "1962-11-01",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "1926년 설립된 역사 깊은 전통 제약 및 혁신 신약(렉라자 등) 기업"
+  },
+  {
+    "canonicalId": "KR_004370",
+    "market": "KR",
+    "ticker": "004370",
+    "sourceTicker": "004370.KS",
+    "nameKo": "농심",
+    "nameEn": "Nongshim",
+    "historicalNames": [
+      "롯데공업",
+      "농심"
+    ],
+    "sector": "음식료 / 필수소비재",
+    "currency": "KRW",
+    "listingDate": "1976-06-30",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "신라면, 짜파게티 등 K-푸드 글로벌 확장을 주도하는 식품 기업"
+  },
+  {
+    "canonicalId": "US_AAPL",
+    "market": "US",
+    "ticker": "AAPL",
+    "sourceTicker": "AAPL",
+    "nameKo": "애플",
+    "nameEn": "Apple Inc.",
+    "historicalNames": [
+      "Apple Computer",
+      "Apple Inc."
+    ],
+    "sector": "빅테크 / IT",
+    "currency": "USD",
+    "listingDate": "1980-12-12",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "iPhone, Mac, 서비스 생태계를 갖춘 글로벌 시가총액 1위 테크 기업"
+  },
+  {
+    "canonicalId": "US_MSFT",
+    "market": "US",
+    "ticker": "MSFT",
+    "sourceTicker": "MSFT",
+    "nameKo": "마이크로소프트",
+    "nameEn": "Microsoft",
+    "historicalNames": [
+      "Microsoft"
+    ],
+    "sector": "빅테크 / 소프트웨어",
+    "currency": "USD",
+    "listingDate": "1986-03-13",
+    "firstValidYear": 1987,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "Windows, Azure 클라우드, 오피스 및 AI(Copilot) 선도 소프트웨어 기업"
+  },
+  {
+    "canonicalId": "US_IBM",
+    "market": "US",
+    "ticker": "IBM",
+    "sourceTicker": "IBM",
+    "nameKo": "IBM",
+    "nameEn": "International Business Machines",
+    "historicalNames": [
+      "IBM"
+    ],
+    "sector": "IT / 엔터프라이즈",
+    "currency": "USD",
+    "listingDate": "1911-06-16",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "100년 역사의 기업용 하이브리드 클라우드, 메인프레임, AI 솔루션 기업"
+  },
+  {
+    "canonicalId": "US_INTC",
+    "market": "US",
+    "ticker": "INTC",
+    "sourceTicker": "INTC",
+    "nameKo": "인텔",
+    "nameEn": "Intel",
+    "historicalNames": [
+      "Intel"
+    ],
+    "sector": "반도체",
+    "currency": "USD",
+    "listingDate": "1971-10-13",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "x86 CPU 아키텍처를 창시한 미국의 대표 반도체 제조 기업"
+  },
+  {
+    "canonicalId": "US_NVDA",
+    "market": "US",
+    "ticker": "NVDA",
+    "sourceTicker": "NVDA",
+    "nameKo": "엔비디아",
+    "nameEn": "NVIDIA",
+    "historicalNames": [
+      "NVIDIA"
+    ],
+    "sector": "반도체 / AI",
+    "currency": "USD",
+    "listingDate": "1999-01-22",
+    "firstValidYear": 2000,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "AI 훈련·추론 가속 GPU와 CUDA 생태계를 지배하는 AI 혁명 주역"
+  },
+  {
+    "canonicalId": "US_AMZN",
+    "market": "US",
+    "ticker": "AMZN",
+    "sourceTicker": "AMZN",
+    "nameKo": "아마존",
+    "nameEn": "Amazon.com",
+    "historicalNames": [
+      "Amazon.com"
+    ],
+    "sector": "빅테크 / 커머스 / 클라우드",
+    "currency": "USD",
+    "listingDate": "1997-05-15",
+    "firstValidYear": 1998,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "글로벌 1위 이커머스 및 AWS 클라우드 컴퓨팅 플랫폼 기업"
+  },
+  {
+    "canonicalId": "US_GOOGL",
+    "market": "US",
+    "ticker": "GOOGL",
+    "sourceTicker": "GOOGL",
+    "nameKo": "알파벳 Class A",
+    "nameEn": "Alphabet Class A",
+    "historicalNames": [
+      "Google",
+      "Alphabet"
+    ],
+    "sector": "빅테크 / 인터넷",
+    "currency": "USD",
+    "listingDate": "2004-08-19",
+    "firstValidYear": 2005,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "Google 검색, YouTube, Android, Google Cloud를 보유한 인터넷 거인"
+  },
+  {
+    "canonicalId": "US_META",
+    "market": "US",
+    "ticker": "META",
+    "sourceTicker": "META",
+    "nameKo": "메타 플랫폼스",
+    "nameEn": "Meta Platforms",
+    "historicalNames": [
+      "Facebook",
+      "Meta Platforms"
+    ],
+    "sector": "빅테크 / 소셜미디어",
+    "currency": "USD",
+    "listingDate": "2012-05-18",
+    "firstValidYear": 2013,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "Instagram, WhatsApp, Facebook을 운영하는 글로벌 소셜/AI 리더"
+  },
+  {
+    "canonicalId": "US_TSLA",
+    "market": "US",
+    "ticker": "TSLA",
+    "sourceTicker": "TSLA",
+    "nameKo": "테슬라",
+    "nameEn": "Tesla",
+    "historicalNames": [
+      "Tesla Motors",
+      "Tesla"
+    ],
+    "sector": "전기차 / 모빌리티 / AI",
+    "currency": "USD",
+    "listingDate": "2010-06-29",
+    "firstValidYear": 2011,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "글로벌 전기차(EV), 자율주행 FSD, 에너지 스토리지 혁신 기업"
+  },
+  {
+    "canonicalId": "US_JPM",
+    "market": "US",
+    "ticker": "JPM",
+    "sourceTicker": "JPM",
+    "nameKo": "JP모건 체이스",
+    "nameEn": "JPMorgan Chase",
+    "historicalNames": [
+      "Chemical Bank",
+      "Chase Manhattan",
+      "JPMorgan Chase"
+    ],
+    "sector": "금융 / 투자은행",
+    "currency": "USD",
+    "listingDate": "1969-03-05",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "자산 기준 미국 최대 상업은행 및 글로벌 투자은행(IB)"
+  },
+  {
+    "canonicalId": "US_BAC",
+    "market": "US",
+    "ticker": "BAC",
+    "sourceTicker": "BAC",
+    "nameKo": "뱅크오브아메리카",
+    "nameEn": "Bank of America",
+    "historicalNames": [
+      "NationsBank",
+      "Bank of America"
+    ],
+    "sector": "금융 / 상업은행",
+    "currency": "USD",
+    "listingDate": "1973-01-02",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "미국 전역의 탄탄한 리테일 및 자산관리 네트워크를 갖춘 초대형 은행"
+  },
+  {
+    "canonicalId": "US_BRK_B",
+    "market": "US",
+    "ticker": "BRK.B",
+    "sourceTicker": "BRK-B",
+    "nameKo": "버크셔 해서웨이 Class B",
+    "nameEn": "Berkshire Hathaway Class B",
+    "historicalNames": [
+      "Berkshire Hathaway"
+    ],
+    "sector": "복합기업 / 투자",
+    "currency": "USD",
+    "listingDate": "1996-05-08",
+    "firstValidYear": 1997,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "Yahoo Finance",
+    "description": "워런 버핏이 이끄는 보험(GEICO), 에너지, 철도(BNSF) 종합 투자 지주사"
+  },
+  {
+    "canonicalId": "US_JNJ",
+    "market": "US",
+    "ticker": "JNJ",
+    "sourceTicker": "JNJ",
+    "nameKo": "존슨앤드존슨",
+    "nameEn": "Johnson & Johnson",
+    "historicalNames": [
+      "Johnson & Johnson"
+    ],
+    "sector": "헬스케어 / 제약",
+    "currency": "USD",
+    "listingDate": "1944-09-25",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "60년 이상 배당을 증액한 헬스케어, 의료기기, 바이오제약 대장주"
+  },
+  {
+    "canonicalId": "US_UNH",
+    "market": "US",
+    "ticker": "UNH",
+    "sourceTicker": "UNH",
+    "nameKo": "유나이티드헬스 그룹",
+    "nameEn": "UnitedHealth Group",
+    "historicalNames": [
+      "UnitedHealth Group"
+    ],
+    "sector": "헬스케어 / 의료보험",
+    "currency": "USD",
+    "listingDate": "1984-10-15",
+    "firstValidYear": 1985,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "미국 최대 민간 건강보험사 및 Optum 헬스케어 서비스 플랫폼 기업"
+  },
+  {
+    "canonicalId": "US_XOM",
+    "market": "US",
+    "ticker": "XOM",
+    "sourceTicker": "XOM",
+    "nameKo": "엑손모빌",
+    "nameEn": "Exxon Mobil",
+    "historicalNames": [
+      "Exxon",
+      "Exxon Mobil"
+    ],
+    "sector": "에너지 / 오일가스",
+    "currency": "USD",
+    "listingDate": "1928-01-03",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "스탠더드 오일 후신의 미국 최대 석유 및 천연가스 메이저 기업"
+  },
+  {
+    "canonicalId": "US_CVX",
+    "market": "US",
+    "ticker": "CVX",
+    "sourceTicker": "CVX",
+    "nameKo": "셰브론",
+    "nameEn": "Chevron",
+    "historicalNames": [
+      "Standard Oil of California",
+      "Chevron"
+    ],
+    "sector": "에너지 / 오일가스",
+    "currency": "USD",
+    "listingDate": "1921-06-23",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "글로벌 상류 탐사 및 정제/다운스트림 사업을 영위하는 에너지 거인"
+  },
+  {
+    "canonicalId": "US_KO",
+    "market": "US",
+    "ticker": "KO",
+    "sourceTicker": "KO",
+    "nameKo": "코카콜라",
+    "nameEn": "Coca-Cola",
+    "historicalNames": [
+      "Coca-Cola"
+    ],
+    "sector": "필수소비재 / 음료",
+    "currency": "USD",
+    "listingDate": "1919-09-05",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "워런 버핏의 영구보유 종목이자 전 세계 200여 개국에 진출한 음료 제국"
+  },
+  {
+    "canonicalId": "US_PEP",
+    "market": "US",
+    "ticker": "PEP",
+    "sourceTicker": "PEP",
+    "nameKo": "펩시코",
+    "nameEn": "PepsiCo",
+    "historicalNames": [
+      "PepsiCo"
+    ],
+    "sector": "필수소비재 / 식음료",
+    "currency": "USD",
+    "listingDate": "1919-12-18",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "펩시 콜라와 Lay's, 도리토스 등 글로벌 1위 스낵 브랜드를 보유한 식품사"
+  },
+  {
+    "canonicalId": "US_PG",
+    "market": "US",
+    "ticker": "PG",
+    "sourceTicker": "PG",
+    "nameKo": "프록터 앤 갬블",
+    "nameEn": "Procter & Gamble",
+    "historicalNames": [
+      "Procter & Gamble"
+    ],
+    "sector": "필수소비재 / 생활용품",
+    "currency": "USD",
+    "listingDate": "1891-03-01",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "팸퍼스, 다우니, 질레트, 오랄비 등 65년+ 배당왕 대표 생활소비재 기업"
+  },
+  {
+    "canonicalId": "US_WMT",
+    "market": "US",
+    "ticker": "WMT",
+    "sourceTicker": "WMT",
+    "nameKo": "월마트",
+    "nameEn": "Walmart",
+    "historicalNames": [
+      "Wal-Mart Stores",
+      "Walmart"
+    ],
+    "sector": "필수소비재 / 유통",
+    "currency": "USD",
+    "listingDate": "1970-10-01",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "매출 기준 세계 최대 오프라인 유통 및 옴니채널 리테일 기업"
+  },
+  {
+    "canonicalId": "US_HD",
+    "market": "US",
+    "ticker": "HD",
+    "sourceTicker": "HD",
+    "nameKo": "홈디포",
+    "nameEn": "Home Depot",
+    "historicalNames": [
+      "Home Depot"
+    ],
+    "sector": "임의소비재 / 주택개선",
+    "currency": "USD",
+    "listingDate": "1981-09-22",
+    "firstValidYear": 1982,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "미국 1위 건축자재, 주택수리 및 인테리어 DIY 전문 유통업체"
+  },
+  {
+    "canonicalId": "US_MCD",
+    "market": "US",
+    "ticker": "MCD",
+    "sourceTicker": "MCD",
+    "nameKo": "맥도날드",
+    "nameEn": "McDonald's",
+    "historicalNames": [
+      "McDonald's"
+    ],
+    "sector": "소비재 / 프랜차이즈",
+    "currency": "USD",
+    "listingDate": "1965-04-21",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "글로벌 1위 패스트푸드 프랜차이즈이자 강력한 부동산 자산 보유 기업"
+  },
+  {
+    "canonicalId": "US_DIS",
+    "market": "US",
+    "ticker": "DIS",
+    "sourceTicker": "DIS",
+    "nameKo": "월트 디즈니",
+    "nameEn": "Walt Disney",
+    "historicalNames": [
+      "Walt Disney Productions",
+      "The Walt Disney Company"
+    ],
+    "sector": "미디어 / 엔터테인먼트",
+    "currency": "USD",
+    "listingDate": "1957-11-12",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "미키마우스, 마블, 스타워즈 IP 및 디즈니 테마파크, OTT(디즈니+) 그룹"
+  },
+  {
+    "canonicalId": "US_CAT",
+    "market": "US",
+    "ticker": "CAT",
+    "sourceTicker": "CAT",
+    "nameKo": "캐터필러",
+    "nameEn": "Caterpillar",
+    "historicalNames": [
+      "Caterpillar Tractor",
+      "Caterpillar Inc."
+    ],
+    "sector": "산업재 / 중장비",
+    "currency": "USD",
+    "listingDate": "1929-12-02",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "글로벌 건설, 광산, 에너지 장비 제조 1위의 경기민감 대표 산업재 기업"
+  },
+  {
+    "canonicalId": "US_NKE",
+    "market": "US",
+    "ticker": "NKE",
+    "sourceTicker": "NKE",
+    "nameKo": "나이키",
+    "nameEn": "Nike",
+    "historicalNames": [
+      "Blue Ribbon Sports",
+      "Nike"
+    ],
+    "sector": "임의소비재 / 스포츠웨어",
+    "currency": "USD",
+    "listingDate": "1980-12-02",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "에어 조던 등 압도적 브랜드 파워를 보유한 글로벌 1위 스포츠웨어 기업"
+  }
+]

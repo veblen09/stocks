@@ -1,0 +1,16 @@
+{
+  "system": "머니트랙 45년 한·미 주식투자 실험실 역사적 뉴스 시스템",
+  "period": "1980-2025 (46개년)",
+  "sources": [
+    "한국은행(BOK) ECOS 경제통계",
+    "금융감독원 전자공시시스템(DART)",
+    "한국거래소(KRX) 기업공시채널 KIND",
+    "Federal Reserve Board (FRB FOMC Historical Records)",
+    "U.S. Securities and Exchange Commission (SEC EDGAR 10-K/10-Q/8-K)",
+    "U.S. Bureau of Labor Statistics (BLS) & Bureau of Economic Analysis (BEA)",
+    "International Monetary Fund (IMF) World Economic Outlook",
+    "World Bank Open Data"
+  ],
+  "copyrightNotice": "모든 기사 및 공시는 저작권법 및 공정 이용(Fair Use) 원칙에 따라 2~4문장의 사실 요약 및 중립적 영향 경로 해설로만 구성되어 있으며, 언론사 원문 전체를 무단 복제하지 않습니다.",
+  "compiledAt": "2026-08-18T07:03:51.413801Z"
+}

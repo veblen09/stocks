@@ -9,48 +9,20 @@ interface AnimatedCharacterGuideProps {
   message?: string;
   compact?: boolean;
   className?: string;
-  age?: number;
-  useSprite?: boolean;
 }
 
 export function AnimatedCharacterGuide({
   mood = 'idle',
-  title = '20대 싱글 청년',
-  subtitle = '사회초년생 자산관리 실험 참가자',
-  message = '이번 턴에는 어떤 선택을 해볼까요?',
+  title = '나의 투자 길잡이',
+  subtitle = '45년 시장 해설가',
+  message = '1980년 말부터 시작된 대한민국과 미국의 경제사 속에서 원칙을 지키는 투자를 설계해 보세요!',
   compact = false,
   className = '',
-  age,
-  useSprite = false,
 }: AnimatedCharacterGuideProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   const isEvent = mood === 'event' || mood === 'warning';
   const isSuccess = mood === 'success';
-
-  // 나이대별 이미지 결정 (반신 늙어가는 모드용)
-  let characterImg = 'images/character-guide.gif'; // 25세
-  if (age !== undefined) {
-    if (age >= 55) {
-      characterImg = 'images/character-guide-60s.png'; // 은퇴 준비 / 은퇴 생활 (50~60대 이상)
-    } else if (age >= 30) {
-      characterImg = 'images/character-guide-30s.png'; // 배우자 / 자녀 등장 / 가족 재무관리 (30~40대)
-    }
-  }
-
-  // 나이대별 전신 이미지 결정 (생애 변화 및 가족/목표 변화 탭용)
-  let fullBodyImg = 'images/character-avatar.png'; // 25세 -> 사회초년생
-  if (age !== undefined) {
-    if (age >= 55) {
-      fullBodyImg = 'images/character-avatar-60s.png'; // 55세 이상 -> 은퇴 준비 및 은퇴 생활 (평안한 노후 부부)
-    } else if (age >= 45) {
-      fullBodyImg = 'images/character-avatar-45s.png'; // 45세 -> 성장한 첫째 + 둘째 아이 + 40대 부부 (학령기 4인 가족)
-    } else if (age >= 35) {
-      fullBodyImg = 'images/character-avatar-35s.png'; // 35세 -> 첫 자녀 출산 (부부 + 첫째 아기)
-    } else if (age >= 30) {
-      fullBodyImg = 'images/character-avatar-30s.png'; // 30세 -> 배우자 등장 (신혼부부)
-    }
-  }
 
   // 상황별 세부 상태 및 색상 매핑
   const getMoodConfig = () => {
@@ -60,36 +32,36 @@ export function AnimatedCharacterGuide({
           border: 'border-rose-200/80 shadow-rose-100/50',
           titleBg: 'bg-rose-50 text-rose-700',
           bubbleBg: 'bg-rose-50/90 border-rose-100/70',
-          status: '⚠️ 위험 경보'
+          status: '⚠️ 위험 분석 중'
         };
       case 'success':
         return {
           border: 'border-emerald-200/80 shadow-emerald-100/50',
           titleBg: 'bg-emerald-50 text-emerald-700',
           bubbleBg: 'bg-emerald-50/90 border-emerald-100/70',
-          status: '🎉 성취 완료'
+          status: '🎉 목표 달성'
         };
       case 'thinking':
         return {
           border: 'border-violet-200/80 shadow-violet-100/50',
           titleBg: 'bg-violet-50 text-violet-700',
           bubbleBg: 'bg-violet-50/90 border-violet-100/70',
-          status: '🤔 생각 정리 중'
+          status: '🤔 퀀트 분석 중'
         };
       case 'event':
         return {
           border: 'border-amber-200/80 shadow-amber-100/50',
           titleBg: 'bg-amber-50 text-amber-700',
           bubbleBg: 'bg-amber-50/90 border-amber-100/70',
-          status: '📢 소식 통신 중'
+          status: '📢 시장 브리핑'
         };
       case 'idle':
       default:
         return {
           border: 'border-white/70',
-          titleBg: 'bg-emerald-50 text-emerald-700',
+          titleBg: 'bg-blue-50 text-blue-700',
           bubbleBg: 'bg-white/85 border-white/70',
-          status: '💡 상시 가이드'
+          status: '💡 투자 인사이트'
         };
     }
   };
@@ -107,9 +79,9 @@ export function AnimatedCharacterGuide({
       ].join(' ')}
     >
       <CharacterStyles />
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/75 to-emerald-50/80" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/75 to-indigo-50/80" />
       <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-200/30 blur-2xl animate-pulse-slow" />
-      <div className="absolute -left-10 bottom-10 h-32 w-32 rounded-full bg-emerald-200/30 blur-2xl animate-pulse-slow" style={{ animationDelay: '2.5s' }} />
+      <div className="absolute -left-10 bottom-10 h-32 w-32 rounded-full bg-indigo-200/30 blur-2xl animate-pulse-slow" style={{ animationDelay: '2.5s' }} />
 
       {/* 이벤트/경보 펄스 링 */}
       {isEvent && (
@@ -126,8 +98,8 @@ export function AnimatedCharacterGuide({
       )}
 
       <div className="relative z-10 p-5">
-        {/* 더 강조된 상단 헤더 영역 (경계선 구분 및 배지 음영 강화) */}
-        <div className="flex justify-between items-center mb-5 pb-3 border-b border-slate-100/50 select-none">
+        {/* 상단 헤더 영역 */}
+        <div className="flex justify-between items-center mb-4 pb-2.5 border-b border-slate-100/50 select-none">
           <div className={`inline-flex items-center gap-2 rounded-2xl px-3.5 py-1.5 text-[11px] font-black shadow-sm border border-slate-200/20 ${conf.titleBg}`}>
             <span className="text-xs">🎯</span>
             {title}
@@ -138,106 +110,39 @@ export function AnimatedCharacterGuide({
         </div>
 
         <div className="relative mx-auto flex flex-col items-center justify-center">
-          {/* 캐릭터 바닥 타원형 그림자 - 전신 크기에 맞춤 */}
+          {/* 캐릭터 바닥 타원형 그림자 */}
           <div 
             className="absolute bottom-2 h-2.5 rounded-full bg-slate-900/20 blur-sm character-shadow transition-all duration-300"
-            style={{ width: useSprite ? '110px' : '160px' }}
+            style={{ width: '160px' }}
           />
 
-          {/* 생각/경고 중일 때 고개를 미세하게 기울이는 래퍼 */}
+          {/* 캐릭터 모션 래퍼 */}
           <div className={(mood === 'thinking' || mood === 'warning') ? 'character-tilt' : ''}>
-            {/* 호버 시 캐릭터가 살짝 더 위로 올라가며 커지는 애니메이션을 위한 래퍼 (z-20) */}
             <div className="relative transition-all duration-500 transform group-hover:-translate-y-2.5 group-hover:scale-[1.03] z-20">
-              {useSprite ? (
-                /* 전신 고정 캐릭터 이미지 렌더링 (화면이 이동하거나 왔다 갔다 하지 않도록 고정) */
-                <img
-                  src={fullBodyImg}
-                  alt="생애 단계 전신 캐릭터"
-                  className={[
-                    compact ? 'h-56' : 'h-80',
-                    'character-motion object-contain drop-shadow-2xl relative z-20 mix-blend-multiply',
-                  ].join(' ')}
-                />
-              ) : (
-                /* 예전 반신 이미지 늙어가는 버전 렌더링 (마우스 호버 시에만 움직이는 GIF로 전환) */
-                <img
-                  src={isHovered ? characterImg : (characterImg === 'images/character-guide.gif' ? 'images/character-guide.png' : characterImg)}
-                  alt="머니트랙 자산관리 가이드 캐릭터"
-                  className={[
-                    compact ? 'h-56' : 'h-80',
-                    'character-motion object-contain drop-shadow-2xl relative z-20 mix-blend-multiply',
-                  ].join(' ')}
-                />
-              )}
+              <img
+                src={isHovered ? 'images/character-guide.gif' : 'images/character-guide.png'}
+                alt="머니트랙 투자 길잡이"
+                className={[
+                  compact ? 'h-44' : 'h-64',
+                  'character-motion object-contain drop-shadow-2xl relative z-20 mix-blend-multiply',
+                ].join(' ')}
+              />
 
-              {/* [위기 상황 표정 변화] 파랗게 질린 이마 + 식은땀 방울 💧 (고정 이미지 위치 대응) */}
-              {mood === 'warning' && (
-                <div className="absolute inset-0 z-20 pointer-events-none select-none">
-                  {/* 파랗게 질린 이마 그늘 */}
-                  <div 
-                    className="absolute bg-gradient-to-b from-blue-600/50 via-blue-500/20 to-transparent rounded-b-md filter blur-[0.8px] mix-blend-multiply"
-                    style={{
-                      left: '44%',
-                      top: useSprite ? '9%' : '14%',
-                      width: useSprite ? '10%' : '7%',
-                      height: useSprite ? '3%' : '4%'
-                    }}
-                  />
-                  {/* 식은땀 흘러내림 */}
-                  <svg 
-                    className="absolute text-sky-400 fill-current animate-satie-sweat"
-                    style={{
-                      left: useSprite ? '53%' : '52%',
-                      top: useSprite ? '8%' : '13%',
-                      width: useSprite ? '12px' : '14px',
-                      height: useSprite ? '12px' : '14px'
-                    }}
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                  </svg>
-                </div>
-              )}
-
-              {/* [성공 상황 표정 변화] 볼 발그레 볼터치 😊 */}
-              {mood === 'success' && (
-                <div className="absolute inset-0 z-20 pointer-events-none select-none">
-                  <div 
-                    className="absolute bg-rose-400/40 rounded-full filter blur-[0.8px]"
-                    style={{
-                      left: useSprite ? '38%' : '42%',
-                      top: useSprite ? '10.5%' : '18%',
-                      width: useSprite ? '6%' : '2.2%',
-                      height: useSprite ? '1%' : '1.2%'
-                    }}
-                  />
-                  <div 
-                    className="absolute bg-rose-400/40 rounded-full filter blur-[0.8px]"
-                    style={{
-                      left: useSprite ? '52%' : '48%',
-                      top: useSprite ? '10.5%' : '18%',
-                      width: useSprite ? '6%' : '2.2%',
-                      height: useSprite ? '1%' : '1.2%'
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* [생각 상황 표정 변화] 머리 위 흔들리는 물음표 ❓ */}
+              {/* 생각 중 말풍선 아이콘 */}
               {mood === 'thinking' && (
-                <div className="absolute left-[54%] top-[4%] z-20 pointer-events-none select-none text-[10px] font-black text-violet-500 animate-bounce">
-                  ❓
+                <div className="absolute left-[54%] top-[4%] z-20 pointer-events-none select-none text-[12px] font-black text-violet-500 animate-bounce">
+                  💡
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* 상황에 맞는 커스텀 말풍선 패널 (음수 마진 -mt-3.5 및 z-10으로 캐릭터 발끝이 말풍선 위로 겹치도록 레이아웃 결합) */}
-        <div className={`relative -mt-3.5 z-10 rounded-2xl p-4 text-sm text-slate-600 shadow-md border character-bubble ${conf.bubbleBg}`}>
+        {/* 상황에 맞는 커스텀 말풍선 패널 */}
+        <div className={`relative -mt-3 z-10 rounded-2xl p-4 text-sm text-slate-600 shadow-md border character-bubble ${conf.bubbleBg}`}>
           <div className="absolute -top-1.5 left-12 h-3 w-3 rotate-45 bg-inherit border-l border-t border-inherit z-0" />
           <p className="text-xs font-bold text-blue-600 mb-1 select-none">{subtitle}</p>
-          <p className="leading-relaxed font-bold text-slate-700">{message}</p>
+          <p className="leading-relaxed font-bold text-slate-700 text-xs">{message}</p>
 
           {mood === 'thinking' && (
             <div className="mt-2.5 flex gap-1.5" aria-label="생각 중">
@@ -252,100 +157,41 @@ export function AnimatedCharacterGuide({
   );
 }
 
-// 2.5D 캐릭터 애니메이션 용 전용 키프레임 인입 컴포넌트
 const CharacterStyles: React.FC = () => (
   <style>{`
     @keyframes characterFloat {
-      0%, 100% {
-        transform: translateY(0) scale(1);
-      }
-      50% {
-        transform: translateY(-8px) scale(1.015);
-      }
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.01); }
     }
-
     @keyframes characterBreath {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.01);
-      }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.01); }
     }
-
     @keyframes characterTilt {
-      0%, 100% {
-        transform: rotate(-0.8deg);
-      }
-      50% {
-        transform: rotate(0.8deg);
-      }
+      0%, 100% { transform: rotate(-0.8deg); }
+      50% { transform: rotate(0.8deg); }
     }
-
     @keyframes characterShadow {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.22;
-      }
-      50% {
-        transform: scale(0.88);
-        opacity: 0.14;
-      }
+      0%, 100% { transform: scale(1); opacity: 0.22; }
+      50% { transform: scale(0.88); opacity: 0.14; }
     }
-
     @keyframes softPulseRing {
-      0% {
-        transform: scale(0.92);
-        opacity: 0.55;
-      }
-      100% {
-        transform: scale(1.25);
-        opacity: 0;
-      }
+      0% { transform: scale(0.92); opacity: 0.55; }
+      100% { transform: scale(1.25); opacity: 0; }
     }
-
     @keyframes sparkleFade {
-      0%, 100% {
-        opacity: 0.2;
-        transform: translateY(0) scale(0.9);
-      }
-      50% {
-        opacity: 0.9;
-        transform: translateY(-4px) scale(1.1);
-      }
+      0%, 100% { opacity: 0.2; transform: translateY(0) scale(0.9); }
+      50% { opacity: 0.9; transform: translateY(-4px) scale(1.1); }
     }
-
     @keyframes bubbleFadeUp {
-      0% {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes typingDot {
-      0%, 80%, 100% {
-        opacity: 0.25;
-        transform: translateY(0);
-      }
-      40% {
-        opacity: 1;
-        transform: translateY(-2px);
-      }
+      0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-2px); }
     }
 
-    /* 식은땀 방울 💧 흘러내리기 */
-    @keyframes satieSweat {
-      0% { transform: translateY(0) scale(0); opacity: 0; }
-      15% { transform: translateY(0) scale(1.1); opacity: 1; }
-      80% { transform: translateY(7px) scale(0.95); opacity: 0.8; }
-      100% { transform: translateY(10px) scale(0.8); opacity: 0; }
-    }
-
-    /* 클래스에 애니메이션 속성 매핑 - 마우스 호버 시에만 동작 */
     .character-motion {
       transform-origin: bottom center;
       transition: transform 0.3s ease-in-out;
@@ -379,52 +225,19 @@ const CharacterStyles: React.FC = () => (
       animation: softPulseRing 1.8s ease-out infinite;
     }
 
-    .character-sparkle {
-      opacity: 0.2;
-    }
-    .group:hover .character-sparkle {
-      animation: sparkleFade 1.6s ease-in-out infinite;
-    }
-    .character-sparkle.delay-200 {
-      animation-delay: 200ms;
-    }
-    .character-sparkle.delay-500 {
-      animation-delay: 500ms;
-    }
-
-    .character-bubble {
-      animation: bubbleFadeUp 0.45s ease-out forwards;
-    }
-
-    .character-dot {
-      animation: typingDot 1.4s infinite ease-in-out;
-    }
-
-    .animate-satie-sweat {
-      opacity: 0;
-    }
-    .group:hover .animate-satie-sweat {
-      animation: satieSweat 2.2s infinite ease-in-out;
-    }
+    .character-sparkle { opacity: 0.2; }
+    .group:hover .character-sparkle { animation: sparkleFade 1.6s ease-in-out infinite; }
+    .character-bubble { animation: bubbleFadeUp 0.45s ease-out forwards; }
+    .character-dot { animation: typingDot 1.4s infinite ease-in-out; }
 
     @keyframes pulse-slow {
       0%, 100% { opacity: 0.35; transform: scale(0.95); }
       50% { opacity: 0.65; transform: scale(1.05); }
     }
-    .group:hover .animate-pulse-slow {
-      animation: pulse-slow 6s ease-in-out infinite;
-    }
+    .group:hover .animate-pulse-slow { animation: pulse-slow 6s ease-in-out infinite; }
 
-    /* 미디어 쿼리 기반 모션 감소 접근성 지원 */
     @media (prefers-reduced-motion: reduce) {
-      .character-motion,
-      .character-shadow,
-      .character-sparkle,
-      .character-bubble,
-      .character-tilt,
-      .character-pulse-ring,
-      .character-dot,
-      .animate-satie-sweat {
+      .character-motion, .character-shadow, .character-sparkle, .character-bubble, .character-tilt, .character-pulse-ring, .character-dot {
         animation: none !important;
         transform: none !important;
         opacity: 1 !important;

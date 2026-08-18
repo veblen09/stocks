@@ -14,7 +14,7 @@ const devHtmlTemplate = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="머니트랙: 가상의 20년 동안 저축과 투자를 경험하며 자산관리의 원리를 배우는 한국 청소년용 시뮬레이션 웹앱" />
+    <meta name="description" content="머니트랙: 1980년 말부터 2025년 말까지 실제 시장 데이터로 경험하는 45년 한·미 주식투자 실험실" />
     <meta name="theme-color" content="#1e1b4b" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -22,7 +22,7 @@ const devHtmlTemplate = `<!doctype html>
     <link rel="manifest" href="./manifest.json" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./favicon.svg" />
-    <title>머니트랙: 20년 자산관리 실험실</title>
+    <title>머니트랙: 45년 한·미 주식투자 실험실</title>
   </head>
   <body>
     <div id="root"></div>

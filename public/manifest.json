@@ -1,15 +1,15 @@
 {
-  "name": "머니트랙 - 20년 자산관리 실험실",
+  "name": "머니트랙: 45년 한·미 주식투자 실험실",
   "short_name": "머니트랙",
-  "description": "가상의 20년 동안 저축과 투자를 경험하며 자산관리의 원리를 배우는 어플 모드 게임",
-  "start_url": "/?app=true",
+  "description": "1980년 말부터 2025년 말까지 실제 시장 데이터로 경험하는 장기 모의주식투자",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#4f46e5",
-  "orientation": "portrait",
+  "theme_color": "#2563eb",
+  "orientation": "any",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "./favicon.svg",
       "sizes": "192x192 512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"

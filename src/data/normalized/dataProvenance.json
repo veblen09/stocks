@@ -1,0 +1,28 @@
+{
+  "datasetName": "머니트랙 45년 한·미 주식투자 데이터셋 (1980-2025)",
+  "version": "2.0.0",
+  "createdAt": "2026-08-18",
+  "totalAnnualPeriods": 45,
+  "baseYear": 1980,
+  "finalYear": 2025,
+  "totalStocks": 50,
+  "koreanStocksCount": 25,
+  "usStocksCount": 25,
+  "benchmarks": [
+    "KOSPI (한국 코스피)",
+    "S&P 500 (미국 대형주 원화환산)",
+    "50:50 Blend (한국/미국 배분)"
+  ],
+  "sources": {
+    "usStocks": "Yahoo Finance Adjusted Prices / SEC Historical 10-K Filings / CRSP (배당 재투자 및 주식분할 완벽 반영)",
+    "koreanStocks": "한국거래소(KRX) 공식 시세 정보 / 한국은행 ECOS / Yahoo Finance (주식분할 반영 수정주가)",
+    "exchangeRate": "한국은행 경제통계시스템(ECOS) 및 미 연방준비은행 FRED USD/KRW 매매기준율",
+    "benchmarks": "한국거래소 코스피 지수 / S&P Dow Jones Indices S&P 500 지수"
+  },
+  "qualityGuidelines": {
+    "preIpoHandling": "상장 이전 기간은 선택이 원천 차단되며, 결측치를 0%나 임의 가격으로 보간하지 않음",
+    "survivorshipBiasWarning": "본 50개 종목은 2025년 기준 한국과 미국의 대표 우량 기업을 중심으로 선정되었으므로 생존자 편향(Survivorship Bias)과 사후편향이 존재합니다.",
+    "fxFormula": "미국주식 KRW 수익률 = (1 + USD 총수익률) * (당해말 환율 / 전년말 환율) - 1",
+    "educationalCost": "기본 거래비용 0.1%는 실제 역사적 수수료율의 복잡성을 단순화한 교육용 모델입니다."
+  }
+}
