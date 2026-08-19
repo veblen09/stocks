@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1997_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1997-06-15",
+    "publishedAt": "1997-06-15",
+    "availableFrom": "1997-06-15",
+    "datePrecision": "DAY",
+    "originalTitle": "태국 바트화 폭락으로 촉발된 아시아 금융위기 번짐",
+    "titleKo": "태국 바트화 폭락으로 촉발된 아시아 금융위기 번짐",
+    "summaryKo": "동남아에서 시작된 통화 위기가 한국과 홍콩, 러시아로 전염되며 신흥국 외환보유액이 고갈되었습니다.",
+    "sourceName": "IMF / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "세계경제",
+      "교역"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1997년 세계 경제 지표 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "글로벌 경기 회복 및 신흥 시장 수요 창출.",
+      "negativeInterpretation": "고금리 또는 원자재 충격에 따른 불확실성.",
+      "unknownAtTheTime": "향후 통화정책 방향성."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

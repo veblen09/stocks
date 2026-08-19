@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2012_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2012-06-30",
+    "publishedAt": "2012-06-30",
+    "availableFrom": "2012-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "드라기 총재의 유로존 수호와 아베노믹스",
+    "titleKo": "[2012년 세계 경제] 드라기 총재의 유로존 수호와 아베노믹스",
+    "summaryKo": "마리오 드라기 ECB 총재의 'Whatever it takes' 선언으로 유럽 위기가 진정되었고, 일본은 아베노믹스 무제한 돈풀기를 시작했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2012년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

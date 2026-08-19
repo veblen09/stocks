@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2018_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2018-06-30",
+    "publishedAt": "2018-06-30",
+    "availableFrom": "2018-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "미·중 무역전쟁과 파월 연준의 금리인상",
+    "titleKo": "[2018년 세계 경제] 미·중 무역전쟁과 파월 연준의 금리인상",
+    "summaryKo": "트럼프 행정부의 대중 관세 폭탄과 파월 연준 의장의 4차례 금리 인상으로 글로벌 공급망이 흔들리며 전 세계 증시가 -10~-20% 조정을 받았습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2018년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

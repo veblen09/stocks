@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1996_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "1996-10-20",
+    "publishedAt": "1996-10-20",
+    "availableFrom": "1996-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[1996년 미국 증시] S&P 500 및 경제 지표",
+    "summaryKo": "1996년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 한국이 29번째 OECD 회원국으로 가입했으나, 16M D램 가격이 80% 폭락하며 무역적자가 사상 최대치로 불어났습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1996년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
+      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
+      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

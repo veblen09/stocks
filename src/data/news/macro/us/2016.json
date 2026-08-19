@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2016_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "2016-10-20",
+    "publishedAt": "2016-10-20",
+    "availableFrom": "2016-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[2016년 미국 증시] S&P 500 및 경제 지표",
+    "summaryKo": "2016년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 영국의 EU 탈퇴(브렉시트) 가결과 도널드 트럼프의 미국 대통령 당선이라는 두 번의 정치적 이변이 일어났으나, 친기업 감세 기대감으로 증시는 상승 마감했습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2016년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
+      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
+      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

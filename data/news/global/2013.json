@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2013_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2013-06-30",
+    "publishedAt": "2013-06-30",
+    "availableFrom": "2013-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "버냉키 텐트럼(테이퍼 발작)과 미국 호황",
+    "titleKo": "[2013년 세계 경제] 버냉키 텐트럼(테이퍼 발작)과 미국 호황",
+    "summaryKo": "연준의 자산매입 축소(테이퍼링) 시사로 신흥국 통화가치가 급락하는 긴축 발작이 발생했으나, 미국 증시는 기업 실적 호조로 S&P 500이 29.6% 급등했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2013년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

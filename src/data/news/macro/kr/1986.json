@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_1986_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "1986-10-30",
+    "publishedAt": "1986-10-30",
+    "availableFrom": "1986-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "대한민국 건국 이래 최초의 경상수지 흑자(46억 달러) 달성",
+    "titleKo": "대한민국 건국 이래 최초의 경상수지 흑자(46억 달러) 달성",
+    "summaryKo": "3저 현상에 힘입어 연간 경제성장률 12.2%와 사상 첫 무역흑자를 기록하며 외채 상환국으로 전환했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1986년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

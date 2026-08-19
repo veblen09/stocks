@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1991_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "1991-10-20",
+    "publishedAt": "1991-10-20",
+    "availableFrom": "1991-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[1991년 미국 증시] S&P 500 및 경제 지표",
+    "summaryKo": "1991년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 소비에트 연방이 공식 해체되며 탈냉전 시대가 열렸습니다. 한국은 1992년 외국인 주식투자 직접 허용을 앞두고 금융 개혁을 추진했습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1991년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
+      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
+      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

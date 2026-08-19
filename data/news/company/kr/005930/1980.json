@@ -1,0 +1,52 @@
+[
+  {
+    "id": "NEWS_1980_KR_SEC",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "전기전자"
+    ],
+    "eventDate": "1980-11-28",
+    "publishedAt": "1980-11-28",
+    "availableFrom": "1980-11-28",
+    "datePrecision": "DAY",
+    "originalTitle": "Samsung Electronics Prepares Domestic Color TV Rollout",
+    "titleKo": "삼성전자공업, 컬러TV 국내 방송 개시에 따른 내수 판매 본격화",
+    "summaryKo": "1980년 12월 한국 최초 컬러TV 방송 개시에 맞추어 삼성전자공업이 컬러TV 대량 생산 체제를 구축하고 내수 공급을 시작했습니다.",
+    "sourceName": "한국거래소 기업공시 / 연차보고서",
+    "sourceUrl": "https://kind.krx.co.kr",
+    "sourceType": "EXCHANGE",
+    "evidenceLevel": "CONTEMPORARY_REPORT",
+    "categories": [
+      "신제품",
+      "가전",
+      "내수확대"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1980년 12월 컬러TV 방송 시작 및 전자기기 라인업 확대.",
+      "impactChannels": [
+        "REVENUE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "컬러TV 보급 확대에 따른 가전 부문 매출 고성장 기대.",
+      "negativeInterpretation": "초기 생산단가 부담 및 금성사, 대한전선 등 가전 3사 간 가격 경쟁.",
+      "unknownAtTheTime": "소비자 구매력 회복 속도 및 수출 쿼터 규제 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

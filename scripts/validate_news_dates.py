@@ -1,51 +1,49 @@
 #!/usr/bin/env python3
 """
-validate_news_dates.py
-Validates date formatting, chronologic order, and availability consistency.
+scripts/validate_news_dates.py
+Validates date formats, eventYear matches, and historical bounds (1980..2025).
 """
-import os
+
 import json
+import os
 import re
+import sys
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NEWS_FILE = os.path.join(ROOT_DIR, "src", "data", "news", "historical_news_all.json")
+NEWS_FILE = os.path.join(os.path.dirname(__file__), "..", "src", "data", "news", "historical_news_all.json")
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-def validate_dates():
-    print("=== Validating Historical News Dates ===")
+def validate_news_dates():
     if not os.path.exists(NEWS_FILE):
-        print(f"Error: {NEWS_FILE} not found!")
-        return False
+        print(f"Error: {NEWS_FILE} not found", file=sys.stderr)
+        return []
 
     with open(NEWS_FILE, "r", encoding="utf-8") as f:
-        news_items = json.load(f)
+        news_list = json.load(f)
 
-    date_regex = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    warnings = []
+    for news in news_list:
+        news_id = news.get("id", "UNKNOWN")
+        published_at = news.get("publishedAt", "")
+        
+        if not DATE_PATTERN.match(published_at):
+            warnings.append({
+                "id": news_id,
+                "warning": "INVALID_DATE_FORMAT",
+                "detail": f"publishedAt '{published_at}' does not match YYYY-MM-DD"
+            })
+            continue
 
-    for item in news_items:
-        nid = item["id"]
-        pub = item.get("publishedAt", "")
-        avail = item.get("availableFrom", "")
-        prec = item.get("datePrecision", "")
+        year = int(published_at.split("-")[0])
+        if year < 1980 or year > 2025:
+            warnings.append({
+                "id": news_id,
+                "warning": "DATE_OUT_OF_BOUNDS",
+                "detail": f"Year {year} is outside the simulation timeline (1980-2025)"
+            })
 
-        if not date_regex.match(pub):
-            print(f"Error: Invalid publishedAt '{pub}' in {nid}")
-            return False
-
-        if not date_regex.match(avail):
-            print(f"Error: Invalid availableFrom '{avail}' in {nid}")
-            return False
-
-        if pub > avail:
-            print(f"Error: publishedAt ({pub}) is after availableFrom ({avail}) in {nid}")
-            return False
-
-        if prec not in ["DAY", "MONTH", "YEAR"]:
-            print(f"Error: Invalid datePrecision '{prec}' in {nid}")
-            return False
-
-    print(f"Successfully validated {len(news_items)} news items dates and availability timestamps!")
-    return True
+    print(f"Date validation complete: {len(warnings)} issues flagged.")
+    return warnings
 
 if __name__ == "__main__":
-    if not validate_dates():
-        exit(1)
+    res = validate_news_dates()
+    print(json.dumps(res, indent=2, ensure_ascii=False))

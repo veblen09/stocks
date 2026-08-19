@@ -1,0 +1,54 @@
+[
+  {
+    "id": "NEWS_1997_KR_005930_01",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "전기전자",
+      "자동차",
+      "철강"
+    ],
+    "eventDate": "1997-11-10",
+    "publishedAt": "1997-11-10",
+    "availableFrom": "1997-11-10",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 고환율로 원화 환산 수출액 급증하나 부채이자 부담 가중",
+    "titleKo": "삼성전자, 고환율로 원화 환산 수출액 급증하나 부채이자 부담 가중",
+    "summaryKo": "달러 매출 결제 비중이 높아 환차익을 기록했으나 시중 금리 25% 급등으로 유동성 관리에 총력을 기울였습니다.",
+    "sourceName": "한국거래소 기업공시 / DART",
+    "sourceUrl": "https://dart.fss.or.kr",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "기업실적",
+      "신제품",
+      "수출"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1997년 기업 핵심 공시 내용.",
+      "impactChannels": [
+        "REVENUE",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "주력 제품의 글로벌 경쟁력 입증 및 매출 신장.",
+      "negativeInterpretation": "경쟁사 증설에 따른 마진 압박 요인.",
+      "unknownAtTheTime": "차세대 신기술 시장 반응."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

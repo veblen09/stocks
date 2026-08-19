@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2021_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2021-06-30",
+    "publishedAt": "2021-06-30",
+    "availableFrom": "2021-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "코스피 3,000 돌파와 인플레이션의 부활",
+    "titleKo": "[2021년 세계 경제] 코스피 3,000 돌파와 인플레이션의 부활",
+    "summaryKo": "코스피가 사상 최초 3,300p(장중)를 돌파했습니다. 그러나 공급망 병목과 유동성 과잉으로 40년 만의 최악 인플레이션 압력이 가중되었습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2021년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

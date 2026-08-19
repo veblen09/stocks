@@ -1,26 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Search,
-  Play,
-  Zap,
-  RotateCcw,
-  PieChart,
-  X,
+  Newspaper,
+  Globe,
+  Scale,
   Sparkles,
+  Award,
+  BookOpen,
+  Eye,
+  FolderOpen,
+  ShieldAlert,
+  TrendingDown,
+  Lock,
+  AlertTriangle,
 } from 'lucide-react';
-import { GlassCard } from '../components/GlassCard';
 import { useStockGame } from '../store/stockGameStore';
-import { STOCKS, STOCKS_BY_ID, isStockListed, getHistoricalStockStats, getStockPriceKRW } from '../engine/returnEngine';
-import { formatKRW, formatPercent, getReturnColor, formatWonNumber } from '../utils/formatMoney';
-import type { Stock } from '../types/stockGame';
+import { formatKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
-import { AnimatedCharacterGuide } from '../components/AnimatedCharacterGuide';
 import { YearEndBriefingModal } from '../components/YearEndBriefingModal';
 import { AutoInvestModal } from '../components/AutoInvestModal';
-import { StockDetailModal } from '../components/StockDetailModal';
+import { CompanyDetailModal } from '../components/CompanyDetailModal';
+import { HistoricalNewsCenterModal } from '../components/HistoricalNewsCenterModal';
+import { NeutralNewsAnalysisModal } from '../components/NeutralNewsAnalysisModal';
 import { GlossaryModal } from '../components/GlossaryModal';
+import { StockMosaicView } from '../components/StockMosaicView';
+import { OrderReviewModal } from '../components/OrderReviewModal';
+import { CrisisDecisionModal } from '../components/CrisisDecisionModal';
+import { RiskDashboardView } from '../components/RiskDashboardView';
+
+// Live Market Replay System
+import { MarketReplayStage } from '../features/marketReplay/MarketReplayStage';
+import { generateYearReplayData, recalculateRemainingMonths } from '../features/marketReplay/monthlyPortfolioEngine';
+import type { YearReplayData } from '../features/marketReplay/marketReplayTypes';
+
+// Enhanced Game Features
+import { ChapterIntroModal } from '../features/chapters/ChapterIntroModal';
+import { ChapterSummaryModal } from '../features/chapters/ChapterSummaryModal';
+import { getChapterByYear } from '../features/chapters/chapterDefinitions';
+import { isChapterStartYear, isChapterEndYear, calculateChapterSummary } from '../features/chapters/chapterEngine';
+import { PredictionModal } from '../features/predictions/PredictionModal';
+import { CompanyEncyclopediaModal } from '../features/encyclopedia/CompanyEncyclopediaModal';
+import { InvestmentYearbookModal } from '../features/yearbook/InvestmentYearbookModal';
+import { selectYearbookHighlights } from '../features/yearbook/yearbookEngine';
+import { AchievementGalleryModal } from '../features/achievements/AchievementGalleryModal';
+import { SaveSlotManagerModal } from '../features/saveSlots/SaveSlotManagerModal';
+import { FixedActionBar } from '../features/gameplay/FixedActionBar';
+
 import { calculatePortfolioValue } from '../engine/portfolioEngine';
-import { calculateMDD } from '../engine/metricsEngine';
+import { calculatePureInvestmentPnL, calculateRiskLevel } from '../engine/metricsEngine';
+import { getMacroNewsForYear, getDecisionCutoffDisplayInfo } from '../engine/newsEngine';
+import { getTradableStocks } from '../engine/universeEngine';
+import { executeCrisisDecision } from '../engine/crisisEngine';
+import { STOCKS_BY_ID } from '../engine/returnEngine';
+import type { HistoricalNewsItem } from '../types/stockNews';
+import type { ChapterSummaryData } from '../types/chapter';
+import type { CrisisDecisionAction } from '../types/stockGame';
 
 interface GamePageProps {
   onNavigate: (page: string) => void;
@@ -29,637 +62,807 @@ interface GamePageProps {
 export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const {
     state,
-    buyStock,
-    sellStock,
+    dispatch,
     stepOneYear,
     runAutoInvest,
     saveAutoInvestRule,
     deleteAutoInvestRule,
-    undoYear,
+    recordPrediction,
+    loadSavedState,
+    setPerceivedRisk,
+    executeCrisisDecisionAction,
   } = useStockGame();
 
-  const { settings, currentYear, cashKRW, holdings, history, isGameOver } = state;
+  const {
+    settings,
+    currentYear,
+    cashKRW,
+    holdings,
+    history,
+    isGameOver,
+    watchlist = [],
+    draftTargetWeights = {},
+    unlockedAchievementIds = [],
+    companyEncyclopedia = {},
+    yearbookEntries = [],
+    annualPredictions = {},
+    playMode = 'REAL',
+    monthlyReplaySpeed = 'NORMAL',
+    perceivedRiskByYear = {},
+    activeCrisisEvent,
+  } = state;
+
   const priorYear = currentYear - 1;
+  const cutoffInfo = getDecisionCutoffDisplayInfo(currentYear);
 
-  // View & Filter States
-  const [marketFilter, setMarketFilter] = useState<'ALL' | 'KR' | 'US' | 'HOLDING'>('ALL');
-  const [sectorFilter, setSectorFilter] = useState<string>('ALL');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  // Modals
-  const [selectedStockForDetail, setSelectedStockForDetail] = useState<Stock | null>(null);
+  // Modals & Active Selections
+  const [selectedCanonicalIdForDetail, setSelectedCanonicalIdForDetail] = useState<string | null>(null);
+  const [initialDetailTab, setInitialDetailTab] = useState<'OVERVIEW' | 'NEWS' | 'LISTING' | 'FILINGS' | 'PRICES' | 'ALLOCATION' | 'NOTES'>('OVERVIEW');
+  const [showNewsCenterModal, setShowNewsCenterModal] = useState<boolean>(false);
+  const [selectedNewsForAnalysis, setSelectedNewsForAnalysis] = useState<HistoricalNewsItem | null>(null);
   const [showAutoInvestModal, setShowAutoInvestModal] = useState<boolean>(
     settings.startMode === 'AUTO_RULE' && history.length === 0
   );
   const [showGlossaryModal, setShowGlossaryModal] = useState<boolean>(false);
   const [showYearEndModal, setShowYearEndModal] = useState<boolean>(false);
+  const [showOrderReviewModal, setShowOrderReviewModal] = useState<boolean>(false);
+  const [showRealLockConfirmModal, setShowRealLockConfirmModal] = useState<boolean>(false);
 
-  // Quick Buy / Sell Dialog State
-  const [quickTradeStock, setQuickTradeStock] = useState<Stock | null>(null);
-  const [quickTradeAmountKRW, setQuickTradeAmountKRW] = useState<number>(1000000);
-  const [quickSellShares, setQuickSellShares] = useState<number>(0);
-  const [quickTradeMode, setQuickTradeMode] = useState<'BUY' | 'SELL'>('BUY');
+  // Live Market Replay Stage State
+  const [showReplayStage, setShowReplayStage] = useState<boolean>(false);
+  const [activeYearReplayData, setActiveYearReplayData] = useState<YearReplayData | null>(null);
 
-  // Compute live portfolio value at beginning of currentYear (using priorYear prices)
-  const currentTotalValue = calculatePortfolioValue(cashKRW, holdings, priorYear);
-  const totalDeposits = history.reduce((sum, h, idx) => (idx === 0 ? sum : sum + h.annualDepositKRW), 0);
-  const totalPrincipal = settings.initialCashKRW + totalDeposits;
-  const netProfit = currentTotalValue - totalPrincipal;
-  const profitRate = totalPrincipal > 0 ? netProfit / totalPrincipal : 0;
+  // Phase 2 & 3 Modals
+  const [showChapterIntroModal, setShowChapterIntroModal] = useState<boolean>(false);
+  const [chapterSummaryData, setChapterSummaryData] = useState<ChapterSummaryData | null>(null);
+  const [showPredictionModal, setShowPredictionModal] = useState<boolean>(false);
+  const [showEncyclopediaModal, setShowEncyclopediaModal] = useState<boolean>(false);
+  const [showYearbookModal, setShowYearbookModal] = useState<boolean>(false);
+  const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
+  const [showSaveSlotModal, setShowSaveSlotModal] = useState<boolean>(false);
 
-  // TWR and MDD so far
-  const lastHistory = history.length > 0 ? history[history.length - 1] : null;
-  const currentTwrIndex = lastHistory ? lastHistory.twrIndexLevel : 100.0;
-  const currentTwr = (currentTwrIndex - 100) / 100;
-  const twrLevels = [100, ...history.map(h => h.twrIndexLevel)];
-  const currentMDD = calculateMDD(twrLevels);
+  // Main Tab: 'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'
+  const [activeTab, setActiveTab] = useState<'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'>('MARKET');
 
-  // Filter stocks
-  const allSectors = Array.from(new Set(STOCKS.map(s => s.sector)));
-  const filteredStocks = STOCKS.filter(s => {
-    if (marketFilter === 'KR' && s.market !== 'KR') return false;
-    if (marketFilter === 'US' && s.market !== 'US') return false;
-    if (marketFilter === 'HOLDING' && (!holdings[s.canonicalId] || holdings[s.canonicalId].shares <= 1e-7)) return false;
-    if (sectorFilter !== 'ALL' && s.sector !== sectorFilter) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        s.nameKo.toLowerCase().includes(q) ||
-        s.nameEn.toLowerCase().includes(q) ||
-        s.ticker.toLowerCase().includes(q)
-      );
+  // Check for chapter start
+  const currentChapter = getChapterByYear(currentYear);
+  useEffect(() => {
+    if (
+      currentChapter &&
+      isChapterStartYear(currentYear, settings.startYear) &&
+      !state.completedChapterIds?.includes(currentChapter.id) &&
+      history.length === (currentChapter.startYear - settings.startYear)
+    ) {
+      setShowChapterIntroModal(true);
     }
-    return true;
-  });
+  }, [currentYear, currentChapter, state.completedChapterIds, history.length, settings.startYear]);
 
-  // Advance 1 Year handler
-  const handleStepOneYear = () => {
-    audioManager.playSound('click');
-    stepOneYear();
-    setShowYearEndModal(true);
+  // Navigate to results if game over
+  useEffect(() => {
+    if (isGameOver) {
+      onNavigate('result');
+    }
+  }, [isGameOver, onNavigate]);
+
+  // Calculate current portfolio values
+  const currentAssets = calculatePortfolioValue(cashKRW, holdings, priorYear);
+  const initialCashKRW = settings.initialCashKRW || 10000000;
+  const isFirstSimulationYear = currentYear === settings.startYear + 1;
+  const totalInvestedPrincipal = initialCashKRW + (isFirstSimulationYear ? 0 : history.length * (settings.annualContributionKRW || 0));
+
+  const purePnL = calculatePureInvestmentPnL(
+    currentAssets,
+    initialCashKRW,
+    isFirstSimulationYear ? 0 : history.length * (settings.annualContributionKRW || 0)
+  );
+
+  // Peak and Drawdown
+  let runningPeak = currentAssets;
+  history.forEach(h => {
+    if (h.endTotalAssetsKRW > runningPeak) runningPeak = h.endTotalAssetsKRW;
+  });
+  const liveDrawdown = runningPeak > 0 ? (currentAssets - runningPeak) / runningPeak : 0;
+  const liveRiskLevel = calculateRiskLevel(liveDrawdown);
+
+  // Tradable Stocks
+  const tradableStocks = useMemo(() => {
+    return getTradableStocks({
+      currentYear,
+      watchlist,
+      holdings,
+    });
+  }, [currentYear, watchlist, holdings]);
+
+  // Macro news for currentYear
+  const macroNewsList = useMemo(() => {
+    return getMacroNewsForYear(currentYear).slice(0, 6);
+  }, [currentYear]);
+
+  // Draft Target Weights Calculation
+  const totalStockTarget = Object.values(draftTargetWeights).reduce((sum, w) => sum + w, 0);
+  const draftCashTargetWeight = Math.max(0, 1.0 - totalStockTarget);
+  const changedStocksCount = Object.values(draftTargetWeights).filter(w => w > 0.0001).length;
+
+  // Single stock concentration check
+  const maxDraftStock = useMemo(() => {
+    let maxCid = '';
+    let maxW = 0;
+    for (const [cid, w] of Object.entries(draftTargetWeights)) {
+      if (w > maxW) {
+        maxW = w;
+        maxCid = cid;
+      }
+    }
+    const s = STOCKS_BY_ID[maxCid];
+    return { cid: maxCid, nameKo: s ? s.nameKo : maxCid, weight: maxW };
+  }, [draftTargetWeights]);
+
+  // Handle Advance Simulation (with Live Market Replay)
+  const handleInitiateAdvance = () => {
+    if (totalStockTarget > 1.0001) {
+      dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' });
+    }
+
+    if (playMode === 'REAL') {
+      setShowRealLockConfirmModal(true);
+    } else {
+      executeAdvanceWorkflow();
+    }
   };
 
-  // Quick Trade Execution
-  const handleExecuteQuickTrade = () => {
-    if (!quickTradeStock) return;
-    try {
-      if (quickTradeMode === 'BUY') {
-        buyStock(quickTradeStock.canonicalId, quickTradeAmountKRW);
-        audioManager.playSound('success');
-      } else {
-        sellStock(quickTradeStock.canonicalId, quickSellShares);
-        audioManager.playSound('click');
-      }
-      setQuickTradeStock(null);
-    } catch (e: any) {
-      alert(e.message || '주문 처리 중 오류가 발생했습니다.');
+  const executeAdvanceWorkflow = () => {
+    setShowRealLockConfirmModal(false);
+    audioManager.playSound('click');
+
+    // First commit draft allocation
+    if (changedStocksCount > 0) {
+      dispatch({ type: 'EXECUTE_DRAFT_ALLOCATION' });
     }
+
+    const deposit = currentYear === settings.startYear + 1 ? 0 : settings.annualContributionKRW;
+    const cashBefore = cashKRW + deposit;
+
+    // Generate 12-Month Live Market Replay Data
+    const replayData = generateYearReplayData(
+      currentYear,
+      cashBefore,
+      holdings,
+      currentAssets,
+      totalInvestedPrincipal,
+      runningPeak,
+      settings,
+      history.length
+    );
+
+    setActiveYearReplayData(replayData);
+
+    if (monthlyReplaySpeed === 'INSTANT' || replayData.quality === 'ANNUAL_ONLY') {
+      // Step immediately
+      stepOneYear();
+      setShowYearEndModal(true);
+
+      if (currentChapter && isChapterEndYear(currentYear, settings.endYear)) {
+        const summary = calculateChapterSummary(currentChapter, state);
+        setChapterSummaryData(summary);
+      }
+    } else {
+      // Open Live Market Replay Stage
+      setShowReplayStage(true);
+    }
+  };
+
+  // Handle Crisis Decision Modal Execution
+  const handleExecuteCrisisDecision = (
+    action: CrisisDecisionAction,
+    options?: { targetCashWeight?: number; customTargetWeights?: { canonicalId: string; weight: number }[]; rationale?: string }
+  ) => {
+    if (activeCrisisEvent) {
+      const res = executeCrisisDecision(
+        activeCrisisEvent,
+        action,
+        state,
+        options
+      );
+
+      // If Replay Stage is active, recalculate remaining months M+1 to 12
+      if (showReplayStage && activeYearReplayData) {
+        const updatedData = recalculateRemainingMonths(
+          activeYearReplayData,
+          activeCrisisEvent.month,
+          res.updatedCash,
+          res.updatedHoldings,
+          settings
+        );
+        setActiveYearReplayData(updatedData);
+      }
+    }
+
+    executeCrisisDecisionAction(action, options);
   };
 
   return (
-    <div className="space-y-5 animate-fade-in-up pb-12">
-      {/* Top Header & Year KPI Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-        {/* Current Year Indicator */}
-        <div className="col-span-2 sm:col-span-2 lg:col-span-1 p-3.5 bg-gradient-to-br from-blue-700 to-indigo-900 text-white rounded-2xl shadow-lg flex flex-col justify-between">
-          <div className="flex items-center justify-between text-[11px] font-bold text-blue-200">
-            <span>운용 연도</span>
-            <span className="bg-blue-600/60 px-2 py-0.5 rounded-full text-[10px]">{currentYear - settings.startYear}/{settings.endYear - settings.startYear}회차</span>
-          </div>
-          <div className="mt-1">
-            <span className="text-2xl font-black tracking-tight">{currentYear}년</span>
-            <span className="text-[10px] text-blue-300 block font-semibold">({settings.startYear}년말 ~ {settings.endYear}년말)</span>
-          </div>
-        </div>
-
-        {/* Total Assets */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-slate-500">총 평가 자산</span>
-          <div>
-            <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight block">
-              {formatKRW(currentTotalValue)}
+    <div className="space-y-4 pb-28 animate-fade-in">
+      {/* Top Header & Year Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+              45년 역사적 시뮬레이션
             </span>
-            <span className="text-[10px] text-slate-400 font-semibold">{formatWonNumber(currentTotalValue)}원</span>
-          </div>
-        </div>
-
-        {/* Invested Principal */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-slate-500">총 납입 원금</span>
-          <div>
-            <span className="text-base sm:text-lg font-black text-slate-800 tracking-tight block">
-              {formatKRW(totalPrincipal)}
+            <span className="text-xs font-bold text-slate-600">
+              {currentYear}년 투자 결정기 ({cutoffInfo.searchPeriod})
             </span>
-            <span className="text-[10px] text-slate-400 font-semibold">누적 입금액</span>
-          </div>
-        </div>
-
-        {/* Net Profit */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-slate-500">누적 투자 손익</span>
-          <div>
-            <span className={`text-base sm:text-lg font-black tracking-tight block ${getReturnColor(netProfit)}`}>
-              {netProfit > 0 ? '+' : ''}{formatKRW(netProfit)}
-            </span>
-            <span className={`text-[10px] font-bold ${getReturnColor(profitRate)}`}>
-              {formatPercent(profitRate)}
-            </span>
-          </div>
-        </div>
-
-        {/* TWR */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-slate-500">시간가중수익률 (TWR)</span>
-          <div>
-            <span className={`text-base sm:text-lg font-black tracking-tight block ${getReturnColor(currentTwr)}`}>
-              {formatPercent(currentTwr)}
-            </span>
-            <span className="text-[10px] text-slate-400 font-semibold">순수 전략 복리</span>
-          </div>
-        </div>
-
-        {/* MDD */}
-        <div className="p-3 bg-white rounded-2xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-slate-500">최대낙폭 (MDD)</span>
-          <div>
-            <span className="text-base sm:text-lg font-black text-slate-800 tracking-tight block">
-              -{formatPercent(currentMDD)}
-            </span>
-            <span className="text-[10px] text-slate-400 font-semibold">최대 손실폭</span>
-          </div>
-        </div>
-
-        {/* Available Cash */}
-        <div className="p-3 bg-emerald-50/80 rounded-2xl border border-emerald-200/70 shadow-sm flex flex-col justify-between">
-          <span className="text-[11px] font-extrabold text-emerald-800">매매 대기 현금</span>
-          <div>
-            <span className="text-base sm:text-lg font-black text-emerald-700 tracking-tight block">
-              {formatKRW(cashKRW)}
-            </span>
-            <span className="text-[10px] text-emerald-600 font-semibold">{formatWonNumber(cashKRW)}원</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Interactive Workspace (Desktop: 2 Columns) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Column: Stock Catalog (7 Cols on Desktop) */}
-        <div className="lg:col-span-7 space-y-4">
-          <GlassCard className="p-5 space-y-4" variant="default">
-            {/* Catalog Filter Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              {/* Market Tabs */}
-              <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
-                <button
-                  onClick={() => setMarketFilter('ALL')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                    marketFilter === 'ALL' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  전체 (50)
-                </button>
-                <button
-                  onClick={() => setMarketFilter('KR')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer flex items-center gap-1 ${
-                    marketFilter === 'KR' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>🇰🇷</span> 한국 (25)
-                </button>
-                <button
-                  onClick={() => setMarketFilter('US')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer flex items-center gap-1 ${
-                    marketFilter === 'US' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <span>🇺🇸</span> 미국 (25)
-                </button>
-                <button
-                  onClick={() => setMarketFilter('HOLDING')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                    marketFilter === 'HOLDING' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  보유종목 ({Object.keys(holdings).length})
-                </button>
-              </div>
-
-              {/* Sector Dropdown */}
-              <select
-                value={sectorFilter}
-                onChange={e => setSectorFilter(e.target.value)}
-                className="px-3 py-1.5 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none shadow-sm"
-              >
-                <option value="ALL">전체 업종</option>
-                {allSectors.map(sec => (
-                  <option key={sec} value={sec}>{sec}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Search Input */}
-            <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="종목명 또는 티커 검색 (예: 삼성전자, AAPL, 현대차, NVDA)"
-                className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 shadow-sm"
-              />
-            </div>
-
-            {/* Stock Cards List */}
-            <div className="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
-              {filteredStocks.length === 0 ? (
-                <div className="text-center py-12 text-slate-400 text-xs font-bold">
-                  조건에 맞는 종목이 없습니다.
-                </div>
-              ) : (
-                filteredStocks.map(stock => {
-                  const isListed = isStockListed(stock.canonicalId, currentYear);
-                  const holding = holdings[stock.canonicalId];
-                  const stats = getHistoricalStockStats(stock.canonicalId, priorYear, settings.includeFxEffect);
-                  const priceKRW = getStockPriceKRW(stock.canonicalId, priorYear);
-
-                  return (
-                    <div
-                      key={stock.canonicalId}
-                      className={`p-3.5 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                        isListed
-                          ? 'bg-white hover:border-blue-300 hover:shadow-md border-slate-200/70'
-                          : 'bg-slate-50/70 border-slate-200/40 opacity-70'
-                      }`}
-                    >
-                      {/* Left: Stock info */}
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-lg">
-                          {stock.market === 'KR' ? '🇰🇷' : '🇺🇸'}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-extrabold text-slate-900 text-sm">{stock.nameKo}</h3>
-                            <span className="text-[10px] font-mono text-slate-400 font-bold">({stock.ticker})</span>
-                            {isListed ? (
-                              <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                                {stock.sector}
-                              </span>
-                            ) : (
-                              <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                                상장 전 ({stock.firstValidYear}년~)
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-3 text-[11px] text-slate-500 font-semibold mt-0.5">
-                            <span>기준가: {priceKRW !== null ? formatKRW(priceKRW) : '-'}</span>
-                            {holding && holding.shares > 0 && (
-                              <span className="text-blue-600 font-bold">
-                                보유: {holding.shares.toFixed(2)}주 ({formatKRW(holding.currentValueKRW)})
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Middle: Historical Stats */}
-                      <div className="flex items-center gap-3 text-[11px] font-bold">
-                        <div className="text-center sm:text-right">
-                          <span className="text-[10px] text-slate-400 block font-semibold">직전 1년</span>
-                          <span className={stats.last1YrReturn !== null ? getReturnColor(stats.last1YrReturn) : 'text-slate-400'}>
-                            {stats.last1YrReturn !== null ? formatPercent(stats.last1YrReturn) : '-'}
-                          </span>
-                        </div>
-                        <div className="text-center sm:text-right">
-                          <span className="text-[10px] text-slate-400 block font-semibold">3년 CAGR</span>
-                          <span className={stats.past3YrCAGR !== null ? getReturnColor(stats.past3YrCAGR) : 'text-slate-400'}>
-                            {stats.past3YrCAGR !== null ? formatPercent(stats.past3YrCAGR) : '-'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right: Actions */}
-                      <div className="flex items-center gap-1.5 self-end sm:self-center">
-                        <button
-                          onClick={() => setSelectedStockForDetail(stock)}
-                          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition cursor-pointer"
-                        >
-                          상세
-                        </button>
-                        {isListed && (
-                          <button
-                            onClick={() => {
-                              setQuickTradeStock(stock);
-                              setQuickTradeMode('BUY');
-                              setQuickTradeAmountKRW(Math.min(cashKRW, 2000000));
-                            }}
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg text-xs shadow-sm transition cursor-pointer"
-                          >
-                            매수
-                          </button>
-                        )}
-                        {holding && holding.shares > 0 && (
-                          <button
-                            onClick={() => {
-                              setQuickTradeStock(stock);
-                              setQuickTradeMode('SELL');
-                              setQuickSellShares(holding.shares);
-                            }}
-                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-lg text-xs shadow-sm transition cursor-pointer"
-                          >
-                            매도
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Right Column: Portfolio & Action Hub (5 Cols on Desktop) */}
-        <div className="lg:col-span-5 space-y-4">
-          {/* Current Portfolio Card */}
-          <GlassCard className="p-5 space-y-4" variant="default">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <PieChart size={18} className="text-blue-600" />
-                <h3 className="font-extrabold text-slate-800 text-sm">보유 포트폴리오 현황</h3>
-              </div>
-              <span className="text-xs font-black text-slate-500">
-                총 {Object.keys(holdings).length}종목 보유
+            {playMode === 'REAL' ? (
+              <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200 flex items-center gap-1">
+                <Lock size={12} /> 실전 모드 (되돌리기 불가)
               </span>
-            </div>
-
-            {/* Holdings List */}
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-              {Object.keys(holdings).length === 0 ? (
-                <div className="text-center py-8 text-slate-400 text-xs font-bold">
-                  현재 보유 중인 주식이 없습니다.<br />
-                  왼쪽 카탈로그에서 종목을 매수하거나 자동투자를 실행해 보세요.
-                </div>
-              ) : (
-                Object.values(holdings).map(h => {
-                  const stock = STOCKS_BY_ID[h.canonicalId];
-                  if (!stock || h.shares <= 1e-7) return null;
-                  const pKRW = getStockPriceKRW(h.canonicalId, priorYear) || 1;
-                  const currentVal = h.shares * pKRW;
-                  const weightPct = currentTotalValue > 0 ? (currentVal / currentTotalValue) * 100 : 0;
-                  const gain = currentVal - h.totalInvestedKRW;
-                  const gainPct = h.totalInvestedKRW > 0 ? gain / h.totalInvestedKRW : 0;
-
-                  return (
-                    <div key={h.canonicalId} className="p-3 bg-white rounded-xl border border-slate-200/60 shadow-sm flex items-center justify-between text-xs font-semibold">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span>{stock.market === 'KR' ? '🇰🇷' : '🇺🇸'}</span>
-                          <span className="font-extrabold text-slate-800">{stock.nameKo}</span>
-                          <span className="text-[10px] text-blue-600 font-black">{weightPct.toFixed(1)}%</span>
-                        </div>
-                        <span className="text-[10px] text-slate-400 block font-mono">
-                          {h.shares.toFixed(2)}주 · 평단 {formatWonNumber(h.averageCostKRW)}원
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-black text-slate-800 block">{formatKRW(currentVal)}</span>
-                        <span className={`text-[10px] font-bold ${getReturnColor(gain)}`}>
-                          {gain > 0 ? '+' : ''}{formatWonNumber(gain)}원 ({formatPercent(gainPct)})
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Cash Row */}
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200/70 flex items-center justify-between text-xs font-bold text-emerald-900">
-              <span>매매 대기 현금</span>
-              <span className="font-black text-emerald-700 text-sm">{formatKRW(cashKRW)}</span>
-            </div>
-          </GlassCard>
-
-          {/* Action Execution Card */}
-          <GlassCard className="p-5 space-y-3.5" variant="strong">
-            <h3 className="font-black text-slate-800 text-sm flex items-center gap-2">
-              <Zap size={18} className="text-amber-500" />
-              시뮬레이션 실행 제어기
-            </h3>
-
-            <div className="space-y-2">
-              {/* Advance 1 Year Primary Button */}
-              <button
-                onClick={handleStepOneYear}
-                className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black rounded-2xl shadow-lg shadow-blue-600/25 transition transform active:scale-98 flex items-center justify-center gap-2 text-sm cursor-pointer"
-              >
-                <Play size={18} />
-                <span>{currentYear}년 투자 실행 & 1년 진행하기</span>
-              </button>
-
-              {/* Multi-Year Auto-Invest Quick Buttons */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setShowAutoInvestModal(true)}
-                  className="py-3 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold rounded-xl border border-indigo-200 transition flex items-center justify-center gap-1 text-xs cursor-pointer"
-                >
-                  <Sparkles size={14} className="text-indigo-600" />
-                  <span>5년·10년 자동투자</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    if (history.length === 0) {
-                      alert('되돌릴 수 있는 이전 연도가 없습니다.');
-                      return;
-                    }
-                    if (confirm('직전 1년 투자를 취소하고 이전 연도로 되돌리시겠습니까?')) {
-                      undoYear();
-                    }
-                  }}
-                  disabled={history.length === 0}
-                  className="py-3 px-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-700 font-extrabold rounded-xl transition flex items-center justify-center gap-1 text-xs cursor-pointer"
-                >
-                  <RotateCcw size={14} />
-                  <span>해당 연도 되돌리기</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Character Guide Mini */}
-            <div className="pt-2">
-              <AnimatedCharacterGuide
-                compact={true}
-                mood="thinking"
-                title="나의 투자 길잡이"
-                subtitle={`${currentYear}년 시장 의사결정`}
-                message={`${currentYear}년 초 자산 배분을 점검하세요. 한국과 미국 우량 기업에 분산하거나 자동투자 규칙을 실행할 수 있습니다.`}
-              />
-            </div>
-          </GlassCard>
-        </div>
-      </div>
-
-      {/* Quick Trade Buy/Sell Modal */}
-      {quickTradeStock && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-md p-6 relative animate-fade-in-up border-white/80" variant="strong">
-            <button
-              onClick={() => setQuickTradeStock(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
-            >
-              <X size={18} />
-            </button>
-
-            <h3 className="text-base font-black text-slate-800 mb-1 flex items-center gap-2">
-              <span>{quickTradeStock.market === 'KR' ? '🇰🇷' : '🇺🇸'}</span>
-              <span>{quickTradeStock.nameKo} ({quickTradeStock.ticker})</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                quickTradeMode === 'BUY' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-800'
-              }`}>
-                {quickTradeMode === 'BUY' ? '매수 주문' : '매도 주문'}
-              </span>
-            </h3>
-            <p className="text-xs text-slate-500 font-semibold mb-4">
-              기준 단가: {formatKRW(getStockPriceKRW(quickTradeStock.canonicalId, priorYear) || 1)}
-            </p>
-
-            {quickTradeMode === 'BUY' ? (
-              <div className="space-y-4 text-xs font-semibold">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-slate-700 font-extrabold">
-                    <span>매수 금액 설정</span>
-                    <span className="text-blue-600 font-black">{formatKRW(quickTradeAmountKRW)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={100000}
-                    max={Math.max(100000, cashKRW)}
-                    step={100000}
-                    value={quickTradeAmountKRW}
-                    onChange={e => setQuickTradeAmountKRW(parseFloat(e.target.value))}
-                    className="w-full accent-blue-600"
-                  />
-                </div>
-
-                <div className="grid grid-cols-4 gap-1.5">
-                  {[0.25, 0.5, 0.75, 1.0].map(ratio => (
-                    <button
-                      key={ratio}
-                      type="button"
-                      onClick={() => setQuickTradeAmountKRW(Math.floor(cashKRW * ratio))}
-                      className="py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-[10px] font-black text-slate-700"
-                    >
-                      {ratio * 100}% ({formatKRW(Math.floor(cashKRW * ratio))})
-                    </button>
-                  ))}
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-xl space-y-1 text-[11px] text-slate-500 font-medium">
-                  <div className="flex justify-between">
-                    <span>예상 매수 수량:</span>
-                    <span className="font-bold text-slate-800">
-                      {((quickTradeAmountKRW) / (getStockPriceKRW(quickTradeStock.canonicalId, priorYear) || 1)).toFixed(4)}주
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>예상 거래비용 (0.1%):</span>
-                    <span className="font-bold text-slate-800">{formatWonNumber(quickTradeAmountKRW * 0.001)}원</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleExecuteQuickTrade}
-                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-md transition cursor-pointer text-xs"
-                >
-                  매수 주문 실행
-                </button>
-              </div>
             ) : (
-              <div className="space-y-4 text-xs font-semibold">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-slate-700 font-extrabold">
-                    <span>매도 수량 설정</span>
-                    <span className="text-slate-800 font-black">{quickSellShares.toFixed(4)}주</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={holdings[quickTradeStock.canonicalId]?.shares || 0}
-                    step={0.01}
-                    value={quickSellShares}
-                    onChange={e => setQuickSellShares(parseFloat(e.target.value))}
-                    className="w-full accent-slate-800"
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setQuickSellShares((holdings[quickTradeStock.canonicalId]?.shares || 0) * 0.5)}
-                    className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700"
-                  >
-                    절반 매도 (50%)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setQuickSellShares(holdings[quickTradeStock.canonicalId]?.shares || 0)}
-                    className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-700"
-                  >
-                    전량 매도 (100%)
-                  </button>
-                </div>
-
-                <button
-                  onClick={handleExecuteQuickTrade}
-                  className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-md transition cursor-pointer text-xs"
-                >
-                  매도 주문 실행
-                </button>
-              </div>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                🟢 연습 모드 (자유 실험)
+              </span>
             )}
-          </GlassCard>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5 font-display flex items-center gap-2">
+            <span>{currentYear}년 포트폴리오 의사결정</span>
+            {currentChapter && (
+              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl">
+                시대: {currentChapter.titleKo}
+              </span>
+            )}
+          </h1>
+        </div>
+
+        {/* Global Toolbar Buttons */}
+        <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
+          <button
+            type="button"
+            onClick={() => setShowAutoInvestModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 transition flex items-center gap-1 cursor-pointer"
+          >
+            <Sparkles size={14} /> 자동투자 전략
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowPredictionModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition flex items-center gap-1 cursor-pointer"
+          >
+            <Eye size={14} /> {currentYear}년 시장 전망
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowEncyclopediaModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition flex items-center gap-1 cursor-pointer"
+          >
+            <BookOpen size={14} /> 기업도감 ({Object.keys(companyEncyclopedia).length})
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowAchievementsModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition flex items-center gap-1 cursor-pointer"
+          >
+            <Award size={14} /> 업적 ({unlockedAchievementIds.length})
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowSaveSlotModal(true)}
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
+            title="저장 슬롯 관리"
+          >
+            <FolderOpen size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* TOP KPI BAR: Separating Total Assets from Pure PnL */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {/* Total Assets */}
+        <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <span className="text-[11px] font-bold text-slate-500">총 평가 자산</span>
+          <div className="my-1">
+            <span className="text-lg sm:text-xl font-black font-mono text-slate-900 block">
+              {formatKRW(currentAssets)}
+            </span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-mono">
+            보유 현금 {formatKRW(cashKRW)}
+          </span>
+        </div>
+
+        {/* Pure Investment PnL */}
+        <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <span className="text-[11px] font-bold text-slate-500">순수 투자손익 (납입원금 제외)</span>
+          <div className="my-1">
+            <span className={`text-lg sm:text-xl font-black font-mono block ${getReturnColor(purePnL.investmentPnLPercent)}`}>
+              {purePnL.investmentPnLKRW >= 0 ? '+' : ''}{formatKRW(purePnL.investmentPnLKRW)}
+            </span>
+          </div>
+          <span className={`text-[10px] font-bold font-mono ${getReturnColor(purePnL.investmentPnLPercent)}`}>
+            원금대비 {purePnL.investmentPnLPercent >= 0 ? '+' : ''}{formatPercent(purePnL.investmentPnLPercent)}
+          </span>
+        </div>
+
+        {/* Total Invested Principal */}
+        <div className="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <span className="text-[11px] font-bold text-slate-500">총 투입 원금 (누적)</span>
+          <div className="my-1">
+            <span className="text-lg sm:text-xl font-black font-mono text-slate-800 block">
+              {formatKRW(totalInvestedPrincipal)}
+            </span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-mono">
+            초기 {formatKRW(initialCashKRW)} + 매년 적립
+          </span>
+        </div>
+
+        {/* Real-Time Drawdown & Risk Gauge */}
+        <div className={`p-3.5 rounded-2xl border shadow-xs flex flex-col justify-between ${
+          liveRiskLevel === 'CRISIS' || liveRiskLevel === 'EXTREME'
+            ? 'bg-rose-50/80 border-rose-200 text-rose-900'
+            : liveRiskLevel === 'WARNING'
+            ? 'bg-amber-50/80 border-amber-200 text-amber-900'
+            : 'bg-slate-50 border-slate-200 text-slate-800'
+        }`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold">고점 대비 낙폭 (Drawdown)</span>
+            <span className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-white/80 border border-slate-200">
+              {liveRiskLevel === 'EXTREME' ? '🔥 극단위험' : liveRiskLevel === 'CRISIS' ? '🚨 위기경보' : liveRiskLevel === 'WARNING' ? '⚠️ 경계' : liveRiskLevel === 'CAUTION' ? '👀 주의' : '🟢 정상'}
+            </span>
+          </div>
+          <div className="my-1">
+            <span className="text-lg sm:text-xl font-black font-mono block text-rose-600">
+              {liveDrawdown < -0.0001 ? `-${formatPercent(Math.abs(liveDrawdown))}` : '0.0% (고점)'}
+            </span>
+          </div>
+          <span className="text-[10px] font-medium opacity-80">
+            역대 최고자산: {formatKRW(runningPeak)}
+          </span>
+        </div>
+      </div>
+
+      {/* Single Stock Concentration Warning (if >= 40%) */}
+      {maxDraftStock.weight >= 0.40 && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between gap-3 text-xs text-amber-900 animate-scale-up">
+          <div className="flex items-center gap-2 font-medium">
+            <AlertTriangle size={18} className="text-amber-600 shrink-0" />
+            <span>
+              <strong>단일 종목 집중 경고:</strong> [{maxDraftStock.nameKo}] 목표 비중이 <strong>{formatPercent(maxDraftStock.weight)}</strong>에 달합니다. 개별 기업 위기 발생 시 최대낙폭이 급격히 확대될 수 있습니다.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' })}
+            className="px-3 py-1 bg-white hover:bg-amber-100 text-amber-800 border border-amber-300 rounded-xl font-bold shrink-0 cursor-pointer text-[11px]"
+          >
+            비중 균등 조정
+          </button>
         </div>
       )}
 
-      {/* Year-End Briefing Modal */}
-      {showYearEndModal && (
-        <YearEndBriefingModal
-          record={lastHistory}
-          isGameOver={isGameOver}
-          onProceed={() => {
-            setShowYearEndModal(false);
-            if (isGameOver) {
-              onNavigate('result');
-            }
+      {/* Main 5-Tab Navigation Bar */}
+      <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl flex-wrap">
+          <button
+            type="button"
+            onClick={() => { audioManager.playUiSound('tab'); setActiveTab('MARKET'); }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'MARKET' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Globe size={15} /> 1. 시장 모자이크 & 탐색
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { audioManager.playUiSound('tab'); setActiveTab('PORTFOLIO'); }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'PORTFOLIO' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Scale size={15} /> 2. 자산배분 & 주문검토 ({changedStocksCount})
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { audioManager.playUiSound('tab'); setActiveTab('NEWS'); }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'NEWS' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Newspaper size={15} /> 3. 역사적 뉴스 & 공시
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { audioManager.playUiSound('tab'); setActiveTab('RISK'); }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'RISK' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <ShieldAlert size={15} /> 4. 리스크 진단 & 민감도
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { audioManager.playUiSound('tab'); setActiveTab('PROGRESS'); }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'PROGRESS' ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TrendingDown size={15} /> 5. 챕터 여정
+          </button>
+        </div>
+
+        {/* Perceived Risk Selector */}
+        <div className="hidden lg:flex items-center gap-2 text-xs font-bold">
+          <span className="text-slate-500">체감 위험도 기록:</span>
+          <div className="flex bg-slate-100 p-0.5 rounded-xl gap-0.5">
+            {(['LOW', 'NORMAL', 'HIGH', 'VERY_HIGH'] as const).map(rk => (
+              <button
+                key={rk}
+                type="button"
+                onClick={() => {
+                  audioManager.playSound('click');
+                  setPerceivedRisk(currentYear, rk);
+                }}
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                  perceivedRiskByYear[currentYear] === rk
+                    ? rk === 'VERY_HIGH'
+                      ? 'bg-rose-600 text-white'
+                      : rk === 'HIGH'
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-blue-600 text-white'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                {rk === 'LOW' ? '안정' : rk === 'NORMAL' ? '보통' : rk === 'HIGH' ? '경계' : '공포'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Tab Views */}
+      {activeTab === 'MARKET' && (
+        <StockMosaicView
+          tradableStocks={tradableStocks}
+          allTradableCount={tradableStocks.length}
+          krTradableCount={tradableStocks.filter(s => s.market === 'KR').length}
+          usTradableCount={tradableStocks.filter(s => s.market === 'US').length}
+          currentYear={currentYear}
+          cashKRW={cashKRW}
+          holdings={holdings}
+          watchlist={watchlist}
+          draftTargetWeights={draftTargetWeights}
+          selectedCanonicalId={selectedCanonicalIdForDetail}
+          onSelectStock={cid => {
+            setSelectedCanonicalIdForDetail(cid);
+            setInitialDetailTab('OVERVIEW');
+          }}
+          onUpdateDraftTargetWeight={(cid, w) => {
+            dispatch({ type: 'SET_DRAFT_TARGET_WEIGHT', payload: { canonicalId: cid, weight: w } });
+          }}
+          onToggleWatchlist={cid => {
+            dispatch({ type: 'TOGGLE_WATCHLIST', payload: cid });
           }}
         />
       )}
 
-      {/* Auto-Invest Modal */}
+      {activeTab === 'PORTFOLIO' && (
+        <div className="space-y-4">
+          <OrderReviewModal
+            currentYear={currentYear}
+            cashKRW={cashKRW}
+            holdings={holdings}
+            draftTargetWeights={draftTargetWeights}
+            tradableStocks={tradableStocks}
+            settings={settings}
+            onExecuteBatchOrder={() => {
+              dispatch({ type: 'EXECUTE_DRAFT_ALLOCATION' });
+              audioManager.playUiSound('success');
+            }}
+            onResetDraft={() => dispatch({ type: 'RESET_DRAFT_TARGET_WEIGHTS' })}
+            onNormalize={() => dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' })}
+            onClose={() => setActiveTab('MARKET')}
+          />
+        </div>
+      )}
+
+      {activeTab === 'NEWS' && (
+        <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-800">{currentYear}년 공개된 역사적 뉴스 & 공시</h2>
+              <p className="text-xs text-slate-500 font-medium">{cutoffInfo.cutoffDate} 기준 확인 가능한 뉴스</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowNewsCenterModal(true)}
+              className="px-3.5 py-1.5 bg-blue-50 text-blue-700 font-bold text-xs rounded-xl border border-blue-200 hover:bg-blue-100 transition cursor-pointer"
+            >
+              전체 뉴스 아카이브 열기
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {macroNewsList.map(news => (
+              <div
+                key={news.id}
+                onClick={() => setSelectedNewsForAnalysis(news)}
+                className="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300 transition cursor-pointer space-y-2 shadow-xs"
+              >
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-blue-700">{news.sourceName || '역사적 기록'}</span>
+                  <span className="font-mono text-slate-400 text-[11px]">{news.publishedAt}</span>
+                </div>
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 leading-snug">{news.titleKo}</h3>
+                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">{news.summaryKo}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'RISK' && (
+        <RiskDashboardView
+          state={state}
+          onOpenGlossary={() => setShowGlossaryModal(true)}
+        />
+      )}
+
+      {activeTab === 'PROGRESS' && (
+        <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <h2 className="text-lg font-black text-slate-800">45년 역사적 시대(Chapter) 여정</h2>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">5년 단위 9개 시대의 역사적 배경과 리스크 통제 목표</p>
+            </div>
+            <span className="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+              현재: {currentChapter?.titleKo || '1980~2025'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {getChapterByYear(currentYear) && (
+              <div className="p-4 bg-blue-50/60 rounded-2xl border border-blue-200 md:col-span-3 space-y-3">
+                <span className="text-xs font-extrabold text-blue-900 block">
+                  현재 진행 중인 시대: {currentChapter?.titleKo} ({currentChapter?.startYear}~{currentChapter?.endYear}년)
+                </span>
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  {currentChapter?.startContext.descriptionKo}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Fixed Bottom Action Bar */}
+      <FixedActionBar
+        currentYear={currentYear}
+        totalStockTarget={totalStockTarget}
+        draftCashTargetWeight={draftCashTargetWeight}
+        changedStocksCount={changedStocksCount}
+        estimatedFeesKRW={0}
+        isOverAllocated={totalStockTarget > 1.0001}
+        onStepOneYear={handleInitiateAdvance}
+        onOpenOrderReview={() => setShowOrderReviewModal(true)}
+        onResetDraft={() => dispatch({ type: 'RESET_DRAFT_TARGET_WEIGHTS' })}
+        onNormalize={() => dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' })}
+      />
+
+      {/* Real Mode Lock Confirmation Modal */}
+      {showRealLockConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="max-w-md w-full bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 space-y-4 animate-scale-up">
+            <div className="flex items-center gap-3 text-slate-800">
+              <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600">
+                <Lock size={22} />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base">결정 잠금 및 {currentYear}년 시장 진행</h3>
+                <span className="text-xs text-slate-500 font-medium">실전 모드 의사결정 확정</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+              실전 모드에서는 시장 결과가 공개된 이후 이번 연도의 투자 결정을 되돌릴 수 없습니다. 원칙에 맞게 배분되었는지 확인 후 진행하세요.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowRealLockConfirmModal(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer"
+              >
+                다시 검토
+              </button>
+              <button
+                type="button"
+                onClick={executeAdvanceWorkflow}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 active:translate-y-0.5 text-white font-extrabold rounded-xl text-xs shadow-md cursor-pointer"
+              >
+                결정 잠금 및 시장 진행
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LIVE MARKET REPLAY STAGE OVERLAY */}
+      {showReplayStage && activeYearReplayData && (
+        <MarketReplayStage
+          isOpen={showReplayStage}
+          yearData={activeYearReplayData}
+          isCrisisActive={Boolean(activeCrisisEvent)}
+          onTriggerCrisis={crisisId => {
+            dispatch({ type: 'TRIGGER_CRISIS_EVENT', payload: { crisisEventId: crisisId } });
+          }}
+          onOpenNewsDetail={news => {
+            setSelectedNewsForAnalysis(news);
+          }}
+          onOpenAllNews={() => {
+            setShowNewsCenterModal(true);
+          }}
+          onFinishReplay={() => {
+            setShowReplayStage(false);
+            stepOneYear();
+            setShowYearEndModal(true);
+
+            if (currentChapter && isChapterEndYear(currentYear, settings.endYear)) {
+              const summary = calculateChapterSummary(currentChapter, state);
+              setChapterSummaryData(summary);
+            }
+          }}
+          onClose={() => {
+            setShowReplayStage(false);
+          }}
+        />
+      )}
+
+      {/* Historical Crisis Decision Modal */}
+      <CrisisDecisionModal
+        isOpen={Boolean(activeCrisisEvent)}
+        crisisEvent={activeCrisisEvent}
+        state={state}
+        onExecute={handleExecuteCrisisDecision}
+        onViewNews={_newsIds => {
+          setShowNewsCenterModal(true);
+        }}
+      />
+
+      {/* Year-End Briefing Modal */}
+      {showYearEndModal && (
+        <YearEndBriefingModal
+          record={state.history[state.history.length - 1] || null}
+          isGameOver={state.isGameOver}
+          onProceed={() => setShowYearEndModal(false)}
+        />
+      )}
+
+      {/* Chapter Summary Modal */}
+      {chapterSummaryData && (
+        <ChapterSummaryModal
+          isOpen={Boolean(chapterSummaryData)}
+          summaryData={chapterSummaryData}
+          onClose={() => setChapterSummaryData(null)}
+        />
+      )}
+
+      {/* Chapter Intro Modal */}
+      {currentChapter && (
+        <ChapterIntroModal
+          isOpen={showChapterIntroModal}
+          chapter={currentChapter}
+          onClose={() => setShowChapterIntroModal(false)}
+        />
+      )}
+
+      {/* Auto Invest Modal */}
       <AutoInvestModal
         isOpen={showAutoInvestModal}
-        currentYear={currentYear}
-        endYear={settings.endYear}
-        savedRules={state.savedAutoInvestRules}
+        state={state}
         onClose={() => setShowAutoInvestModal(false)}
-        onExecuteAutoInvest={(rule, years) => {
-          runAutoInvest(rule, years);
-          setShowYearEndModal(true);
-        }}
-        onSaveRule={saveAutoInvestRule}
-        onDeleteRule={deleteAutoInvestRule}
+        onRunAutoInvest={(rule, yrs) => runAutoInvest(rule, yrs)}
+        onSaveRule={rule => saveAutoInvestRule(rule)}
+        onDeleteRule={id => deleteAutoInvestRule(id)}
       />
 
-      {/* Stock Detail Modal */}
-      <StockDetailModal
-        stock={selectedStockForDetail}
-        currentYear={currentYear}
-        onClose={() => setSelectedStockForDetail(null)}
+      {/* Order Review Modal */}
+      {showOrderReviewModal && (
+        <OrderReviewModal
+          currentYear={currentYear}
+          cashKRW={cashKRW}
+          holdings={holdings}
+          draftTargetWeights={draftTargetWeights}
+          tradableStocks={tradableStocks}
+          settings={settings}
+          onExecuteBatchOrder={() => {
+            dispatch({ type: 'EXECUTE_DRAFT_ALLOCATION' });
+            setShowOrderReviewModal(false);
+            audioManager.playUiSound('success');
+          }}
+          onResetDraft={() => dispatch({ type: 'RESET_DRAFT_TARGET_WEIGHTS' })}
+          onNormalize={() => dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' })}
+          onClose={() => setShowOrderReviewModal(false)}
+        />
+      )}
+
+      {/* Company Detail Modal */}
+      {selectedCanonicalIdForDetail && (
+        <CompanyDetailModal
+          canonicalId={selectedCanonicalIdForDetail}
+          initialTab={initialDetailTab}
+          onClose={() => setSelectedCanonicalIdForDetail(null)}
+        />
+      )}
+
+      {/* Historical News Center Modal */}
+      <HistoricalNewsCenterModal
+        isOpen={showNewsCenterModal}
+        onSelectCompanyForDetail={cid => {
+          setSelectedCanonicalIdForDetail(cid);
+          setShowNewsCenterModal(false);
+        }}
+        onClose={() => setShowNewsCenterModal(false)}
       />
+
+      {/* Prediction Modal */}
+      <PredictionModal
+        isOpen={showPredictionModal}
+        year={currentYear}
+        existingPrediction={annualPredictions[currentYear]}
+        onSavePrediction={recordPrediction}
+        onClose={() => setShowPredictionModal(false)}
+      />
+
+      {/* Company Encyclopedia Modal */}
+      <CompanyEncyclopediaModal
+        isOpen={showEncyclopediaModal}
+        entries={companyEncyclopedia}
+        currentYear={currentYear}
+        onClose={() => setShowEncyclopediaModal(false)}
+      />
+
+      {/* Investment Yearbook Modal */}
+      <InvestmentYearbookModal
+        isOpen={showYearbookModal}
+        entries={yearbookEntries}
+        highlights={selectYearbookHighlights(yearbookEntries, state)}
+        onClose={() => setShowYearbookModal(false)}
+      />
+
+      {/* Achievement Gallery Modal */}
+      <AchievementGalleryModal
+        isOpen={showAchievementsModal}
+        unlockedAchievementIds={unlockedAchievementIds}
+        onClose={() => setShowAchievementsModal(false)}
+      />
+
+      {/* Save Slot Manager Modal */}
+      <SaveSlotManagerModal
+        isOpen={showSaveSlotModal}
+        currentGameState={state}
+        onLoadGame={loadSavedState}
+        onClose={() => setShowSaveSlotModal(false)}
+      />
+
+      {/* Neutral News Analysis Modal */}
+      {selectedNewsForAnalysis && (
+        <NeutralNewsAnalysisModal
+          newsItem={selectedNewsForAnalysis}
+          onClose={() => setSelectedNewsForAnalysis(null)}
+        />
+      )}
 
       {/* Glossary Modal */}
-      <GlossaryModal isOpen={showGlossaryModal} onClose={() => setShowGlossaryModal(false)} />
+      <GlossaryModal
+        isOpen={showGlossaryModal}
+        onClose={() => setShowGlossaryModal(false)}
+      />
     </div>
   );
 };

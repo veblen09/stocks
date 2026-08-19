@@ -1,0 +1,340 @@
+import { describe, it, expect } from 'vitest';
+import {
+  generateYearReplayData,
+  getMonthlyReplayQuality,
+  getMonthlyStockPriceKRW,
+  recalculateRemainingMonths,
+  getNewlyAvailableNewsForMonth,
+} from '../src/features/marketReplay/monthlyPortfolioEngine';
+import { calculateRiskLevel } from '../src/engine/metricsEngine';
+import { calculateStockAnnualPerformance, STOCKS_BY_ID } from '../src/engine/returnEngine';
+import type { GameSettings, StockHolding } from '../src/types/stockGame';
+
+const DEFAULT_SETTINGS: GameSettings = {
+  nickname: '테스트투자자',
+  startYear: 1980,
+  endYear: 2025,
+  initialCashKRW: 10000000,
+  annualContributionKRW: 3000000,
+  allowFractionalShares: true,
+  feeRate: 0.001,
+  fxFeeRate: 0.0,
+  includeFxEffect: true,
+  primaryBenchmark: 'kospi',
+  startMode: 'MANUAL',
+};
+
+describe('Live Market Replay Engine Tests', () => {
+  it('1. Quality detection should identify verified monthly vs annual only without creating fake data', () => {
+    // 2008 has verified monthly data for major stocks
+    const holdings2008: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 100,
+        currentValueKRW: 5000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const quality2008 = getMonthlyReplayQuality(2008, holdings2008);
+    expect(quality2008).toBe('VERIFIED_MONTHLY');
+  });
+
+  it('2. Month 1 data slice should strictly contain Month 1 and zero future month leaks', () => {
+    const holdings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 50,
+        currentValueKRW: 2500000,
+        currentWeight: 0.5,
+        totalInvestedKRW: 2500000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const replayData = generateYearReplayData(
+      2008,
+      2500000,
+      holdings,
+      5000000,
+      5000000,
+      5000000,
+      DEFAULT_SETTINGS,
+      0
+    );
+
+    expect(replayData.points.length).toBe(12);
+
+    // Visible slice at Month 1 (index 0)
+    const month1Slice = replayData.points.slice(0, 1);
+    expect(month1Slice.length).toBe(1);
+    expect(month1Slice[0].month).toBe(1);
+    expect(month1Slice[0].date).toBe('2008-01-28');
+
+    // Visible slice at Month 6 (index 5)
+    const month6Slice = replayData.points.slice(0, 6);
+    expect(month6Slice.length).toBe(6);
+    expect(month6Slice[5].month).toBe(6);
+    expect(month6Slice.every(p => p.month <= 6)).toBe(true);
+  });
+
+  it('3. Pure Investment PnL must strictly separate year-start deposit from investment gains', () => {
+    const holdings: Record<string, StockHolding> = {};
+    const initialDeposit = 3000000;
+    const startCash = 10000000 + initialDeposit; // 13,000,000 KRW
+    const cumulativePrincipal = 13000000;
+
+    const replayData = generateYearReplayData(
+      2008,
+      startCash,
+      holdings,
+      13000000,
+      cumulativePrincipal,
+      13000000,
+      DEFAULT_SETTINGS,
+      1
+    );
+
+    // If holding only cash, investment PnL should be exactly 0
+    replayData.points.forEach(p => {
+      expect(p.portfolioValueKRW).toBe(13000000);
+      expect(p.cumulativeContributionsKRW).toBe(13000000);
+      expect(p.investmentPnLKRW).toBe(0);
+      expect(p.investmentPnLPercent).toBe(0);
+    });
+  });
+
+  it('4. Risk Level mapping correctly converts drawdowns into 5 tiers', () => {
+    expect(calculateRiskLevel(0.0)).toBe('NORMAL');
+    expect(calculateRiskLevel(-0.04)).toBe('NORMAL');
+    expect(calculateRiskLevel(-0.12)).toBe('CAUTION');
+    expect(calculateRiskLevel(-0.24)).toBe('WARNING');
+    expect(calculateRiskLevel(-0.35)).toBe('CRISIS');
+    expect(calculateRiskLevel(-0.45)).toBe('EXTREME');
+  });
+
+  it('5. Crisis event in 2008 September should mark Month 9 as isCrisisMonth', () => {
+    const holdings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 10,
+        currentValueKRW: 1000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 1000000,
+        averageCostKRW: 100000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const replayData = generateYearReplayData(
+      2008,
+      0,
+      holdings,
+      1000000,
+      1000000,
+      1000000,
+      DEFAULT_SETTINGS,
+      0
+    );
+
+    const month9 = replayData.points.find(p => p.month === 9);
+    expect(month9).toBeDefined();
+    expect(month9?.isCrisisMonth).toBe(true);
+    expect(month9?.crisisEventId).toBe('crisis_2008_lehman');
+
+    const month1 = replayData.points.find(p => p.month === 1);
+    expect(month1?.isCrisisMonth).toBe(false);
+  });
+
+  it('6. recalculateRemainingMonths should update months 10~12 after a Crisis Decision in month 9', () => {
+    const initialHoldings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 100,
+        currentValueKRW: 5000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const originalData = generateYearReplayData(
+      2008,
+      0,
+      initialHoldings,
+      5000000,
+      5000000,
+      5000000,
+      DEFAULT_SETTINGS,
+      0
+    );
+
+    // Suppose user sells 50% shares to raise cash in Month 9
+    const updatedHoldings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 50,
+        currentValueKRW: 2500000,
+        currentWeight: 0.5,
+        totalInvestedKRW: 2500000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+    const updatedCash = 2500000;
+
+    const recalculated = recalculateRemainingMonths(
+      originalData,
+      9,
+      updatedCash,
+      updatedHoldings,
+      DEFAULT_SETTINGS
+    );
+
+    // Months 1 to 9 should remain identical
+    for (let m = 1; m <= 9; m++) {
+      expect(recalculated.points[m - 1].portfolioValueKRW).toBe(originalData.points[m - 1].portfolioValueKRW);
+    }
+
+    // Month 10 should reflect new cash and fewer shares
+    expect(recalculated.points[9].cashKRW).toBe(updatedCash);
+  });
+
+  it('7. Historical news should only be available in or after its availableFrom month', () => {
+    // Check news available in 2008-09
+    const septNews = getNewlyAvailableNewsForMonth(2008, 9);
+    expect(Array.isArray(septNews)).toBe(true);
+
+    septNews.forEach(n => {
+      expect(n.availableFrom.startsWith('2008-09')).toBe(true);
+    });
+  });
+
+  it('8. Zero calculation drift: Monthly US stock pricing includes valid FX rate without NaN', () => {
+    const applePrice = getMonthlyStockPriceKRW('US_AAPL', 2020, 6);
+    expect(applePrice).toBeGreaterThan(0);
+    expect(Number.isFinite(applePrice)).toBe(true);
+  });
+
+  it('9. 45-year simulation trajectory produces finite values for all points (no NaN or Infinity)', () => {
+    const holdings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 100,
+        currentValueKRW: 5000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    for (let yr = 1980; yr <= 2025; yr++) {
+      const data = generateYearReplayData(
+        yr,
+        10000000,
+        holdings,
+        10000000,
+        10000000,
+        10000000,
+        DEFAULT_SETTINGS,
+        yr - 1980
+      );
+
+      expect(data.points.length).toBe(12);
+      data.points.forEach(p => {
+        expect(Number.isFinite(p.portfolioValueKRW)).toBe(true);
+        expect(Number.isFinite(p.ytdReturn)).toBe(true);
+        expect(Number.isFinite(p.drawdown)).toBe(true);
+        expect(Number.isNaN(p.portfolioValueKRW)).toBe(false);
+      });
+    }
+  });
+
+  it('10. Underwater duration correctly counts consecutive months below peak', () => {
+    const holdings: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 100,
+        currentValueKRW: 5000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    // 2008 was a bear market year with extended drawdown
+    const data2008 = generateYearReplayData(
+      2008,
+      0,
+      holdings,
+      5000000,
+      5000000,
+      6000000, // Peak was 6,000,000 KRW
+      DEFAULT_SETTINGS,
+      1
+    );
+
+    const month12 = data2008.points[11];
+    expect(month12.monthsUnderwater).toBeGreaterThanOrEqual(1);
+    expect(data2008.maxMonthsUnderwater).toBeGreaterThanOrEqual(1);
+  });
+
+  it('11. 1987 October Black Monday triggers crisis at Month 10 and safely recalculates months 11~12', () => {
+    const holdings1987: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 100,
+        currentValueKRW: 5000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 50000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const data1987 = generateYearReplayData(
+      1987,
+      5000000,
+      holdings1987,
+      10000000,
+      10000000,
+      10000000,
+      DEFAULT_SETTINGS,
+      7
+    );
+
+    const month10 = data1987.points[9];
+    expect(month10.month).toBe(10);
+    expect(month10.isCrisisMonth).toBe(true);
+    expect(month10.crisisEventId).toBe('crisis_1987_black_monday');
+
+    // Test remaining months recalculation after crisis decision in Month 10
+    const recalculated = recalculateRemainingMonths(
+      data1987,
+      10,
+      7000000, // Raised cash
+      holdings1987,
+      DEFAULT_SETTINGS
+    );
+
+    expect(recalculated.points.length).toBe(12);
+    expect(recalculated.points[10].month).toBe(11);
+    expect(recalculated.points[11].month).toBe(12);
+    expect(recalculated.points[11].portfolioValueKRW).toBeGreaterThan(0);
+  });
+});

@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_1985_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "1985-10-30",
+    "publishedAt": "1985-10-30",
+    "availableFrom": "1985-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "엔고(円高) 수혜로 한국 수출기업의 가격경쟁력 획기적 개선",
+    "titleKo": "엔고(円高) 수혜로 한국 수출기업의 가격경쟁력 획기적 개선",
+    "summaryKo": "일본 엔화가 1년 만에 50% 이상 급등하면서 한국의 자동차, 조선, 전자 제품 수출이 폭발적으로 증가했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1985년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "NEWS_1985_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국경제",
+      "금융"
+    ],
+    "eventDate": "1985-09-20",
+    "publishedAt": "1985-09-20",
+    "availableFrom": "1985-09-20",
+    "datePrecision": "DAY",
+    "originalTitle": "달러화 가치 급락 및 미국 수출 경쟁력 회복 기대",
+    "titleKo": "달러화 가치 급락 및 미국 수출 경쟁력 회복 기대",
+    "summaryKo": "엔화 대비 달러 가치가 급락하며 미국 제조업의 환율 부담이 경감되기 시작했습니다.",
+    "sourceName": "Federal Reserve / BLS",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "미국경제",
+      "연준금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1985년 미국 주요 경제 지표 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST"
+      ],
+      "positiveInterpretation": "미국 소비 경제의 탄력성과 기술 혁신.",
+      "negativeInterpretation": "금리 변동성에 따른 차입 비용 증가 위험.",
+      "unknownAtTheTime": "인플레이션 안정화 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

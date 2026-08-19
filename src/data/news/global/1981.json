@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1981_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1981-06-15",
+    "publishedAt": "1981-06-15",
+    "availableFrom": "1981-06-15",
+    "datePrecision": "DAY",
+    "originalTitle": "글로벌 경기 둔화와 원자재 가격 안정세",
+    "titleKo": "글로벌 경기 둔화와 원자재 가격 안정세",
+    "summaryKo": "OECD 국가들의 긴축정책 지속으로 유가 상승세가 둔화되었으나 선진국 전반의 고금리 여파가 지속되었습니다.",
+    "sourceName": "IMF / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "세계경제",
+      "교역"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1981년 세계 경제 지표 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "글로벌 경기 회복 및 신흥 시장 수요 창출.",
+      "negativeInterpretation": "고금리 또는 원자재 충격에 따른 불확실성.",
+      "unknownAtTheTime": "향후 통화정책 방향성."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

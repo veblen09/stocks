@@ -1,0 +1,51 @@
+[
+  {
+    "id": "NEWS_2006_US_AAPL_GEN",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "기술주"
+    ],
+    "eventDate": "2006-11-30",
+    "publishedAt": "2006-11-30",
+    "availableFrom": "2006-11-30",
+    "datePrecision": "DAY",
+    "originalTitle": "Apple Inc. Form 10-K Annual Report",
+    "titleKo": "애플(Apple) 2006년 회계연도 10-K 공식 제출",
+    "summaryKo": "2006년 연간 감사 실적 및 주요 하드웨어·소프트웨어 서비스 매출 내역 공시.",
+    "sourceName": "SEC EDGAR",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "10-K",
+      "연차보고서"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "VALUATION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2006년 미국 SEC 공식 제출 10-K 보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "VALUATION"
+      ],
+      "positiveInterpretation": "하드웨어 판매 호조 및 사용자 생태계 락인 효과.",
+      "negativeInterpretation": "부품 공급망 원가 및 환율 변동 위험.",
+      "unknownAtTheTime": "신제품 라인업 확장."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

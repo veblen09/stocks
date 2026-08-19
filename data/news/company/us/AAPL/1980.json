@@ -1,0 +1,54 @@
+[
+  {
+    "id": "NEWS_1980_US_AAPL",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "기술주"
+    ],
+    "eventDate": "1980-12-12",
+    "publishedAt": "1980-12-12",
+    "availableFrom": "1980-12-12",
+    "datePrecision": "DAY",
+    "originalTitle": "Apple Computer, Inc. Completes Initial Public Offering on NASDAQ",
+    "titleKo": "애플 컴퓨터(Apple Computer), 나스닥 시장 성공적 IPO 상장",
+    "summaryKo": "개인용 PC 선도기업 애플 컴퓨터가 주당 22달러에 상장되어 1956년 포드자동차 이후 최대 규모의 IPO 자금 조달에 성공했습니다.",
+    "sourceName": "SEC EDGAR / Apple Computer Prospectus",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "상장",
+      "신제품",
+      "개인용PC"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "CAPITAL_COST",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "애플 컴퓨터 주당 22달러 상장, 460만 주 공모 성공.",
+      "impactChannels": [
+        "REVENUE",
+        "CAPITAL_COST",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "개인용 컴퓨터(Apple II) 시장의 대중화 및 막대한 R&D 자금 확보.",
+      "negativeInterpretation": "IBM 등 거대 IT 기업들의 PC 시장 진입 예고에 따른 경쟁 심화 우려.",
+      "unknownAtTheTime": "차세대 컴퓨터(Lisa/Macintosh)의 시장 안착 성공 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

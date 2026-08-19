@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1993_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1993-06-30",
+    "publishedAt": "1993-06-30",
+    "availableFrom": "1993-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "금융실명제 전격 실시",
+    "titleKo": "[1993년 세계 경제] 금융실명제 전격 실시",
+    "summaryKo": "김영삼 정부의 8·12 금융실명제 긴급명령이 발표되었습니다. 단기 충격 후 지하경제가 양성화되고 주식시장의 투명성이 대폭 개선되었습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1993년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

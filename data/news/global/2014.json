@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2014_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2014-06-30",
+    "publishedAt": "2014-06-30",
+    "availableFrom": "2014-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "유가 대폭락과 박스피의 늪",
+    "titleKo": "[2014년 세계 경제] 유가 대폭락과 박스피의 늪",
+    "summaryKo": "미국 셰일가스 혁명과 사우디의 증산 치킨게임으로 국제유가가 배럴당 100달러에서 50달러로 반토막 났습니다. 한국 증시는 1,900선 박스권에 갇혔습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2014년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

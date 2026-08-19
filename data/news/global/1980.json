@@ -1,0 +1,51 @@
+[
+  {
+    "id": "NEWS_1980_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "에너지",
+      "원자재"
+    ],
+    "eventDate": "1980-11-15",
+    "publishedAt": "1980-11-15",
+    "availableFrom": "1980-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "Second Oil Crisis and Global Stagflation Impact",
+    "titleKo": "제2차 석유파동 지속과 글로벌 스태그플레이션 심화",
+    "summaryKo": "이란-이라크 전쟁 발발로 국제유가가 배럴당 35달러를 돌파하며 주요 선진국의 인플레이션이 두 자릿수를 기록하고 경기침체 우려가 고조되었습니다.",
+    "sourceName": "국제통화기금(IMF) / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "유가",
+      "인플레이션",
+      "스태그플레이션"
+    ],
+    "affectedChannels": [
+      "COST",
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1980년 원유 수입단가 급등 및 주요국 CPI 12~14% 상회 확인.",
+      "impactChannels": [
+        "COST",
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "에너지 절약형 신기술 및 원자재 대체 산업 수요 촉진 가능성.",
+      "negativeInterpretation": "원유 수입 의존도가 높은 제조업 국가의 원가 부담 및 소비 위축.",
+      "unknownAtTheTime": "이란-이라크 전쟁의 장기화 여부 및 유가 안정화 시점."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

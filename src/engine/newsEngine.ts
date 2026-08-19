@@ -274,3 +274,86 @@ export function evaluateNewsDecisionCharacteristics(state: StockGameState): News
     feedbackSummaryKo: feedback,
   };
 }
+
+/**
+ * Returns macro and market news available at year Y decision point
+ */
+export function getMacroNewsForYear(
+  year: number,
+  market?: NewsMarket | 'ALL'
+): HistoricalNewsItem[] {
+  return getAvailableNewsForYear(year, {
+    scope: 'ALL',
+    market: market || 'ALL',
+  }).filter(item => item.scope !== 'COMPANY');
+}
+
+/**
+ * Returns sector-specific news available at year Y decision point
+ */
+export function getSectorNewsForYear(
+  year: number,
+  sector: string
+): HistoricalNewsItem[] {
+  return getAvailableNewsForYear(year, { sector });
+}
+
+/**
+ * Formats standard cutoff notice strings according to Section 22.2
+ */
+export function getDecisionCutoffDisplayInfo(year: number) {
+  const cutoffDate = getDecisionCutoffDate(year);
+  const [cYear, cMonth, cDay] = cutoffDate.split('-');
+  return {
+    currentYear: year,
+    cutoffDate,
+    searchPeriod: `1980-01-01 ~ ${cutoffDate}`,
+    topBannerNotice: `현재 표시되는 정보는 ${cYear}년 ${cMonth}월 ${cDay}일까지 당시 투자자가 확인할 수 있었던 자료입니다.`,
+    isLockedFuture: true,
+    lockMessage: `${year}년 중 발생 사건은 연말 결산 시 잠금 해제`,
+  };
+}
+
+/**
+ * Compiles side-by-side comparison data for up to 4 selected companies (Section 33)
+ */
+export function getCompanyComparisonData(
+  canonicalIds: string[],
+  year: number
+): import('../types/stockNews').CompanyComparisonItem[] {
+  return canonicalIds.map(cid => {
+    const overview = getCompanyOverviewAtYear(cid, year);
+    const availableNews = getAvailableNewsForYear(year, { canonicalCompanyId: cid });
+
+    // Resolve risk factors from latest available news
+    const riskFactors = Array.from(
+      new Set(
+        availableNews.flatMap(n =>
+          n.affectedChannels.filter(ch => ['COST', 'INTEREST_RATE', 'REGULATION', 'SUPPLY_CHAIN', 'COMPETITION'].includes(ch))
+        )
+      )
+    );
+
+    return {
+      canonicalCompanyId: cid,
+      currentYear: year,
+      nameKo: overview.nameKo,
+      ticker: overview.ticker,
+      market: overview.market,
+      sector: overview.sector,
+      isListed: overview.isListed,
+      listingDate: overview.listingDate,
+      contemporaryBusiness: overview.contemporaryBusiness,
+      recentNewsCount: availableNews.length,
+      recentNews: availableNews.slice(0, 3),
+      last1YrReturn: null,
+      past3YrCAGR: null,
+      historicalMDD: null,
+      dataQuality: overview.dataQuality === 'HIGH' ? '우수(공식감사)' : '제한적',
+      coverageStatus: overview.coverageStatus,
+      riskFactors,
+    };
+  });
+}
+
+

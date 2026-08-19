@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1986_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1986-06-15",
+    "publishedAt": "1986-06-15",
+    "availableFrom": "1986-06-15",
+    "datePrecision": "DAY",
+    "originalTitle": "국제유가 배럴당 10달러대 폭락 및 글로벌 저물가 번영",
+    "titleKo": "국제유가 배럴당 10달러대 폭락 및 글로벌 저물가 번영",
+    "summaryKo": "OPEC 생산 쿼터 붕괴로 유가가 폭락하며 전 세계적인 생산원가 하락과 경기 확장이 전개되었습니다.",
+    "sourceName": "IMF / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "세계경제",
+      "교역"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1986년 세계 경제 지표 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "글로벌 경기 회복 및 신흥 시장 수요 창출.",
+      "negativeInterpretation": "고금리 또는 원자재 충격에 따른 불확실성.",
+      "unknownAtTheTime": "향후 통화정책 방향성."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

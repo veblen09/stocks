@@ -399,4 +399,43 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
       expect(res.history.length).toBe(10);
     }).not.toThrow();
   });
+
+  // Test 19: 100% 최대 매수 주문 실행 시 수수료 초과 에러 없이 안전하게 체결되는지
+  it('19. 100% 최대 매수 주문 실행 시 수수료 초과 에러 없이 안전하게 체결되는지', () => {
+    const cash = 10000000;
+    // Attempting to buy with raw cash amount 10,000,000 should automatically clamp to max affordable
+    const res = executeBuy('KR_005930', cash, cash, {}, 1981, TEST_SETTINGS);
+    expect(res.updatedCash).toBeGreaterThanOrEqual(0);
+    expect(res.updatedHoldings['KR_005930'].shares).toBeGreaterThan(0);
+    expect(res.tradeLogs.length).toBe(1);
+    expect(res.totalFees).toBeGreaterThan(0);
+    expect(res.updatedCash + res.tradeLogs[0].totalAmountKRW + res.totalFees).toBeLessThanOrEqual(cash + 1e-4);
+  });
+
+
+  // Test 20: 100% 단일 종목 집중 매수 후 다음 연도 진행 시 화면 렌더링 및 결산 레코드가 정상 생성되는지
+  it('20. 100% 단일 종목 집중 매수 후 다음 연도 진행 시 정상 결산 레코드가 생성되는지', () => {
+    const cash = 10000000;
+    const buyRes = executeBuy('KR_005930', cash, cash, {}, 1981, TEST_SETTINGS);
+
+    const startAssets = calculatePortfolioValue(buyRes.updatedCash, buyRes.updatedHoldings, 1980);
+    const stepRes = advanceSimulationOneYear(
+      1981,
+      buyRes.updatedCash,
+      buyRes.updatedHoldings,
+      startAssets,
+      0,
+      buyRes.totalFees,
+      [],
+      TEST_SETTINGS
+    );
+
+    expect(stepRes.performanceRecord.year).toBe(1981);
+    expect(stepRes.performanceRecord.endTotalAssetsKRW).toBeGreaterThan(0);
+    expect(stepRes.performanceRecord.holdingsSnapshot.length).toBe(1);
+    expect(stepRes.performanceRecord.bestPerformer).toBeDefined();
+    expect(stepRes.performanceRecord.worstPerformer).toBeDefined();
+    expect(stepRes.nextYear).toBe(1982);
+  });
 });
+

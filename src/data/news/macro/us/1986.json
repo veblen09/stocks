@@ -1,0 +1,48 @@
+[
+  {
+    "id": "NEWS_1986_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국경제",
+      "금융"
+    ],
+    "eventDate": "1986-09-20",
+    "publishedAt": "1986-09-20",
+    "availableFrom": "1986-09-20",
+    "datePrecision": "DAY",
+    "originalTitle": "마이크로소프트(MSFT) 나스닥 시장 공모 상장",
+    "titleKo": "마이크로소프트(MSFT) 나스닥 시장 공모 상장",
+    "summaryKo": "빌 게이츠가 설립한 마이크로소프트가 주당 21달러에 나스닥에 상장되어 IT 소프트웨어 붐을 촉발했습니다.",
+    "sourceName": "Federal Reserve / BLS",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "미국경제",
+      "연준금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1986년 미국 주요 경제 지표 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST"
+      ],
+      "positiveInterpretation": "미국 소비 경제의 탄력성과 기술 혁신.",
+      "negativeInterpretation": "금리 변동성에 따른 차입 비용 증가 위험.",
+      "unknownAtTheTime": "인플레이션 안정화 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

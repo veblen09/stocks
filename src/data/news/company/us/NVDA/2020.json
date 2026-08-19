@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_2020_US_NVDA_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "2020-11-15",
+    "publishedAt": "2020-11-15",
+    "availableFrom": "2020-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "엔비디아, 데이터센터 매출이 게이밍 매출을 최초로 추월 공시",
+    "titleKo": "엔비디아, 데이터센터 매출이 게이밍 매출을 최초로 추월 공시",
+    "summaryKo": "클라우드 AI 가속기 수요 폭증과 멜라녹스 인수 시너지로 시가총액이 급증했습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2020년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

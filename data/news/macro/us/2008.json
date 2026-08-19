@@ -1,0 +1,48 @@
+[
+  {
+    "id": "NEWS_2008_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국경제",
+      "금융"
+    ],
+    "eventDate": "2008-09-20",
+    "publishedAt": "2008-09-20",
+    "availableFrom": "2008-09-20",
+    "datePrecision": "DAY",
+    "originalTitle": "미 정부 7,000억 달러 구제금융(TARP) 및 연준 제로금리(0~0.25%) 단행",
+    "titleKo": "미 정부 7,000억 달러 구제금융(TARP) 및 연준 제로금리(0~0.25%) 단행",
+    "summaryKo": "벤 버냉키 연준 의장이 양적완화(QE)를 발표하고 무제한 달러 유동성 공급에 나섰습니다.",
+    "sourceName": "Federal Reserve / BLS",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "미국경제",
+      "연준금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2008년 미국 주요 경제 지표 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST"
+      ],
+      "positiveInterpretation": "미국 소비 경제의 탄력성과 기술 혁신.",
+      "negativeInterpretation": "금리 변동성에 따른 차입 비용 증가 위험.",
+      "unknownAtTheTime": "인플레이션 안정화 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

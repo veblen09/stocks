@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_1983_US_AAPL_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "1983-11-15",
+    "publishedAt": "1983-11-15",
+    "availableFrom": "1983-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "애플 컴퓨터, 그래픽 UI 탑재 'Lisa' 컴퓨터 출시",
+    "titleKo": "애플 컴퓨터, 그래픽 UI 탑재 'Lisa' 컴퓨터 출시",
+    "summaryKo": "마우스와 윈도우 인터페이스를 적용한 차세대 컴퓨터를 선보이며 기술 혁신을 주도했습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1983년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

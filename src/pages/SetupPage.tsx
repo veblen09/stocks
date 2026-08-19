@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, AlertCircle, Calendar, Sliders } from 'lucide-react';
+import { ArrowLeft, Play, Calendar, Sliders, Shield, Zap } from 'lucide-react';
 import { GlassCard } from '../components/GlassCard';
 import { HeroBackground } from '../components/HeroBackground';
-import type { GameSettings, BenchmarkId } from '../types/stockGame';
+import type { GameSettings, BenchmarkId, PlayMode, MonthlyReplaySpeed } from '../types/stockGame';
 import { useStockGame } from '../store/stockGameStore';
 import { audioManager } from '../utils/audioManager';
 import { formatKRW } from '../utils/formatMoney';
+import { useToast } from '../features/notifications/ToastProvider';
 
 interface SetupPageProps {
   onNavigate: (page: string) => void;
@@ -13,24 +14,30 @@ interface SetupPageProps {
 
 export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
   const { startNewGame } = useStockGame();
+  const { showToast } = useToast();
 
   const [nickname, setNickname] = useState<string>('투자탐험가');
   const [startYear, setStartYear] = useState<number>(1980);
   const [endYear, setEndYear] = useState<number>(2025);
   const [initialCash, setInitialCash] = useState<number>(10000000);
   const [annualContribution, setAnnualContribution] = useState<number>(3000000);
-  const [allowFractional, setAllowFractional] = useState<boolean>(true);
-  const [feeMode, setFeeMode] = useState<'STANDARD' | 'LOW' | 'ZERO'>('STANDARD');
-  const [includeFx, setIncludeFx] = useState<boolean>(true);
+  const allowFractional = true;
+  const includeFx = true;
   const [primaryBenchmark, setPrimaryBenchmark] = useState<BenchmarkId>('kospi');
-  const [startMode, setStartMode] = useState<'MANUAL' | 'AUTO_RULE'>('MANUAL');
+  const startMode = 'MANUAL';
+
+  // Enhanced Risk Settings
+  const [playMode, setPlayModeState] = useState<PlayMode>('REAL');
+  const [universeMode, setUniverseModeState] = useState<'CLASSIC_50' | 'HISTORICAL_SURVIVOR'>('CLASSIC_50');
+  const [showRealPurchasingPower, setShowRealPurchasingPowerState] = useState<boolean>(true);
+  const [monthlyReplaySpeed, setMonthlyReplaySpeedState] = useState<MonthlyReplaySpeed>('NORMAL');
 
   const totalYears = endYear - startYear;
   const isPeriodValid = totalYears >= 5;
 
   const handleStartGame = () => {
     if (!isPeriodValid) {
-      alert('투자 기간은 최소 5년 이상이어야 합니다.');
+      showToast('투자 기간은 최소 5년 이상이어야 합니다.', 'warning');
       return;
     }
 
@@ -41,11 +48,15 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
       initialCashKRW: initialCash,
       annualContributionKRW: annualContribution,
       allowFractionalShares: allowFractional,
-      feeRate: feeMode === 'ZERO' ? 0 : feeMode === 'LOW' ? 0.0005 : 0.001,
+      feeRate: 0.001,
       fxFeeRate: 0.0,
       includeFxEffect: includeFx,
       primaryBenchmark,
       startMode,
+      playMode,
+      monthlyReplaySpeed,
+      showRealPurchasingPower,
+      universeMode,
     };
 
     audioManager.playSound('success');
@@ -70,22 +81,69 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
           </button>
           <div className="text-right">
             <h1 className="text-lg sm:text-xl font-black text-slate-800 tracking-tight font-display">
-              투자 환경 설정
+              투자 환경 & 규칙 설정
             </h1>
             <p className="text-xs text-blue-600 font-bold">1980~2025 실제 시장 데이터 기반 맞춤 설계</p>
           </div>
         </div>
 
-        {/* Survivorship Bias Disclaimer Banner */}
-        <div className="p-3.5 bg-amber-50/90 rounded-2xl border border-amber-200/80 flex items-start gap-3 text-xs text-amber-900 shadow-sm font-semibold">
-          <AlertCircle size={18} className="text-amber-600 flex-shrink-0 mt-0.5" />
-          <div className="space-y-0.5 leading-relaxed">
-            <span className="font-extrabold block">생존자 편향(Survivorship Bias) 고지</span>
-            <p className="text-[11px] font-medium text-amber-800">
-              이 시뮬레이션의 50개 종목은 현재 알려진 대표 기업을 중심으로 선정되어 생존자 편향이 존재할 수 있습니다. 따라서 결과를 실제 투자전략의 객관적 백테스트로 해석해서는 안 됩니다.
-            </p>
+        {/* Play Mode & Rules Card (NEW P1 Feature) */}
+        <GlassCard className="p-5 sm:p-6 space-y-4" variant="default">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <Shield size={18} className="text-indigo-600" />
+            <h2 className="font-extrabold text-slate-800 text-sm">플레이 방식 및 규칙 모드</h2>
           </div>
-        </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Real Mode */}
+            <button
+              type="button"
+              onClick={() => { audioManager.playUiSound('keyTap'); setPlayModeState('REAL'); }}
+              className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
+                playMode === 'REAL'
+                  ? 'border-indigo-600 bg-indigo-50/70 shadow-sm'
+                  : 'border-slate-200 bg-white hover:bg-slate-50'
+              }`}
+            >
+              <div className={`p-2 rounded-xl mt-0.5 ${playMode === 'REAL' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                <Shield size={18} />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-xs text-slate-900">실전 모드 (권장)</span>
+                  <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full">진짜 긴장감</span>
+                </div>
+                <p className="text-[11px] text-slate-600 font-medium mt-1 leading-relaxed">
+                  결과가 공개된 이후 이전 연도 결정을 되돌릴 수 없습니다. 실제 역사 속 위기에서 원칙을 지키는 훈련을 수행합니다.
+                </p>
+              </div>
+            </button>
+
+            {/* Practice Mode */}
+            <button
+              type="button"
+              onClick={() => { audioManager.playUiSound('keyTap'); setPlayModeState('PRACTICE'); }}
+              className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
+                playMode === 'PRACTICE'
+                  ? 'border-emerald-600 bg-emerald-50/70 shadow-sm'
+                  : 'border-slate-200 bg-white hover:bg-slate-50'
+              }`}
+            >
+              <div className={`p-2 rounded-xl mt-0.5 ${playMode === 'PRACTICE' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                <Zap size={18} />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-xs text-slate-900">연습 모드</span>
+                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">자유 실험</span>
+                </div>
+                <p className="text-[11px] text-slate-600 font-medium mt-1 leading-relaxed">
+                  연도 결과를 되돌리고 다른 투자 전략을 자유롭게 실험할 수 있습니다. 되돌린 재실험 횟수는 별도 기록됩니다.
+                </p>
+              </div>
+            </button>
+          </div>
+        </GlassCard>
 
         {/* Main Settings Form Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -117,211 +175,187 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
                   onChange={e => {
                     const sy = parseInt(e.target.value);
                     setStartYear(sy);
-                    if (endYear <= sy + 4) {
+                    if (endYear - sy < 5) {
                       setEndYear(Math.min(2025, sy + 5));
                     }
                   }}
-                  className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
+                  className="w-full px-3.5 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
                 >
-                  {Array.from({ length: 45 }, (_, i) => 1980 + i).map(y => (
+                  {Array.from({ length: 41 }, (_, i) => 1980 + i).map(y => (
                     <option key={y} value={y}>{y}년 말</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold text-slate-700">종료 연도</label>
+                <label className="text-xs font-extrabold text-slate-700">종료 기준 연도</label>
                 <select
                   value={endYear}
                   onChange={e => setEndYear(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
+                  className="w-full px-3.5 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
                 >
-                  {Array.from({ length: 2025 - startYear }, (_, i) => startYear + 1 + i).map(y => (
-                    <option key={y} value={y}>{y}년 말</option>
+                  {Array.from({ length: 41 }, (_, i) => 1985 + i).map(y => (
+                    <option key={y} value={y} disabled={y <= startYear}>
+                      {y}년 말 {y - startYear >= 5 ? `(${y - startYear}년)` : '(최소 5년 이상)'}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div className={`p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between ${
-              isPeriodValid ? 'bg-blue-50/80 border-blue-200 text-blue-800' : 'bg-rose-50 border-rose-200 text-rose-800'
-            }`}>
-              <span>총 운용 기간</span>
-              <span>{startYear}년 말 ~ {endYear}년 말 ({totalYears}개 연간 구간)</span>
-            </div>
-            {!isPeriodValid && (
-              <span className="text-[11px] font-bold text-rose-600 block">
-                ⚠️ 선택 기간이 5년 미만이면 실행할 수 없습니다.
-              </span>
-            )}
-
             {/* Initial Cash */}
-            <div className="space-y-1.5 pt-2">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-extrabold text-slate-700">초기 투자금 ({startYear}년 말)</span>
-                <span className="font-black text-blue-600">{formatKRW(initialCash)}</span>
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-extrabold text-slate-700">초기 투자 원금</label>
+                <span className="text-xs font-mono font-extrabold text-blue-700">{formatKRW(initialCash)}</span>
               </div>
-              <div className="flex gap-1.5">
-                {[5000000, 10000000, 50000000, 100000000].map(val => (
+              <div className="grid grid-cols-3 gap-2">
+                {[10000000, 30000000, 50000000].map(amt => (
                   <button
-                    key={val}
+                    key={amt}
                     type="button"
-                    onClick={() => setInitialCash(val)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-black border transition cursor-pointer ${
-                      initialCash === val
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    onClick={() => { audioManager.playUiSound('keyTap'); setInitialCash(amt); }}
+                    className={`py-1.5 rounded-xl font-extrabold text-xs transition cursor-pointer border ${
+                      initialCash === amt
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    {val / 10000}만
+                    {formatKRW(amt)}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Annual Deposit */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center text-xs">
-                <span className="font-extrabold text-slate-700">연간 추가 투자금 (매년 초 입금)</span>
-                <span className="font-black text-indigo-600">{formatKRW(annualContribution)}</span>
+            {/* Annual Contribution */}
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-extrabold text-slate-700">매년 연초 추가 납입금</label>
+                <span className="text-xs font-mono font-extrabold text-blue-700">+{formatKRW(annualContribution)}</span>
               </div>
-              <div className="flex gap-1.5">
-                {[0, 1000000, 3000000, 5000000, 10000000].map(val => (
+              <div className="grid grid-cols-4 gap-2">
+                {[0, 1000000, 3000000, 5000000].map(amt => (
                   <button
-                    key={val}
+                    key={amt}
                     type="button"
-                    onClick={() => setAnnualContribution(val)}
-                    className={`flex-1 py-1.5 rounded-lg text-[11px] font-black border transition cursor-pointer ${
-                      annualContribution === val
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    onClick={() => { audioManager.playUiSound('keyTap'); setAnnualContribution(amt); }}
+                    className={`py-1.5 rounded-xl font-extrabold text-xs transition cursor-pointer border ${
+                      annualContribution === amt
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    {val === 0 ? '0원' : `${val / 10000}만`}
+                    {amt === 0 ? '없음' : formatKRW(amt)}
                   </button>
                 ))}
               </div>
             </div>
           </GlassCard>
 
-          {/* Card 2: 거래비용, 환율, 벤치마크 및 시작 모드 */}
+          {/* Card 2: 벤치마크 및 시뮬레이션 설정 */}
           <GlassCard className="p-5 sm:p-6 space-y-4" variant="default">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Sliders size={18} className="text-blue-600" />
-              <h2 className="font-extrabold text-slate-800 text-sm">거래 규칙 & 비교 지수</h2>
+              <Sliders size={18} className="text-purple-600" />
+              <h2 className="font-extrabold text-slate-800 text-sm">비교 벤치마크 & 속도 설정</h2>
             </div>
 
             {/* Primary Benchmark */}
             <div className="space-y-1">
-              <label className="text-xs font-extrabold text-slate-700">기본 비교 벤치마크</label>
-              <select
-                value={primaryBenchmark}
-                onChange={e => setPrimaryBenchmark(e.target.value as any)}
-                className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
-              >
-                <option value="kospi">한국 대표지수 (코스피 KOSPI)</option>
-                <option value="sp500">미국 대표지수 (S&P 500 원화환산)</option>
-                <option value="blend5050">50:50 한국/미국 혼합 리밸런싱 지수</option>
-              </select>
-              <p className="text-[10px] text-slate-400 font-semibold">
-                * 최종 보고서에서는 3대 벤치마크 모두와 정밀 비교 분석이 제공됩니다.
-              </p>
-            </div>
-
-            {/* Trading Fee Mode */}
-            <div className="space-y-1">
-              <label className="text-xs font-extrabold text-slate-700">거래비용 모드</label>
+              <label className="text-xs font-extrabold text-slate-700">주요 성과 비교 벤치마크</label>
               <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFeeMode('STANDARD')}
-                  className={`py-2 px-2 rounded-xl text-[11px] font-black border transition cursor-pointer ${
-                    feeMode === 'STANDARD'
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  기본 0.1% (교육용)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFeeMode('LOW')}
-                  className={`py-2 px-2 rounded-xl text-[11px] font-black border transition cursor-pointer ${
-                    feeMode === 'LOW'
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  우대 0.05%
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFeeMode('ZERO')}
-                  className={`py-2 px-2 rounded-xl text-[11px] font-black border transition cursor-pointer ${
-                    feeMode === 'ZERO'
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  비용 없음
-                </button>
+                {[
+                  { id: 'kospi' as const, label: '🇰🇷 코스피' },
+                  { id: 'sp500' as const, label: '🇺🇸 S&P 500' },
+                  { id: 'blend5050' as const, label: '⚖️ 50:50 혼합' },
+                ].map(b => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => { audioManager.playUiSound('keyTap'); setPrimaryBenchmark(b.id); }}
+                    className={`py-2 px-2 rounded-xl font-extrabold text-xs transition cursor-pointer border text-center ${
+                      primaryBenchmark === b.id
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {b.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* FX Effect and Fractional Shares */}
-            <div className="space-y-2 pt-1">
-              <label className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60 cursor-pointer">
-                <div>
-                  <span className="text-xs font-extrabold text-slate-800 block">미국주식 환율 효과 반영</span>
-                  <span className="text-[10px] text-slate-400 font-semibold">USD/KRW 환율 변동을 원화 수익률에 결합</span>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={includeFx}
-                  onChange={e => setIncludeFx(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
-
-              <label className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200/60 cursor-pointer">
-                <div>
-                  <span className="text-xs font-extrabold text-slate-800 block">소수점 주식 투자 허용</span>
-                  <span className="text-[10px] text-slate-400 font-semibold">정밀한 비중 분산 투자를 위해 소수점 허용</span>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={allowFractional}
-                  onChange={e => setAllowFractional(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-              </label>
+            {/* Monthly Replay Speed */}
+            <div className="space-y-1">
+              <label className="text-xs font-extrabold text-slate-700">월별 시장 재생 속도</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'NORMAL' as const, label: '보통 (약 8초)' },
+                  { id: 'FAST' as const, label: '빠르게 (약 3초)' },
+                  { id: 'INSTANT' as const, label: '즉시 진행' },
+                ].map(s => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => { audioManager.playUiSound('keyTap'); setMonthlyReplaySpeedState(s.id); }}
+                    className={`py-1.5 px-2 rounded-xl font-extrabold text-xs transition cursor-pointer border text-center ${
+                      monthlyReplaySpeed === s.id
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Start Mode Choice */}
-            <div className="space-y-1 pt-1">
-              <label className="text-xs font-extrabold text-slate-700">시작 방식</label>
+            {/* CPI Real Purchasing Power Toggle */}
+            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span className="font-extrabold text-xs text-slate-800 block">실질 구매력(CPI 물가반영) 표시</span>
+                <span className="text-[11px] text-slate-500">한국은행/통계청 역사적 CPI 기준 물가 가치 계산</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playUiSound('keyTap');
+                  setShowRealPurchasingPowerState(!showRealPurchasingPower);
+                }}
+                className={`px-3 py-1.5 rounded-xl font-extrabold text-xs cursor-pointer transition ${
+                  showRealPurchasingPower
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-200 text-slate-600'
+                }`}
+              >
+                {showRealPurchasingPower ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            {/* Universe Mode */}
+            <div className="space-y-1">
+              <label className="text-xs font-extrabold text-slate-700">종목 유니버스 모드</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setStartMode('MANUAL')}
-                  className={`py-2 px-3 rounded-xl text-xs font-black border transition cursor-pointer ${
-                    startMode === 'MANUAL'
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                  onClick={() => { audioManager.playUiSound('keyTap'); setUniverseModeState('CLASSIC_50'); }}
+                  className={`py-2 px-2.5 rounded-xl font-extrabold text-xs transition cursor-pointer border text-center ${
+                    universeMode === 'CLASSIC_50'
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  직접 수동 투자 시작
+                  🏛️ 클래식 50종목 (기본)
                 </button>
                 <button
                   type="button"
-                  onClick={() => setStartMode('AUTO_RULE')}
-                  className={`py-2 px-3 rounded-xl text-xs font-black border transition cursor-pointer flex items-center justify-center gap-1 ${
-                    startMode === 'AUTO_RULE'
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                  onClick={() => { audioManager.playUiSound('keyTap'); setUniverseModeState('HISTORICAL_SURVIVOR'); }}
+                  className={`py-2 px-2.5 rounded-xl font-extrabold text-xs transition cursor-pointer border text-center ${
+                    universeMode === 'HISTORICAL_SURVIVOR'
+                      ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
                       : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
-                  <span>⚡ 자동투자 규칙부터 설정</span>
+                  📜 역사적 생존 (실험적)
                 </button>
               </div>
             </div>
@@ -329,14 +363,16 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Start Game Action Button */}
-        <button
-          onClick={handleStartGame}
-          disabled={!isPeriodValid}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-300 disabled:to-slate-400 text-white font-black rounded-2xl shadow-xl shadow-blue-600/25 transition transform active:scale-98 flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
-        >
-          <Play size={20} />
-          <span>{startYear}년 말 {nickname}의 45년 주식투자 시뮬레이션 시작하기</span>
-        </button>
+        <div className="flex items-center justify-center pt-2">
+          <button
+            type="button"
+            onClick={handleStartGame}
+            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 active:translate-y-0.5 text-white font-black text-base rounded-2xl shadow-xl transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Play size={20} />
+            <span>{nickname} 님의 45년 투자 생존 시뮬레이션 시작</span>
+          </button>
+        </div>
       </div>
     </HeroBackground>
   );

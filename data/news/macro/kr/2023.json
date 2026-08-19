@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_2023_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "2023-10-30",
+    "publishedAt": "2023-10-30",
+    "availableFrom": "2023-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "반도체 업황 바닥 통과 및 HBM(고대역폭메모리) 프리미엄 부각",
+    "titleKo": "반도체 업황 바닥 통과 및 HBM(고대역폭메모리) 프리미엄 부각",
+    "summaryKo": "챗GPT용 GPU에 탑재되는 HBM 메모리 공급 부족으로 SK하이닉스와 삼성전자가 주목받았습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2023년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

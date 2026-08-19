@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2004_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2004-09-15",
+    "publishedAt": "2004-09-15",
+    "availableFrom": "2004-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "차이나 쇼크와 구글(Google)의 상장",
+    "titleKo": "[2004년 한국 거시] 차이나 쇼크와 구글(Google)의 상장",
+    "summaryKo": "2004년 한국 거시경제 지표 및 코스피 지수 결산: 중국 원자바오 총리의 긴축 발언으로 '차이나 쇼크'가 발생했으나, 8월 구글이 나스닥에 상장하며 웹 2.0 시대를 열었습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2004년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

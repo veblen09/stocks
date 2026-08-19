@@ -13,12 +13,13 @@ const devHtmlTemplate = `<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="머니트랙: 1980년 말부터 2025년 말까지 실제 시장 데이터로 경험하는 45년 한·미 주식투자 실험실" />
-    <meta name="theme-color" content="#1e1b4b" />
+    <meta name="theme-color" content="#f4f7fb" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="머니트랙" />
+
     <link rel="manifest" href="./manifest.json" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./favicon.svg" />

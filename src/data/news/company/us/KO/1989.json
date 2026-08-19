@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_1989_US_KO_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_KO"
+    ],
+    "relatedTickers": [
+      "KO"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "1989-11-15",
+    "publishedAt": "1989-11-15",
+    "availableFrom": "1989-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "코카콜라, 워런 버핏의 버크셔 해서웨이 대규모 지분 인수 공시",
+    "titleKo": "코카콜라, 워런 버핏의 버크셔 해서웨이 대규모 지분 인수 공시",
+    "summaryKo": "버핏이 코카콜라 보통주 7%를 집중 매수하며 장기 가치투자 사례로 주목받았습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1989년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

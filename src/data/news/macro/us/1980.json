@@ -1,0 +1,50 @@
+[
+  {
+    "id": "NEWS_1980_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "금융"
+    ],
+    "eventDate": "1980-12-05",
+    "publishedAt": "1980-12-05",
+    "availableFrom": "1980-12-05",
+    "datePrecision": "DAY",
+    "originalTitle": "Fed Chairman Paul Volcker Pushes Fed Funds Rate to Record 20%",
+    "titleKo": "미 연준 폴 볼커 의장, 연방기금금리 사상 최고 20% 인상",
+    "summaryKo": "미국 연방준비제도(Fed)가 고물가를 잡기 위해 기준금리를 20%까지 전격 인상하는 극단적 긴축 통화정책을 단행했습니다.",
+    "sourceName": "Federal Reserve Board Historical Decisions",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "금리",
+      "통화정책",
+      "인플레이션"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST",
+      "VALUATION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "미국 연방기금금리 20.0% 도달, 단기 대출금리 급등.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST",
+        "VALUATION"
+      ],
+      "positiveInterpretation": "장기 인플레이션 기대심리 조기 차단 기대.",
+      "negativeInterpretation": "기업 자금조달 비용 급증 및 경기침체 위험 확대.",
+      "unknownAtTheTime": "인플레이션 진정 속도 및 향후 경기 연착륙 성공 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

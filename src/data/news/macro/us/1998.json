@@ -1,0 +1,52 @@
+[
+  {
+    "id": "NEWS_1998_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "1998-10-20",
+    "publishedAt": "1998-10-20",
+    "availableFrom": "1998-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[1998년 미국 거시경제] 연준 3차례 금리 인하와 S&P 500 랠리",
+    "summaryKo": "러시아 모라토리엄 및 LTCM 파산 위기 속에서 연방준비제도(Fed)가 전격적인 3차례 금리 인하를 단행하며 금융시스템 안정을 지원했습니다. 견조한 소비와 기술주 강세로 S&P 500 지수는 견고한 상승세를 이어갔습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis & Federal Reserve",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준",
+      "금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "facts": [
+        "1998년 가을 러시아 외환위기 및 LTCM 헤지펀드 유동성 위기 발생",
+        "연방준비제도(Fed), 9월부터 11월까지 3차례에 걸쳐 기준금리 75bp 전격 인하",
+        "미국 실질 GDP 성장률 4.5% 및 S&P 500 지수 강세 지속"
+      ],
+      "marketContext": "글로벌 금융 불안에도 불구하고 연준의 선제적 금리 인하로 미국 내수와 기술 혁신 기업들의 성장 동력이 유지되었습니다.",
+      "keyVariables": [
+        "연준 기준금리 (4.75%)",
+        "미국 실질 GDP 성장률 (4.5%)",
+        "S&P 500 토탈 리턴 (+28.6%)"
+      ],
+      "limitations": "해외 금융위기 완화 이후 기술주 중심의 주가 밸류에이션 상승세가 가속화되었습니다."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

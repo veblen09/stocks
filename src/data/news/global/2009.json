@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2009_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2009-06-30",
+    "publishedAt": "2009-06-30",
+    "availableFrom": "2009-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "양적완화(QE)와 차·화·정 랠리",
+    "titleKo": "[2009년 세계 경제] 양적완화(QE)와 차·화·정 랠리",
+    "summaryKo": "벤 버냉키 연준 의장의 전례 없는 '헬리콥터 머니' 양적완화로 유동성이 폭발했습니다. 한국은 자동차·화학·정유(차화정)의 경쟁력으로 49.6% V자 반등했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2009년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

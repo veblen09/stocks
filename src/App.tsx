@@ -6,7 +6,10 @@ import { GamePage } from './pages/GamePage';
 import { ResultPage } from './pages/ResultPage';
 import { TeacherPage } from './pages/TeacherPage';
 import { AudioController } from './components/AudioController';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider } from './features/notifications/ToastProvider';
 import { audioManager } from './utils/audioManager';
+
 
 function MainRouter() {
   const [currentPage, setCurrentPage] = useState<string>(() => {
@@ -53,8 +56,8 @@ function MainRouter() {
     </div>
   );
 }
-
 function App() {
+
   // Initialize audio system on first user click/keydown
   useEffect(() => {
     audioManager.init();
@@ -75,10 +78,16 @@ function App() {
   }, []);
 
   return (
-    <StockGameProvider>
-      <MainRouter />
-    </StockGameProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <StockGameProvider>
+          <MainRouter />
+        </StockGameProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
+
+
 
 export default App;

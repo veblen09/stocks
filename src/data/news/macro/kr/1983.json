@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_1983_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "1983-10-30",
+    "publishedAt": "1983-10-30",
+    "availableFrom": "1983-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "이병철 회장 '도쿄선언' 발표: 64K D-RAM 반도체 독자 개발 착수",
+    "titleKo": "이병철 회장 '도쿄선언' 발표: 64K D-RAM 반도체 독자 개발 착수",
+    "summaryKo": "삼성그룹이 미국과 일본에 이어 세계 3번째로 첨단 초LSI 메모리 반도체 사업에 전격 진출을 선언했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1983년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

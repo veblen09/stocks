@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2022_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2022-06-30",
+    "publishedAt": "2022-06-30",
+    "availableFrom": "2022-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "러시아-우크라이나 전쟁과 4연속 자이언트 스텝",
+    "titleKo": "[2022년 세계 경제] 러시아-우크라이나 전쟁과 4연속 자이언트 스텝",
+    "summaryKo": "러시아의 우크라이나 침공으로 에너지·곡물 가격이 폭등하자 미 연준이 4연속 0.75%p 금리 인상(자이언트 스텝)을 단행, 주식과 채권이 동반 폭락했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2022년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

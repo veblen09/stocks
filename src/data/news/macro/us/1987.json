@@ -1,0 +1,48 @@
+[
+  {
+    "id": "NEWS_1987_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국경제",
+      "금융"
+    ],
+    "eventDate": "1987-09-20",
+    "publishedAt": "1987-09-20",
+    "availableFrom": "1987-09-20",
+    "datePrecision": "DAY",
+    "originalTitle": "신임 앨런 그린스펀 연준 의장, 긴급 유동성 무제한 공급 선언",
+    "titleKo": "신임 앨런 그린스펀 연준 의장, 긴급 유동성 무제한 공급 선언",
+    "summaryKo": "블랙 먼데이 충격을 차단하기 위해 금융시스템에 긴급 자금을 공급하며 '그린스펀 풋'의 시초를 열었습니다.",
+    "sourceName": "Federal Reserve / BLS",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "미국경제",
+      "연준금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1987년 미국 주요 경제 지표 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST"
+      ],
+      "positiveInterpretation": "미국 소비 경제의 탄력성과 기술 혁신.",
+      "negativeInterpretation": "금리 변동성에 따른 차입 비용 증가 위험.",
+      "unknownAtTheTime": "인플레이션 안정화 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

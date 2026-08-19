@@ -1,0 +1,51 @@
+[
+  {
+    "id": "NEWS_1980_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "제조업",
+      "수출"
+    ],
+    "eventDate": "1980-12-20",
+    "publishedAt": "1980-12-20",
+    "availableFrom": "1980-12-20",
+    "datePrecision": "DAY",
+    "originalTitle": "Bank of Korea Reports -1.7% GDP Contraction for 1980",
+    "titleKo": "한국은행, 1980년 경제성장률 -1.7% 마이너스 성장 발표",
+    "summaryKo": "제2차 오일쇼크와 극심한 냉해 농업 흉작, 정국 불안이 겹치며 대한민국 정부 수립 이후 최초로 연간 역성장(-1.7%)과 소비자물가 28.7% 급등을 기록했습니다.",
+    "sourceName": "한국은행 경제통계시스템 (BOK ECOS)",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "경제성장률",
+      "물가",
+      "마이너스성장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "COST",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1980년 실질 GDP -1.7% 역성장, CPI 28.7% 상승 기록 공식 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "COST",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "정부 주도의 중화학공업 투자조정 및 물가안정 종합대책 추진.",
+      "negativeInterpretation": "내수 위축, 기업 채무 부담 가중, 원자재 수입비용 폭증.",
+      "unknownAtTheTime": "수출 경기 회복 시점 및 환율 안정화 경로."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

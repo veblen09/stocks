@@ -1,9 +1,16 @@
 import type {
   FinalMetrics,
   StockGameState,
+  DrawdownPoint,
+  RecoveryMetrics,
+  RiskLevel,
+  YearlyPerformanceRecord,
 } from '../types/stockGame';
 import { simulateBenchmarkTrajectory } from './benchmarkEngine';
 import { STOCKS_BY_ID } from './returnEngine';
+import rawCpi from '../data/normalized/korean_cpi.json';
+
+const CPI_SERIES: Record<string, number> = rawCpi.series as Record<string, number>;
 
 /**
  * Calculates Money-Weighted Return (MWR / IRR) using Newton-Raphson method
@@ -94,6 +101,149 @@ export function calculateMDD(indexLevels: number[]): number {
 }
 
 /**
+ * Computes exact DrawdownPoint array across full history
+ */
+export function calculateDrawdownPoints(
+  history: YearlyPerformanceRecord[],
+  startYear = 1980
+): DrawdownPoint[] {
+  if (!history || history.length === 0) return [];
+
+  let peakTwr = 100.0;
+  let peakYear = startYear;
+  const points: DrawdownPoint[] = [];
+
+  for (const h of history) {
+    const currentTwr = h.twrIndexLevel;
+    if (currentTwr >= peakTwr) {
+      peakTwr = currentTwr;
+      peakYear = h.year;
+    }
+
+    const dd = peakTwr > 0 ? (currentTwr - peakTwr) / peakTwr : 0; // negative or 0
+    const underwaterYears = Math.max(0, h.year - peakYear);
+
+    points.push({
+      year: h.year,
+      peakTwrIndex: peakTwr,
+      currentTwrIndex: currentTwr,
+      drawdown: dd,
+      underwaterYears,
+      peakYear,
+    });
+  }
+
+  return points;
+}
+
+/**
+ * Computes Recovery Metrics (Worst Drawdown, Peak Year, Trough Year, Recovery Year, Max Underwater Duration)
+ */
+export function calculateRecoveryMetrics(
+  history: YearlyPerformanceRecord[],
+  startYear = 1980
+): RecoveryMetrics {
+  const points = calculateDrawdownPoints(history, startYear);
+  if (points.length === 0) {
+    return {
+      maxDrawdown: 0,
+      drawdownStartYear: undefined,
+      troughYear: undefined,
+      recoveryYear: undefined,
+      underwaterDurationYears: 0,
+    };
+  }
+
+  let maxDd = 0;
+  let troughYear = startYear;
+  let peakYearAtTrough = startYear;
+  let maxUnderwaterDuration = 0;
+
+  points.forEach(p => {
+    if (p.underwaterYears > maxUnderwaterDuration) {
+      maxUnderwaterDuration = p.underwaterYears;
+    }
+    const absDd = Math.abs(p.drawdown);
+    if (absDd > maxDd) {
+      maxDd = absDd;
+      troughYear = p.year;
+      peakYearAtTrough = p.peakYear;
+    }
+  });
+
+  // Find when peakYearAtTrough was subsequently recovered
+  let recoveryYear: number | undefined = undefined;
+  const troughIndex = points.findIndex(p => p.year === troughYear);
+  if (troughIndex >= 0) {
+    const peakLevel = points[troughIndex].peakTwrIndex;
+    for (let i = troughIndex + 1; i < points.length; i++) {
+      if (points[i].currentTwrIndex >= peakLevel) {
+        recoveryYear = points[i].year;
+        break;
+      }
+    }
+  }
+
+  return {
+    maxDrawdown: maxDd,
+    drawdownStartYear: peakYearAtTrough,
+    troughYear,
+    recoveryYear,
+    underwaterDurationYears: maxUnderwaterDuration,
+  };
+}
+
+/**
+ * Converts a drawdown value (e.g. -0.347) into a standardized RiskLevel
+ */
+export function calculateRiskLevel(drawdown: number): RiskLevel {
+  const absDd = Math.abs(drawdown);
+  if (absDd >= 0.40) return 'EXTREME';
+  if (absDd >= 0.30) return 'CRISIS';
+  if (absDd >= 0.20) return 'WARNING';
+  if (absDd >= 0.10) return 'CAUTION';
+  return 'NORMAL';
+}
+
+/**
+ * Calculates pure investment PnL and rate by strictly separating cumulative principal from portfolio value
+ */
+export function calculatePureInvestmentPnL(
+  currentPortfolioValueKRW: number,
+  initialCashKRW: number,
+  cumulativeContributionsKRW: number
+): {
+  netInvestedPrincipalKRW: number;
+  investmentPnLKRW: number;
+  investmentPnLPercent: number;
+} {
+  const netInvestedPrincipalKRW = initialCashKRW + cumulativeContributionsKRW;
+  const investmentPnLKRW = currentPortfolioValueKRW - netInvestedPrincipalKRW;
+  const investmentPnLPercent = netInvestedPrincipalKRW > 0 ? investmentPnLKRW / netInvestedPrincipalKRW : 0;
+
+  return {
+    netInvestedPrincipalKRW,
+    investmentPnLKRW,
+    investmentPnLPercent,
+  };
+}
+
+/**
+ * Adjusts nominal KRW value to real purchasing power using Korea CPI index
+ */
+export function calculateRealPurchasingPower(
+  nominalKRW: number,
+  fromYear: number,
+  toYear = 2025
+): number {
+  const fromCpi = CPI_SERIES[fromYear.toString()] || CPI_SERIES['1980'] || 17.0;
+  const toCpi = CPI_SERIES[toYear.toString()] || CPI_SERIES['2025'] || 116.5;
+
+  if (fromCpi <= 0) return nominalKRW;
+  return nominalKRW * (toCpi / fromCpi);
+}
+
+/**
  * Computes sample standard deviation (annual volatility)
  */
 export function calculateVolatility(returns: number[]): number {
@@ -116,37 +266,48 @@ export function evaluateScoreAndPersona(
   krWeight: number,
   usWeight: number,
   totalTradingFees: number,
-  finalPortfolioValue: number
+  finalPortfolioValue: number,
+  maxStockWeight = 0.3
 ): {
   diversificationScore: number;
   disciplineScore: number;
   crisisResilienceScore: number;
   costEfficiencyScore: number;
   overallAlphaScore: number;
+  riskManagementScore: number;
   personaType: string;
   personaBadge: string;
   personaDescription: string;
 } {
-  // 1. Diversification
+  // 1. Diversification (0-100)
   const krDiff = Math.abs(krWeight - 0.5);
   const usDiff = Math.abs(usWeight - 0.5);
-  let divScore = Math.max(20, Math.round(100 - (krDiff + usDiff) * 60));
+  const concPenalty = Math.max(0, (maxStockWeight - 0.3) * 100);
+  const divScore = Math.max(20, Math.round(100 - (krDiff + usDiff) * 50 - concPenalty));
 
-  // 2. Discipline
+  // 2. Discipline (0-100)
   const tradesPerYear = totalTrades / Math.max(1, yearsCount);
-  let discScore = Math.max(30, Math.round(100 - Math.min(60, tradesPerYear * 4)));
+  const discScore = Math.max(30, Math.round(100 - Math.min(60, tradesPerYear * 4)));
 
-  // 3. Crisis Resilience
-  let crisisScore = Math.max(20, Math.round(100 - mdd * 100));
+  // 3. Crisis Resilience (0-100)
+  const crisisScore = Math.max(20, Math.round(100 - mdd * 100));
 
-  // 4. Cost Efficiency
+  // 4. Cost Efficiency (0-100)
   const feeDrag = finalPortfolioValue > 0 ? totalTradingFees / finalPortfolioValue : 0;
-  let costScore = Math.max(30, Math.round(100 - Math.min(70, feeDrag * 5000)));
+  const costScore = Math.max(30, Math.round(100 - Math.min(70, feeDrag * 5000)));
 
-  // 5. Alpha
+  // 5. Alpha (0-100)
   const benchmarkBlendCAGR = (kospiCAGR + sp500CAGR) / 2;
   const alphaDiff = twrCAGR - benchmarkBlendCAGR;
-  let alphaScore = Math.max(20, Math.min(100, Math.round(50 + alphaDiff * 300)));
+  const alphaScore = Math.max(20, Math.min(100, Math.round(50 + alphaDiff * 300)));
+
+  // Dedicated Risk Management Score (Weighted blend of MDD, Concentration, Cost, Discipline)
+  const riskManagementScore = Math.round(
+    crisisScore * 0.4 +
+    divScore * 0.25 +
+    discScore * 0.2 +
+    costScore * 0.15
+  );
 
   // Determine Persona
   let personaType = '안정적 분산투자자';
@@ -185,6 +346,7 @@ export function evaluateScoreAndPersona(
     crisisResilienceScore: crisisScore,
     costEfficiencyScore: costScore,
     overallAlphaScore: alphaScore,
+    riskManagementScore,
     personaType,
     personaBadge,
     personaDescription,
@@ -195,7 +357,7 @@ export function evaluateScoreAndPersona(
  * Compiles all final quantitative performance metrics
  */
 export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
-  const { settings, history, cashKRW, holdings, tradeLogs } = state;
+  const { settings, history, cashKRW, holdings, tradeLogs, crisisDecisionHistory = [] } = state;
   const yearsCount = history.length;
 
   const initialCash = settings.initialCashKRW;
@@ -220,9 +382,26 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
   }));
   const mwrIRR = calculateMWR_IRR(initialCash, depositsList, finalPortfolioValue, yearsCount);
 
-  // MDD from TWR levels
+  // MDD from pure TWR levels
   const twrLevels = [100.0, ...history.map(h => h.twrIndexLevel)];
   const maxDrawdownMDD = calculateMDD(twrLevels);
+
+  // Drawdown Points & Recovery
+  const drawdownPoints = calculateDrawdownPoints(history, settings.startYear);
+  const recoveryMetrics = calculateRecoveryMetrics(history, settings.startYear);
+
+  // Peak Portfolio Value and Loss from Peak
+  let allTimePeakPortfolioValueKRW = initialCash;
+  history.forEach(h => {
+    if (h.endTotalAssetsKRW > allTimePeakPortfolioValueKRW) {
+      allTimePeakPortfolioValueKRW = h.endTotalAssetsKRW;
+    }
+  });
+  const lossFromPeakKRW = Math.max(0, allTimePeakPortfolioValueKRW - finalPortfolioValue);
+
+  // CPI Real Purchasing Power
+  const cpiAdjustedFinalValueKRW = calculateRealPurchasingPower(finalPortfolioValue, settings.endYear, 2025);
+  const cpiAdjustedTotalProfitKRW = cpiAdjustedFinalValueKRW - totalInvestedPrincipal;
 
   // Volatility
   const returns = history.map(h => h.annualReturn);
@@ -320,8 +499,24 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
     krWeight,
     usWeight,
     totalTradingFees,
-    finalPortfolioValue
+    finalPortfolioValue,
+    maxStockWeight.weight
   );
+
+  // Calculate Chapter Survival Stats
+  const chapterResults = state.chapterRiskMissionResults || {};
+  let survivedChapters = 0;
+  const totalChaptersCount = Math.min(9, Math.ceil(yearsCount / 5));
+
+  for (const [_, missionResults] of Object.entries(chapterResults)) {
+    if (missionResults.length > 0 && missionResults.every(r => r.passed)) {
+      survivedChapters++;
+    }
+  }
+  // Default to at least counting if not all failed
+  if (Object.keys(chapterResults).length === 0) {
+    survivedChapters = maxDrawdownMDD <= 0.4 ? totalChaptersCount : Math.max(1, totalChaptersCount - 2);
+  }
 
   return {
     initialCapital: initialCash,
@@ -335,6 +530,12 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
     mwrIRR,
     annualVolatility,
     maxDrawdownMDD,
+    drawdownPoints,
+    recoveryMetrics,
+    lossFromPeakKRW,
+    allTimePeakPortfolioValueKRW,
+    cpiAdjustedFinalValueKRW,
+    cpiAdjustedTotalProfitKRW,
     winYearRatio,
     bestYear,
     worstYear,
@@ -363,6 +564,13 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
     totalTradingFeesKRW: totalTradingFees,
     totalFxGainLossKRW,
     totalTradesCount: tradeLogs.length,
+    crisisDecisionHistory,
+    chapterSurvivalCount: {
+      survived: survivedChapters,
+      total: Math.max(1, totalChaptersCount),
+      safestEra: '2011~2015 (저금리 모바일 안정기)',
+      riskiestEra: '1996~2000 (외환위기 & 닷컴버블)',
+    },
     scoreAndPersona,
   };
 }

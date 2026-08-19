@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2019_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2019-06-30",
+    "publishedAt": "2019-06-30",
+    "availableFrom": "2019-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "연준의 금리인하 피벗과 빅테크 질주",
+    "titleKo": "[2019년 세계 경제] 연준의 금리인하 피벗과 빅테크 질주",
+    "summaryKo": "경기 둔화 우려에 연준이 '보험성 금리인하'로 돌아서며 유동성이 재유입되었습니다. 애플(+86%), 마이크로소프트(+55%) 등 빅테크가 신고가를 썼습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2019년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

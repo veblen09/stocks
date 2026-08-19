@@ -1,13 +1,16 @@
 import type {
   AutoInvestRule,
+  CrisisDecisionRecord,
   GameSettings,
   StockHolding,
   TradeLogItem,
   YearlyPerformanceRecord,
 } from '../types/stockGame';
-import { executeBuy, executeRebalanceToTargetWeights } from './tradeEngine';
+import { executeBuy, executeSell, executeRebalanceToTargetWeights } from './tradeEngine';
 import { advanceSimulationOneYear, calculatePortfolioValue } from './portfolioEngine';
-import { STOCKS, isStockListed, getHistoricalStockStats } from './returnEngine';
+import { STOCKS, isStockListed, getHistoricalStockStats, getStockPriceKRW } from './returnEngine';
+import { getCrisisEventForYear } from './crisisEngine';
+import { calculateMDD, calculateRecoveryMetrics, calculatePureInvestmentPnL } from './metricsEngine';
 
 export interface AutoInvestStepState {
   currentYear: number;
@@ -15,7 +18,21 @@ export interface AutoInvestStepState {
   holdings: Record<string, StockHolding>;
   history: YearlyPerformanceRecord[];
   tradeLogs: TradeLogItem[];
+  crisisDecisionHistory?: CrisisDecisionRecord[];
   isGameOver: boolean;
+}
+
+export interface AutoInvestSummary {
+  yearsRun: number;
+  finalPortfolioValue: number;
+  totalInvestedPrincipal: number;
+  pureInvestmentPnLKRW: number;
+  pureInvestmentPnLPercent: number;
+  twrCAGR: number;
+  maxDrawdownMDD: number;
+  worstYear: { year: number; returnRate: number };
+  maxUnderwaterYears: number;
+  crisisDecisionsExecuted: number;
 }
 
 /**
@@ -144,6 +161,7 @@ export function executeAutoInvestSingleYear(
   let cash = state.cashKRW + deposit;
   let holdings = { ...state.holdings };
   const logs: TradeLogItem[] = [];
+  const crisisRecords: CrisisDecisionRecord[] = [...(state.crisisDecisionHistory || [])];
   let feesPaidThisYear = 0;
 
   const targetAllocations = resolveTargetAllocationsForYear(rule, year, settings);
@@ -192,6 +210,83 @@ export function executeAutoInvestSingleYear(
     }
   }
 
+  // Check if historical crisis event occurs this year and crisisRule is configured
+  const crisisEvent = getCrisisEventForYear(year);
+  if (crisisEvent && rule.crisisRule) {
+    const crisisAction = rule.crisisRule.action;
+    const priorYear = year - 1;
+    let krVal = 0;
+    let usVal = 0;
+    let currentHoldingVal = 0;
+
+    for (const cid in holdings) {
+      const h = holdings[cid];
+      const p = getStockPriceKRW(cid, priorYear) || 0;
+      const v = h.shares * p;
+      currentHoldingVal += v;
+      if (cid.startsWith('KR_')) krVal += v;
+      else usVal += v;
+    }
+
+    const totalValBefore = cash + currentHoldingVal;
+    let crisisFeePaid = 0;
+
+    if ((crisisAction === 'REBALANCE' || crisisAction === 'REBALANCE_TO_TARGET') && targetAllocations.length > 0) {
+      const rebRes = executeRebalanceToTargetWeights(targetAllocations, cash, holdings, year, settings);
+      cash = rebRes.updatedCash;
+      holdings = rebRes.updatedHoldings;
+      logs.push(...rebRes.tradeLogs);
+      feesPaidThisYear += rebRes.totalFees;
+      crisisFeePaid = rebRes.totalFees;
+    } else if (crisisAction === 'RAISE_CASH') {
+      const targetCashWeight = rule.crisisRule.targetCashWeight || 0.3;
+      const targetCashAmount = totalValBefore * targetCashWeight;
+      const neededCash = targetCashAmount - cash;
+
+      if (neededCash > 1000 && currentHoldingVal > 0) {
+        const sellFraction = Math.min(0.999, neededCash / currentHoldingVal);
+        for (const cid in holdings) {
+          const h = holdings[cid];
+          if (h.shares > 0) {
+            const sharesToSell = h.shares * sellFraction;
+            if (sharesToSell > 1e-6) {
+              const sellRes = executeSell(cid, sharesToSell, cash, holdings, year, settings);
+              cash = sellRes.updatedCash;
+              holdings = sellRes.updatedHoldings;
+              logs.push(...sellRes.tradeLogs);
+              feesPaidThisYear += sellRes.totalFees;
+              crisisFeePaid += sellRes.totalFees;
+            }
+          }
+        }
+      }
+    }
+
+    crisisRecords.push({
+      crisisId: crisisEvent.id,
+      year: crisisEvent.year,
+      month: crisisEvent.month,
+      titleKo: crisisEvent.titleKo,
+      chosenAction: crisisAction === 'REBALANCE_TO_TARGET' ? 'REBALANCE' : crisisAction,
+      targetCashWeight: rule.crisisRule.targetCashWeight,
+      portfolioValueAtCrisisKRW: totalValBefore,
+      drawdownAtCrisis: 0,
+      tradingFeePaidKRW: crisisFeePaid,
+      allocationBefore: {
+        krWeight: totalValBefore > 0 ? krVal / totalValBefore : 0,
+        usWeight: totalValBefore > 0 ? usVal / totalValBefore : 0,
+        cashWeight: totalValBefore > 0 ? cash / totalValBefore : 1,
+      },
+      allocationAfter: {
+        krWeight: totalValBefore > 0 ? krVal / totalValBefore : 0,
+        usWeight: totalValBefore > 0 ? usVal / totalValBefore : 0,
+        cashWeight: totalValBefore > 0 ? cash / totalValBefore : 1,
+      },
+      rationale: `자동투자 규칙에 따른 ${crisisAction === 'HOLD' ? '원칙 유지' : crisisAction === 'RAISE_CASH' ? '현금 비중 확대' : '목표비중 리밸런싱'} 자동 집행`,
+      timestamp: Date.now(),
+    });
+  }
+
   const startAssets = calculatePortfolioValue(cash, holdings, year - 1);
 
   const stepRes = advanceSimulationOneYear(
@@ -211,6 +306,7 @@ export function executeAutoInvestSingleYear(
     holdings: stepRes.updatedHoldings,
     history: [...state.history, stepRes.performanceRecord],
     tradeLogs: [...state.tradeLogs, ...logs],
+    crisisDecisionHistory: crisisRecords,
     isGameOver: stepRes.isGameOver,
   };
 }
@@ -234,4 +330,51 @@ export function runAutoInvestSimulation(
   }
 
   return state;
+}
+
+/**
+ * Summarizes the output of an automated investment execution
+ */
+export function summarizeAutoInvestResults(
+  startState: AutoInvestStepState,
+  endState: AutoInvestStepState,
+  settings: GameSettings
+): AutoInvestSummary {
+  const yearsRun = endState.history.length - startState.history.length;
+  const lastHistory = endState.history.length > 0 ? endState.history[endState.history.length - 1] : null;
+  const finalValue = lastHistory ? lastHistory.endTotalAssetsKRW : endState.cashKRW;
+
+  const totalDeposits = endState.history.reduce((sum, h, idx) => (idx === 0 ? sum : sum + h.annualDepositKRW), 0);
+  const { netInvestedPrincipalKRW, investmentPnLKRW, investmentPnLPercent } = calculatePureInvestmentPnL(
+    finalValue,
+    settings.initialCashKRW,
+    totalDeposits
+  );
+
+  const twrLevels = [100.0, ...endState.history.map(h => h.twrIndexLevel)];
+  const maxDrawdownMDD = calculateMDD(twrLevels);
+  const recoveryMetrics = calculateRecoveryMetrics(endState.history, settings.startYear);
+
+  let worstYear = { year: settings.startYear + 1, returnRate: 0 };
+  endState.history.forEach(h => {
+    if (h.annualReturn < worstYear.returnRate || h === endState.history[0]) {
+      worstYear = { year: h.year, returnRate: h.annualReturn };
+    }
+  });
+
+  const twrIndexEnd = lastHistory ? lastHistory.twrIndexLevel : 100.0;
+  const twrCAGR = endState.history.length > 0 ? Math.pow(twrIndexEnd / 100.0, 1.0 / endState.history.length) - 1.0 : 0;
+
+  return {
+    yearsRun,
+    finalPortfolioValue: finalValue,
+    totalInvestedPrincipal: netInvestedPrincipalKRW,
+    pureInvestmentPnLKRW: investmentPnLKRW,
+    pureInvestmentPnLPercent: investmentPnLPercent,
+    twrCAGR,
+    maxDrawdownMDD,
+    worstYear,
+    maxUnderwaterYears: recoveryMetrics.underwaterDurationYears || 0,
+    crisisDecisionsExecuted: endState.crisisDecisionHistory?.length || 0,
+  };
 }

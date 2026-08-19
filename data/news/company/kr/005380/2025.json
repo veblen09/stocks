@@ -1,0 +1,54 @@
+[
+  {
+    "id": "NEWS_2025_KR_005380_01",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005380"
+    ],
+    "relatedTickers": [
+      "005380"
+    ],
+    "relatedSectors": [
+      "전기전자",
+      "자동차",
+      "철강"
+    ],
+    "eventDate": "2025-11-10",
+    "publishedAt": "2025-11-10",
+    "availableFrom": "2025-11-10",
+    "datePrecision": "DAY",
+    "originalTitle": "현대차, 인도법인 대규모 IPO 성공 및 사상 최대 주주환원율 발표",
+    "titleKo": "현대차, 인도법인 대규모 IPO 성공 및 사상 최대 주주환원율 발표",
+    "summaryKo": "하이브리드차와 전기차의 글로벌 균형 성장으로 영업이익 15조 원을 돌파했습니다.",
+    "sourceName": "한국거래소 기업공시 / DART",
+    "sourceUrl": "https://dart.fss.or.kr",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "기업실적",
+      "신제품",
+      "수출"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2025년 기업 핵심 공시 내용.",
+      "impactChannels": [
+        "REVENUE",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "주력 제품의 글로벌 경쟁력 입증 및 매출 신장.",
+      "negativeInterpretation": "경쟁사 증설에 따른 마진 압박 요인.",
+      "unknownAtTheTime": "차세대 신기술 시장 반응."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

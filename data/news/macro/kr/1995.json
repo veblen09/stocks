@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1995_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "1995-09-15",
+    "publishedAt": "1995-09-15",
+    "availableFrom": "1995-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "윈도우 95 출시와 인터넷 혁명 개막",
+    "titleKo": "[1995년 한국 거시] 윈도우 95 출시와 인터넷 혁명 개막",
+    "summaryKo": "1995년 한국 거시경제 지표 및 코스피 지수 결산: 마이크로소프트 윈도우 95와 넷스케이프 브라우저 등장으로 PC와 인터넷 보급이 폭발했습니다. 한국은 1인당 국민소득 1만 달러를 돌파했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1995년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

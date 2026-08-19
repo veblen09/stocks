@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1989_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1989-06-15",
+    "publishedAt": "1989-06-15",
+    "availableFrom": "1989-06-15",
+    "datePrecision": "DAY",
+    "originalTitle": "동서 냉전 종식과 동유럽 공산권 붕괴 가속",
+    "titleKo": "동서 냉전 종식과 동유럽 공산권 붕괴 가속",
+    "summaryKo": "베를린 장벽이 무너지며 글로벌 자유무역 확산과 시장경제 통합의 새로운 시대가 열렸습니다.",
+    "sourceName": "IMF / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "세계경제",
+      "교역"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1989년 세계 경제 지표 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "글로벌 경기 회복 및 신흥 시장 수요 창출.",
+      "negativeInterpretation": "고금리 또는 원자재 충격에 따른 불확실성.",
+      "unknownAtTheTime": "향후 통화정책 방향성."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

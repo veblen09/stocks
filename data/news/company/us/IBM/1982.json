@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_1982_US_IBM_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_IBM"
+    ],
+    "relatedTickers": [
+      "IBM"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "1982-11-15",
+    "publishedAt": "1982-11-15",
+    "availableFrom": "1982-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "IBM, PC 판매 급증으로 소프트웨어 및 주변기기 생태계 확장",
+    "titleKo": "IBM, PC 판매 급증으로 소프트웨어 및 주변기기 생태계 확장",
+    "summaryKo": "IBM PC 판매량이 연간 수십만 대를 돌파하며 PC 산업의 폭발적 성장을 견인했습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1982년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

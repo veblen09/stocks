@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1993_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "1993-09-15",
+    "publishedAt": "1993-09-15",
+    "availableFrom": "1993-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "금융실명제 전격 실시",
+    "titleKo": "[1993년 한국 거시] 금융실명제 전격 실시",
+    "summaryKo": "1993년 한국 거시경제 지표 및 코스피 지수 결산: 김영삼 정부의 8·12 금융실명제 긴급명령이 발표되었습니다. 단기 충격 후 지하경제가 양성화되고 주식시장의 투명성이 대폭 개선되었습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1993년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

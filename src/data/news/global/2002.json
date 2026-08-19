@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2002_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2002-06-30",
+    "publishedAt": "2002-06-30",
+    "availableFrom": "2002-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "한일 월드컵 4강과 카드채 사태 조짐",
+    "titleKo": "[2002년 세계 경제] 한일 월드컵 4강과 카드채 사태 조짐",
+    "summaryKo": "2002 월드컵 열기 속에 내수 소비가 부양되었으나, 무분별한 신용카드 발급으로 연말 카드채 부실 위기가 고조되었습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2002년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

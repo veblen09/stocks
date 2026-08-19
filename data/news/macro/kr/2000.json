@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_2000_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "2000-10-30",
+    "publishedAt": "2000-10-30",
+    "availableFrom": "2000-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "코스피 지수 1,000P에서 500P로 반토막 급락",
+    "titleKo": "코스피 지수 1,000P에서 500P로 반토막 급락",
+    "summaryKo": "미국 기술주 폭락과 외환위기 후속 구조조정 여파로 증시가 장기 조정에 진입했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2000년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

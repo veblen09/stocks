@@ -628,33 +628,67 @@ def main():
     with open(os.path.join(DATA_NEWS_DIR, "news-index.json"), "w", encoding="utf-8") as f:
         json.dump(news_index, f, ensure_ascii=False, indent=2)
 
-    with open(os.path.join(SRC_NEWS_DIR, "news-index.json"), "w", encoding="utf-8") as f:
-        json.dump(news_index, f, ensure_ascii=False, indent=2)
+    # Partition into modular subdirectories for lazy-loading (Section 27)
+    for base_dir in [DATA_NEWS_DIR, SRC_NEWS_DIR]:
+        # 1. Global news by year
+        global_dir = os.path.join(base_dir, "global")
+        os.makedirs(global_dir, exist_ok=True)
+        # 2. Macro KR/US by year
+        macro_kr_dir = os.path.join(base_dir, "macro", "kr")
+        macro_us_dir = os.path.join(base_dir, "macro", "us")
+        os.makedirs(macro_kr_dir, exist_ok=True)
+        os.makedirs(macro_us_dir, exist_ok=True)
+        # 3. Company directories
+        company_kr_dir = os.path.join(base_dir, "company", "kr")
+        company_us_dir = os.path.join(base_dir, "company", "us")
+        os.makedirs(company_kr_dir, exist_ok=True)
+        os.makedirs(company_us_dir, exist_ok=True)
+        # 4. Sector directory
+        sector_dir = os.path.join(base_dir, "sector")
+        os.makedirs(sector_dir, exist_ok=True)
 
-    provenance = {
-        "system": "머니트랙 45년 한·미 주식투자 실험실 역사적 뉴스 시스템",
-        "period": "1980-2025 (46개년)",
-        "sources": [
-            "한국은행(BOK) ECOS 경제통계",
-            "금융감독원 전자공시시스템(DART)",
-            "한국거래소(KRX) 기업공시채널 KIND",
-            "Federal Reserve Board (FRB FOMC Historical Records)",
-            "U.S. Securities and Exchange Commission (SEC EDGAR 10-K/10-Q/8-K)",
-            "U.S. Bureau of Labor Statistics (BLS) & Bureau of Economic Analysis (BEA)",
-            "International Monetary Fund (IMF) World Economic Outlook",
-            "World Bank Open Data"
-        ],
-        "copyrightNotice": "모든 기사 및 공시는 저작권법 및 공정 이용(Fair Use) 원칙에 따라 2~4문장의 사실 요약 및 중립적 영향 경로 해설로만 구성되어 있으며, 언론사 원문 전체를 무단 복제하지 않습니다.",
-        "compiledAt": datetime.utcnow().isoformat() + "Z"
-    }
+        # Write partitioned files
+        for y in range(1980, 2026):
+            y_str = str(y)
+            # Global
+            g_items = [item for item in all_news if item["publishedAt"].startswith(y_str) and item["scope"] in ["GLOBAL_MACRO", "MARKET"]]
+            with open(os.path.join(global_dir, f"{y_str}.json"), "w", encoding="utf-8") as f:
+                json.dump(g_items, f, ensure_ascii=False, indent=2)
 
-    with open(os.path.join(DATA_NEWS_DIR, "news-provenance.json"), "w", encoding="utf-8") as f:
-        json.dump(provenance, f, ensure_ascii=False, indent=2)
+            # Macro KR
+            m_kr = [item for item in all_news if item["publishedAt"].startswith(y_str) and item["scope"] == "KOREA_MACRO"]
+            with open(os.path.join(macro_kr_dir, f"{y_str}.json"), "w", encoding="utf-8") as f:
+                json.dump(m_kr, f, ensure_ascii=False, indent=2)
 
-    with open(os.path.join(SRC_NEWS_DIR, "news-provenance.json"), "w", encoding="utf-8") as f:
-        json.dump(provenance, f, ensure_ascii=False, indent=2)
+            # Macro US
+            m_us = [item for item in all_news if item["publishedAt"].startswith(y_str) and item["scope"] == "US_MACRO"]
+            with open(os.path.join(macro_us_dir, f"{y_str}.json"), "w", encoding="utf-8") as f:
+                json.dump(m_us, f, ensure_ascii=False, indent=2)
 
-    print("Successfully generated all historical news databases in data/news/ and src/data/news/!")
+        # Company partitioned files
+        for item in all_news:
+            if item["scope"] == "COMPANY":
+                for cid in item.get("canonicalCompanyIds", []):
+                    market = "kr" if cid.startswith("KR_") else "us"
+                    ticker_clean = cid.replace("KR_", "").replace("US_", "")
+                    comp_dir = os.path.join(base_dir, "company", market, ticker_clean)
+                    os.makedirs(comp_dir, exist_ok=True)
+                    pub_y = item["publishedAt"][:4]
+                    c_file = os.path.join(comp_dir, f"{pub_y}.json")
+                    existing = []
+                    if os.path.exists(c_file):
+                        try:
+                            with open(c_file, "r", encoding="utf-8") as f:
+                                existing = json.load(f)
+                        except Exception:
+                            existing = []
+                    if item not in existing:
+                        existing.append(item)
+                    with open(c_file, "w", encoding="utf-8") as f:
+                        json.dump(existing, f, ensure_ascii=False, indent=2)
+
+    print("Successfully generated all historical news databases and partitioned structure in data/news/ and src/data/news/!")
 
 if __name__ == "__main__":
     main()
+

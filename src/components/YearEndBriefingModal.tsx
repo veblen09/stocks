@@ -1,8 +1,16 @@
-import React from 'react';
-import { ArrowRight, Trophy, TrendingDown, Newspaper, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  ArrowRight,
+  Unlock,
+  Eye,
+  FileText,
+} from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import type { YearlyPerformanceRecord } from '../types/stockGame';
-import { formatKRW, formatPercent, getReturnBgColor, getReturnColor } from '../utils/formatMoney';
+import { getReturnBgColor, getReturnColor, formatKRW } from '../utils/formatMoney';
+import { getAvailableNewsForYear, getYearRetrospectiveNews } from '../engine/newsEngine';
+import { useStockGame } from '../store/stockGameStore';
+import { audioManager } from '../utils/audioManager';
 
 interface YearEndBriefingModalProps {
   record: YearlyPerformanceRecord | null;
@@ -15,132 +23,226 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
   isGameOver,
   onProceed,
 }) => {
+  const { state } = useStockGame();
+  const [activeTab, setActiveTab] = useState<'RETROSPECTIVE' | 'KNOWN_BEFORE' | 'MY_DECISION'>('RETROSPECTIVE');
+
+  useEffect(() => {
+    if (record) {
+      if (record.annualReturn >= 0) {
+        audioManager.playUiSound('success');
+      } else {
+        audioManager.playUiSound('notification');
+      }
+    }
+  }, [record]);
+
   if (!record) return null;
+
+  const currentYear = record.year;
+  const priorYear = currentYear - 1;
+
+  // News known before investment (cutoff date: (currentYear - 1)-12-31)
+  const knownBeforeNews = getAvailableNewsForYear(currentYear).slice(0, 4);
+
+  // Realized retrospective news during currentYear (unlocked now!)
+  const realizedYearNews = getYearRetrospectiveNews(currentYear);
+
+  // Player's investment notes for current holding stocks
+  const playerNotes = Object.entries(state.investmentNotes || {}).filter(([_, note]) => note && note.trim().length > 0);
 
   const retColor = getReturnColor(record.annualReturn);
   const retBg = getReturnBgColor(record.annualReturn);
 
+  const handleProceed = () => {
+    audioManager.playUiSound('confirm');
+    onProceed();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
-      <GlassCard className="w-full max-w-xl p-6 relative animate-fade-in-up border-white/90 shadow-2xl flex flex-col max-h-[90vh]" variant="strong">
-        {/* Top Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-              {record.year}년 운용 성과 결산
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="year-end-title"
+    >
+      <GlassCard
+        className="w-full max-w-2xl bg-white border-slate-200 shadow-2xl flex flex-col max-h-[92vh] text-slate-800 p-5 sm:p-6"
+        variant="default"
+      >
+        {/* Top Header & Year Result Badge */}
+        <div className="pb-4 border-b border-slate-200 shrink-0 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 font-mono text-xs font-bold border border-blue-200">
+              {currentYear}년 투자 결산 브리핑
             </span>
-            <h3 className="text-xl font-black text-slate-800 tracking-tight mt-1.5 font-display">
-              {record.year}년 투자 결산 브리핑
-            </h3>
+            <span className="text-xs text-slate-500 font-medium">
+              {priorYear}년 말 ➔ {currentYear}년 말
+            </span>
           </div>
-          <div className={`px-4 py-2 rounded-2xl border font-black text-lg ${retBg}`}>
-            {formatPercent(record.annualReturn)}
+
+          <div className="flex items-baseline justify-between pt-1">
+            <div>
+              <h3 id="year-end-title" className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                {currentYear}년 연간 운용 결과
+              </h3>
+              <p className="text-xs text-slate-500">
+                기말 평가자산: <strong className="text-slate-900 font-mono">{formatKRW(record.endTotalAssetsKRW)}</strong>
+              </p>
+
+            </div>
+
+            <div className={`px-3 py-1.5 rounded-xl ${retBg} border border-slate-200 text-right`}>
+              <span className={`text-xl font-bold font-mono ${retColor}`}>
+                {record.annualReturn >= 0 ? '+' : ''}{(record.annualReturn * 100).toFixed(2)}%
+              </span>
+              <span className="text-[11px] text-slate-500 block font-medium">포트폴리오 수익률</span>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-4 overflow-y-auto pr-1 text-xs text-slate-600 font-medium">
-          {/* Market Comparison 3-Grid */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/60">
-              <span className="text-[10px] text-slate-400 font-bold block">내 포트폴리오</span>
-              <span className={`text-base font-black ${retColor}`}>
-                {formatPercent(record.annualReturn)}
-              </span>
-            </div>
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/60">
-              <span className="text-[10px] text-slate-400 font-bold block">코스피 지수</span>
-              <span className={`text-base font-black ${getReturnColor(record.benchmarkReturns.kospi)}`}>
-                {formatPercent(record.benchmarkReturns.kospi)}
-              </span>
-            </div>
-            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/60">
-              <span className="text-[10px] text-slate-400 font-bold block">S&P 500 (원화)</span>
-              <span className={`text-base font-black ${getReturnColor(record.benchmarkReturns.sp500KRW)}`}>
-                {formatPercent(record.benchmarkReturns.sp500KRW)}
-              </span>
-            </div>
-          </div>
+        {/* 3 Analysis Tabs */}
+        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1 my-3 text-xs font-bold shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              audioManager.playUiSound('tab');
+              setActiveTab('RETROSPECTIVE');
+            }}
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === 'RETROSPECTIVE' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Unlock size={13} />
+            <span>실제 발생 사건 ({realizedYearNews.length})</span>
+          </button>
 
-          {/* Key Drivers */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {record.bestPerformer && (
-              <div className="p-3 bg-emerald-50/70 border border-emerald-200/70 rounded-2xl flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                  <Trophy size={16} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-emerald-800 font-bold block">최고 상승 보유종목</span>
-                  <span className="font-extrabold text-slate-800 text-xs">
-                    {record.bestPerformer.nameKo} ({formatPercent(record.bestPerformer.returnPercent, true)})
-                  </span>
-                </div>
-              </div>
-            )}
+          <button
+            type="button"
+            onClick={() => {
+              audioManager.playUiSound('tab');
+              setActiveTab('KNOWN_BEFORE');
+            }}
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === 'KNOWN_BEFORE' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Eye size={13} />
+            <span>연초 확인 정보 ({knownBeforeNews.length})</span>
+          </button>
 
-            {record.worstPerformer && (
-              <div className="p-3 bg-slate-100/80 border border-slate-200/70 rounded-2xl flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-slate-700 text-white flex items-center justify-center font-bold">
-                  <TrendingDown size={16} />
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 font-bold block">최저 수익 보유종목</span>
-                  <span className="font-extrabold text-slate-800 text-xs">
-                    {record.worstPerformer.nameKo} ({formatPercent(record.worstPerformer.returnPercent, true)})
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* FX & Asset summary */}
-          <div className="p-3 bg-white rounded-2xl border border-slate-200/60 shadow-sm space-y-1.5">
-            <div className="flex justify-between items-center text-xs font-semibold">
-              <span className="text-slate-500">기말 총 평가액</span>
-              <span className="font-extrabold text-slate-800 text-sm">{formatKRW(record.endTotalAssetsKRW)}</span>
-            </div>
-            <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500">
-              <span>USD/KRW 환율 ({record.year}년말)</span>
-              <span className="font-bold text-slate-700">{record.fxRate.toFixed(2)}원 / $</span>
-            </div>
-            {Math.abs(record.fxContributionPnlKRW) > 100 && (
-              <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500">
-                <span>미국주식 환율 효과 기여손익</span>
-                <span className={`font-bold ${record.fxContributionPnlKRW > 0 ? 'text-rose-600' : 'text-blue-600'}`}>
-                  {formatKRW(record.fxContributionPnlKRW)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Historical Market Briefing */}
-          <div className="p-4 bg-gradient-to-br from-indigo-50/80 to-blue-50/80 rounded-2xl border border-indigo-200/70 space-y-1.5">
-            <div className="flex items-center gap-2 text-indigo-900 font-black text-xs">
-              <Newspaper size={16} className="text-indigo-600" />
-              <span>{record.year}년 실제 역사적 시장 브리핑</span>
-            </div>
-            <h4 className="font-extrabold text-slate-800 text-sm">{record.marketBriefing.titleKo}</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-semibold">
-              {record.marketBriefing.descriptionKo}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              audioManager.playUiSound('tab');
+              setActiveTab('MY_DECISION');
+            }}
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === 'MY_DECISION' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <FileText size={13} />
+            <span>나의 투자 가설 ({playerNotes.length})</span>
+          </button>
         </div>
 
-        {/* Action Button */}
-        <button
-          onClick={onProceed}
-          className="w-full mt-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-lg shadow-blue-600/25 transition flex items-center justify-center gap-2 text-sm cursor-pointer"
-        >
-          {isGameOver ? (
-            <>
-              <CheckCircle2 size={18} /> 최종 결과 보고서 보러가기
-            </>
-          ) : (
-            <>
-              <span>{record.year + 1}년으로 이동하기</span>
-              <ArrowRight size={16} />
-            </>
+        {/* Scrollable Tab Content */}
+        <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs text-slate-700">
+          {/* TAB 1: RETROSPECTIVE */}
+          {activeTab === 'RETROSPECTIVE' && (
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 leading-relaxed">
+                <strong>🔓 {currentYear}년 사후 검증 정보</strong>: 해당 연도가 완전히 종료되어 당해 연도 중에 발생했던 실제 시장 뉴스와 실적이 공개되었습니다.
+              </div>
+
+              {realizedYearNews.length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-400">
+                  당해 연도 주요 보도자료 정리본을 로드 중입니다.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {realizedYearNews.map((news) => (
+                    <div
+                      key={news.id}
+                      className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
+                        <span className="text-blue-700 font-bold">{news.publishedAt}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">{news.sourceName}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-xs leading-snug">{news.titleKo}</h4>
+                      <p className="text-xs text-slate-700 leading-relaxed">{news.summaryKo}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
-        </button>
+
+          {/* TAB 2: KNOWN BEFORE */}
+          {activeTab === 'KNOWN_BEFORE' && (
+            <div className="space-y-3">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 leading-relaxed">
+                <strong>👁️ 연초 기준 공개 정보</strong>: {priorYear}년 12월 31일 당시 투자 결정을 내릴 때 사용자가 확인했던 주요 뉴스입니다.
+              </div>
+
+              <div className="space-y-2.5">
+                {knownBeforeNews.map((news) => (
+                  <div
+                    key={news.id}
+                    className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
+                      <span className="text-blue-700 font-bold">{news.publishedAt}</span>
+                      <span>{news.sourceName}</span>
+                    </div>
+                    <h4 className="font-bold text-slate-900 text-xs leading-snug">{news.titleKo}</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed">{news.summaryKo}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: MY DECISION */}
+          {activeTab === 'MY_DECISION' && (
+            <div className="space-y-3">
+              {playerNotes.length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-400 space-y-1">
+                  <p>기록된 투자 메모가 없습니다.</p>
+                  <p className="text-[11px]">종목 상세 화면의 [투자 메모] 탭에서 투자 가설을 기록해 보세요.</p>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {playerNotes.map(([cid, note]) => (
+                    <div
+                      key={cid}
+                      className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5"
+                    >
+                      <span className="font-bold text-slate-900 block text-xs">{cid} 투자 가설</span>
+                      <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{note}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom CTA Button */}
+        <div className="pt-4 border-t border-slate-200 shrink-0 flex items-center justify-between">
+          <div className="text-xs text-slate-500 font-medium">
+            다음 운용 연도: <strong className="text-slate-900">{currentYear + 1}년</strong>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleProceed}
+            className="py-2.5 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-blue-600/20"
+          >
+            <span>{isGameOver ? '최종 성과 보고서 확인하기' : `${currentYear + 1}년 투자 환경으로 이동`}</span>
+            <ArrowRight size={14} />
+          </button>
+        </div>
       </GlassCard>
     </div>
   );

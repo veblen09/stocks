@@ -106,29 +106,41 @@ export function getStockAnnualReturn(
 }
 
 /**
- * Calculates historical statistical indicators available up to priorYear (NO future leakage!)
+ * Returns historical annualized return and volatility statistics up to priorYear
  */
+export interface HistoricalStockStats {
+  yearsOfData: number;
+  last1YrReturn: number | null;
+  prior1YReturn?: number | null;
+  past3YrCAGR: number | null;
+  cagr3Y?: number | null;
+  past5YrCAGR: number | null;
+  cagr5Y?: number | null;
+  historicalVolatility: number | null;
+  volatility3Y?: number | null;
+  historicalMDD: number | null;
+  mddHistorical?: number | null;
+}
+
 export function getHistoricalStockStats(
   canonicalId: string,
   priorYear: number,
   includeFxEffect = true
-): {
-  yearsOfData: number;
-  last1YrReturn: number | null;
-  past3YrCAGR: number | null;
-  past5YrCAGR: number | null;
-  historicalVolatility: number | null;
-  historicalMDD: number | null;
-} {
+): HistoricalStockStats {
   const stock = STOCKS_BY_ID[canonicalId];
   if (!stock) {
     return {
       yearsOfData: 0,
       last1YrReturn: null,
+      prior1YReturn: null,
       past3YrCAGR: null,
+      cagr3Y: null,
       past5YrCAGR: null,
+      cagr5Y: null,
       historicalVolatility: null,
+      volatility3Y: null,
       historicalMDD: null,
+      mddHistorical: null,
     };
   }
 
@@ -205,9 +217,15 @@ export function getHistoricalStockStats(
   return {
     yearsOfData,
     last1YrReturn,
+    prior1YReturn: last1YrReturn,
     past3YrCAGR,
+    cagr3Y: past3YrCAGR,
     past5YrCAGR,
+    cagr5Y: past5YrCAGR,
     historicalVolatility,
+    volatility3Y: historicalVolatility,
     historicalMDD,
+    mddHistorical: historicalMDD,
   };
 }
+

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "NEWS_1987_KR_005930_01",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "전기전자",
+      "자동차",
+      "철강"
+    ],
+    "eventDate": "1987-11-10",
+    "publishedAt": "1987-11-10",
+    "availableFrom": "1987-11-10",
+    "datePrecision": "DAY",
+    "originalTitle": "이병철 삼성 창업회장 타계 및 이건희 회장 취임",
+    "titleKo": "이병철 삼성 창업회장 타계 및 이건희 회장 취임",
+    "summaryKo": "그룹 후계 구도가 확정되고 제2창업과 첨단 하이테크 기업으로의 전환이 선포되었습니다.",
+    "sourceName": "한국거래소 기업공시 / DART",
+    "sourceUrl": "https://dart.fss.or.kr",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "기업실적",
+      "신제품",
+      "수출"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1987년 기업 핵심 공시 내용.",
+      "impactChannels": [
+        "REVENUE",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "주력 제품의 글로벌 경쟁력 입증 및 매출 신장.",
+      "negativeInterpretation": "경쟁사 증설에 따른 마진 압박 요인.",
+      "unknownAtTheTime": "차세대 신기술 시장 반응."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

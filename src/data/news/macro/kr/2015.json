@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2015_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2015-09-15",
+    "publishedAt": "2015-09-15",
+    "availableFrom": "2015-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "중국 증시 버블 붕괴와 위안화 기습 절하",
+    "titleKo": "[2015년 한국 거시] 중국 증시 버블 붕괴와 위안화 기습 절하",
+    "summaryKo": "2015년 한국 거시경제 지표 및 코스피 지수 결산: 상하이 종합지수가 5,000p에서 반토막 나고 중국 인민은행의 기습 위안화 절하로 글로벌 금융시장이 요동쳤습니다. 미 연준은 9년 만에 첫 금리 인상을 단행했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2015년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

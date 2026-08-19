@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2005_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2005-06-30",
+    "publishedAt": "2005-06-30",
+    "availableFrom": "2005-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "적립식 펀드 돌풍과 코스피 신고가",
+    "titleKo": "[2005년 세계 경제] 적립식 펀드 돌풍과 코스피 신고가",
+    "summaryKo": "적립식 펀드 붐이 대한민국을 강타하며 매월 수조 원의 개인 자금이 유입되어 코스피가 53.9% 폭등, 16년 만에 사상 최고가를 경신했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2005년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

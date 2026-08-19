@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2003_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2003-09-15",
+    "publishedAt": "2003-09-15",
+    "availableFrom": "2003-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "이라크 전쟁과 카드 대란 수습",
+    "titleKo": "[2003년 한국 거시] 이라크 전쟁과 카드 대란 수습",
+    "summaryKo": "2003년 한국 거시경제 지표 및 코스피 지수 결산: 미국의 이라크 침공과 SK글로벌 분식회계, 카드사 부도 위기가 닥쳤으나, 정부의 공적자금 투입과 중국 특수 기대감으로 하반기 반등했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2003년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

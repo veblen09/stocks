@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_1987_US_AAPL_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "1987-11-15",
+    "publishedAt": "1987-11-15",
+    "availableFrom": "1987-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "애플, 컬러 그래픽 지원 'Macintosh II' 발표",
+    "titleKo": "애플, 컬러 그래픽 지원 'Macintosh II' 발표",
+    "summaryKo": "전문가용 그래픽 워크스테이션 시장에서 독보적 입지를 구축했습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1987년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

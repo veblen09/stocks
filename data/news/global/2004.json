@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2004_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2004-06-30",
+    "publishedAt": "2004-06-30",
+    "availableFrom": "2004-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "차이나 쇼크와 구글(Google)의 상장",
+    "titleKo": "[2004년 세계 경제] 차이나 쇼크와 구글(Google)의 상장",
+    "summaryKo": "중국 원자바오 총리의 긴축 발언으로 '차이나 쇼크'가 발생했으나, 8월 구글이 나스닥에 상장하며 웹 2.0 시대를 열었습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2004년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

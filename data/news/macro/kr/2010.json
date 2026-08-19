@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2010_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2010-09-15",
+    "publishedAt": "2010-09-15",
+    "availableFrom": "2010-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "스마트폰 혁명과 자문형 랩 붐",
+    "titleKo": "[2010년 한국 거시] 스마트폰 혁명과 자문형 랩 붐",
+    "summaryKo": "2010년 한국 거시경제 지표 및 코스피 지수 결산: 갤럭시 S와 아이폰 4가 보급되며 모바일 스마트폰 혁명이 본격화되었습니다. 코스피 지수는 연말 2,051p로 사상 최고 종가를 기록했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2010년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

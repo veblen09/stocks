@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2011_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2011-06-30",
+    "publishedAt": "2011-06-30",
+    "availableFrom": "2011-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "미국 신용등급 강등과 유럽 재정위기",
+    "titleKo": "[2011년 세계 경제] 미국 신용등급 강등과 유럽 재정위기",
+    "summaryKo": "S&P가 사상 최초로 미국 국가신용등급을 AAA에서 AA+로 강등하고, 그리스·이탈리아 등 남유럽 재정위기가 번지며 8월 글로벌 증시가 폭락했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2011년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

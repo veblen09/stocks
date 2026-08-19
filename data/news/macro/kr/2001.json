@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2001_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2001-09-15",
+    "publishedAt": "2001-09-15",
+    "availableFrom": "2001-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "9·11 테러와 초저금리 시대 개막",
+    "titleKo": "[2001년 한국 거시] 9·11 테러와 초저금리 시대 개막",
+    "summaryKo": "2001년 한국 거시경제 지표 및 코스피 지수 결산: 9월 11일 뉴욕 세계무역센터 테러로 세계 증시가 충격을 받았으나, 미 연준의 파격적 금리 인하(1.75%)와 유동성으로 연말 증시는 V자 반등했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2001년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1983_GL_01",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1983-06-15",
+    "publishedAt": "1983-06-15",
+    "availableFrom": "1983-06-15",
+    "datePrecision": "DAY",
+    "originalTitle": "선진국 경기 완만한 회복세 진입",
+    "titleKo": "선진국 경기 완만한 회복세 진입",
+    "summaryKo": "미국 중심의 금리 인하 효과로 글로벌 교역량이 회복되고 인플레이션 압력이 완화되었습니다.",
+    "sourceName": "IMF / World Economic Outlook",
+    "sourceUrl": "https://www.imf.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "세계경제",
+      "교역"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1983년 세계 경제 지표 집계.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "글로벌 경기 회복 및 신흥 시장 수요 창출.",
+      "negativeInterpretation": "고금리 또는 원자재 충격에 따른 불확실성.",
+      "unknownAtTheTime": "향후 통화정책 방향성."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

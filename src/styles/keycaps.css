@@ -1,0 +1,272 @@
+/**
+ * 3D Mechanical Keyboard Keycap Styles
+ * 머니트랙: 45년 한·미 주식투자 실험실 입체적 키보드 덱 & 키캡 스타일
+ */
+
+/* 1. Keyboard Chassis / Deck */
+.stock-keyboard-deck {
+  background: linear-gradient(180deg, #edf2f7 0%, #dce5ef 100%);
+  border: 1px solid #c7d2df;
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(80, 98, 120, 0.10),
+    0 14px 30px rgba(35, 52, 78, 0.10);
+}
+
+@media (max-width: 640px) {
+  .stock-keyboard-deck {
+    padding: 12px;
+    border-radius: 20px;
+  }
+}
+
+/* 2. Stock Keycap (3D tactile mechanical key) */
+.stock-key {
+  position: relative;
+  min-height: 150px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fb 58%, #e8edf4 100%);
+  border: 1px solid var(--key-border);
+  border-radius: 16px;
+  color: var(--text-primary);
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 0 var(--key-side),
+    0 9px 16px rgba(38, 54, 78, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  transform: translateY(0);
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.stock-key:hover {
+  transform: translateY(-1px);
+  border-color: #9eacc0;
+  box-shadow:
+    0 7px 0 var(--key-side),
+    0 12px 20px rgba(38, 54, 78, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.stock-key:active,
+.stock-key[data-pressed="true"] {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 var(--key-side),
+    0 3px 6px rgba(38, 54, 78, 0.12),
+    inset 0 2px 5px rgba(50, 65, 85, 0.08);
+}
+
+.stock-key:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 3px;
+}
+
+/* Stock Key Variants */
+.stock-key.is-holding {
+  border-color: var(--kr-market);
+  box-shadow:
+    0 6px 0 #93b5ee,
+    0 9px 18px rgba(37, 99, 235, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 2px rgba(37, 99, 235, 0.35);
+}
+
+.stock-key.is-holding:hover {
+  box-shadow:
+    0 7px 0 #93b5ee,
+    0 12px 22px rgba(37, 99, 235, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 2px rgba(37, 99, 235, 0.50);
+}
+
+.stock-key.is-holding:active,
+.stock-key.is-holding[data-pressed="true"] {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 #93b5ee,
+    0 3px 6px rgba(37, 99, 235, 0.15),
+    inset 0 2px 5px rgba(37, 99, 235, 0.10),
+    0 0 0 2px rgba(37, 99, 235, 0.50);
+}
+
+/* 3. Cash Keycap (Spacebar Style, 2-column span) */
+.cash-key {
+  position: relative;
+  min-height: 150px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background: linear-gradient(180deg, #f0fdf4 0%, #e2f9eb 60%, #d1f2de 100%);
+  border: 1px solid #a3e3c0;
+  border-radius: 16px;
+  color: #064e3b;
+  text-align: left;
+  user-select: none;
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 0 #85d4aa,
+    0 9px 16px rgba(16, 185, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  transform: translateY(0);
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    border-color 140ms ease;
+}
+
+@media (min-width: 768px) {
+  .cash-key {
+    grid-column: span 2;
+  }
+}
+
+.cash-key:hover {
+  transform: translateY(-1px);
+  border-color: #6ee7b7;
+  box-shadow:
+    0 7px 0 #85d4aa,
+    0 12px 20px rgba(16, 185, 129, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.cash-key:active,
+.cash-key[data-pressed="true"] {
+  transform: translateY(5px);
+  box-shadow:
+    0 1px 0 #85d4aa,
+    0 3px 6px rgba(16, 185, 129, 0.12),
+    inset 0 2px 5px rgba(6, 78, 59, 0.10);
+}
+
+.cash-key:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, 0.45);
+  outline-offset: 3px;
+}
+
+/* 4. Function / Filter Keycaps (.filter-key) */
+.filter-key {
+  position: relative;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+  border: 1px solid var(--key-border);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  box-shadow:
+    0 3px 0 var(--key-side),
+    0 4px 8px rgba(38, 54, 78, 0.08);
+
+  transform: translateY(0);
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.filter-key:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 0 var(--key-side),
+    0 6px 10px rgba(38, 54, 78, 0.12);
+  color: var(--text-primary);
+  border-color: #a0aec0;
+}
+
+.filter-key:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--key-side);
+}
+
+.filter-key[aria-pressed="true"],
+.filter-key.is-active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #aeb9c8;
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filter-key:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 5. Keypad Step Buttons (.allocation-key) */
+.allocation-key {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #edf2f7 100%);
+  border: 1px solid #cbd5e1;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+
+  box-shadow:
+    0 3px 0 #94a3b8,
+    0 4px 6px rgba(0, 0, 0, 0.06);
+
+  transform: translateY(0);
+  transition: transform 70ms ease, box-shadow 70ms ease;
+}
+
+.allocation-key:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 0 #94a3b8,
+    0 5px 8px rgba(0, 0, 0, 0.08);
+}
+
+.allocation-key:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #94a3b8;
+}
+
+.allocation-key:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 6. Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .stock-key,
+  .cash-key,
+  .filter-key,
+  .allocation-key {
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+}

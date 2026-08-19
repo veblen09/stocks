@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2016_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2016-06-30",
+    "publishedAt": "2016-06-30",
+    "availableFrom": "2016-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "브렉시트 충격과 트럼프 대통령 당선",
+    "titleKo": "[2016년 세계 경제] 브렉시트 충격과 트럼프 대통령 당선",
+    "summaryKo": "영국의 EU 탈퇴(브렉시트) 가결과 도널드 트럼프의 미국 대통령 당선이라는 두 번의 정치적 이변이 일어났으나, 친기업 감세 기대감으로 증시는 상승 마감했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2016년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

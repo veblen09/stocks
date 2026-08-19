@@ -1,0 +1,1554 @@
+[
+  {
+    "canonicalCompanyId": "KR_005930",
+    "currentTicker": "005930",
+    "currentName": "삼성전자",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1975-06-11",
+    "firstTradingDate": "1975-06-11",
+    "firstValidPriceDate": "1975-06-11",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1969-01-13",
+        "validTo": "1984-02-27",
+        "name": "삼성전자공업",
+        "ticker": "00593"
+      },
+      {
+        "validFrom": "1984-02-28",
+        "validTo": null,
+        "name": "삼성전자",
+        "ticker": "005930"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1975-06-11",
+        "sector": "전기전자"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_005930",
+    "listingNewsIds": [
+      "KRX_LIST_1975_005930",
+      "COMP_1983_KR_005930"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 1위 메모리 반도체 및 스마트폰, 가전 종합 전자 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_000660",
+    "currentTicker": "000660",
+    "currentName": "SK하이닉스",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1996-12-26",
+    "firstTradingDate": "1996-12-26",
+    "firstValidPriceDate": "1996-12-26",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1983-02-23",
+        "validTo": "1996-10-31",
+        "name": "현대전자산업",
+        "ticker": "00660"
+      },
+      {
+        "validFrom": "2001-03-29",
+        "validTo": "2012-03-22",
+        "name": "하이닉스반도체",
+        "ticker": "000660"
+      },
+      {
+        "validFrom": "2012-03-23",
+        "validTo": null,
+        "name": "SK하이닉스",
+        "ticker": "000660"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1996-12-26",
+        "sector": "반도체"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_000660",
+    "listingNewsIds": [
+      "KRX_LIST_1996_000660",
+      "COMP_1996_KR_000660"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 HBM 및 DRAM, NAND 플래시 메모리 선도 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_005380",
+    "currentTicker": "005380",
+    "currentName": "현대차",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1974-06-28",
+    "firstTradingDate": "1974-06-28",
+    "firstValidPriceDate": "1974-06-28",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1967-12-29",
+        "validTo": null,
+        "name": "현대자동차",
+        "ticker": "005380"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1974-06-28",
+        "sector": "자동차"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_005380",
+    "listingNewsIds": [
+      "KRX_LIST_1974_005380",
+      "COMP_1985_KR_005380"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 3위 자동차 완성차 및 미래 모빌리티 그룹"
+  },
+  {
+    "canonicalCompanyId": "KR_000270",
+    "currentTicker": "000270",
+    "currentName": "기아",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1973-07-21",
+    "firstTradingDate": "1973-07-21",
+    "firstValidPriceDate": "1973-07-21",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1973-07-21",
+        "name": "기아산업",
+        "ticker": "000270"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1973-07-21",
+        "sector": "자동차"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_000270",
+    "listingNewsIds": [
+      "KRX_LIST_1973_000270"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 디자인 및 친환경차 중심의 글로벌 완성차 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_005490",
+    "currentTicker": "005490",
+    "currentName": "POSCO홀딩스",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1988-06-10",
+    "firstTradingDate": "1988-06-10",
+    "firstValidPriceDate": "1988-06-10",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1968-04-01",
+        "validTo": "2002-03-14",
+        "name": "포항종합제철 (포철)",
+        "ticker": "00549"
+      },
+      {
+        "validFrom": "2002-03-15",
+        "validTo": "2022-03-01",
+        "name": "POSCO(포스코)",
+        "ticker": "005490"
+      },
+      {
+        "validFrom": "2022-03-02",
+        "validTo": null,
+        "name": "POSCO홀딩스",
+        "ticker": "005490"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1988-06-10",
+        "sector": "철강"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_005490",
+    "listingNewsIds": [
+      "KRX_LIST_1988_005490",
+      "COMP_1988_KR_005490"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 경쟁력 1위 철강 기업이자 리튬/이차전지 소재 지주회사"
+  },
+  {
+    "canonicalCompanyId": "KR_051910",
+    "currentTicker": "051910",
+    "currentName": "LG화학",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2001-04-25",
+    "firstTradingDate": "2001-04-25",
+    "firstValidPriceDate": "2001-04-25",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2001-04-25",
+        "name": "LG화학",
+        "ticker": "051910"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2001-04-25",
+        "sector": "석유화학 / 배터리"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_051910",
+    "listingNewsIds": [
+      "KRX_LIST_2001_051910"
+    ],
+    "dataQuality": "HIGH",
+    "description": "석유화학, 첨단소재, 생명과학 종합 화학 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_006400",
+    "currentTicker": "006400",
+    "currentName": "삼성SDI",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1979-02-27",
+    "firstTradingDate": "1979-02-27",
+    "firstValidPriceDate": "1979-02-27",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1979-02-27",
+        "name": "삼성전관",
+        "ticker": "006400"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1979-02-27",
+        "sector": "2차전지 / 디스플레이"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_006400",
+    "listingNewsIds": [
+      "KRX_LIST_1979_006400"
+    ],
+    "dataQuality": "HIGH",
+    "description": "전기차 배터리, ESS, 전자재료 선도 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_066570",
+    "currentTicker": "066570",
+    "currentName": "LG전자",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2002-04-22",
+    "firstTradingDate": "2002-04-22",
+    "firstValidPriceDate": "2002-04-22",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1958-10-01",
+        "validTo": "1995-02-28",
+        "name": "금성사 (Goldstar)",
+        "ticker": "06657"
+      },
+      {
+        "validFrom": "2002-04-01",
+        "validTo": null,
+        "name": "LG전자",
+        "ticker": "066570"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2002-04-22",
+        "sector": "가전 / IT"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_066570",
+    "listingNewsIds": [
+      "KRX_LIST_2002_066570"
+    ],
+    "dataQuality": "HIGH",
+    "description": "프리미엄 가전, OLED TV 및 자동차 전장 솔루션 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_207940",
+    "currentTicker": "207940",
+    "currentName": "삼성바이오로직스",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2016-11-10",
+    "firstTradingDate": "2016-11-10",
+    "firstValidPriceDate": "2016-11-10",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2016-11-10",
+        "name": "삼성바이오로직스",
+        "ticker": "207940"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2016-11-10",
+        "sector": "바이오 / 제약"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_207940",
+    "listingNewsIds": [
+      "KRX_LIST_2016_207940",
+      "COMP_2016_KR_207940"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 1위 바이오의약품 위탁개발생산(CDMO) 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_035420",
+    "currentTicker": "035420",
+    "currentName": "NAVER",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2002-10-29",
+    "firstTradingDate": "2002-10-29",
+    "firstValidPriceDate": "2002-10-29",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2002-10-29",
+        "name": "NHN(네이버컴)",
+        "ticker": "035420"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2002-10-29",
+        "sector": "인터넷 / 플랫폼"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_035420",
+    "listingNewsIds": [
+      "KRX_LIST_2002_035420",
+      "COMP_2002_KR_035420"
+    ],
+    "dataQuality": "HIGH",
+    "description": "한국 최대 검색 포털, 커머스, 클라우드 및 AI 플랫폼 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_035720",
+    "currentTicker": "035720",
+    "currentName": "카카오",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1999-11-11",
+    "firstTradingDate": "1999-11-11",
+    "firstValidPriceDate": "1999-11-11",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1999-11-11",
+        "name": "다음커뮤니케이션",
+        "ticker": "035720"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1999-11-11",
+        "sector": "인터넷 / 모바일"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_035720",
+    "listingNewsIds": [
+      "KRX_LIST_1999_035720"
+    ],
+    "dataQuality": "HIGH",
+    "description": "국민 메신저 카카오톡 기반 모바일 플랫폼 및 콘텐츠 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_068270",
+    "currentTicker": "068270",
+    "currentName": "셀트리온",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2005-07-19",
+    "firstTradingDate": "2005-07-19",
+    "firstValidPriceDate": "2005-07-19",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2005-07-19",
+        "name": "셀트리온(넥스솔)",
+        "ticker": "068270"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2005-07-19",
+        "sector": "바이오시밀러"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_068270",
+    "listingNewsIds": [
+      "KRX_LIST_2005_068270"
+    ],
+    "dataQuality": "HIGH",
+    "description": "바이오시밀러 및 자가면역/항암 바이오의약품 전문 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_105560",
+    "currentTicker": "105560",
+    "currentName": "KB금융",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2008-10-10",
+    "firstTradingDate": "2008-10-10",
+    "firstValidPriceDate": "2008-10-10",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2008-10-10",
+        "name": "KB금융지주",
+        "ticker": "105560"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2008-10-10",
+        "sector": "금융 / 은행"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_105560",
+    "listingNewsIds": [
+      "KRX_LIST_2008_105560"
+    ],
+    "dataQuality": "HIGH",
+    "description": "KB국민은행 중심의 대한민국 대표 종합금융그룹"
+  },
+  {
+    "canonicalCompanyId": "KR_055550",
+    "currentTicker": "055550",
+    "currentName": "신한지주",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2001-09-10",
+    "firstTradingDate": "2001-09-10",
+    "firstValidPriceDate": "2001-09-10",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2001-09-10",
+        "name": "신한금융지주회사",
+        "ticker": "055550"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2001-09-10",
+        "sector": "금융 / 은행"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_055550",
+    "listingNewsIds": [
+      "KRX_LIST_2001_055550"
+    ],
+    "dataQuality": "HIGH",
+    "description": "신한은행, 신한카드 중심의 대형 종합금융지주"
+  },
+  {
+    "canonicalCompanyId": "KR_086790",
+    "currentTicker": "086790",
+    "currentName": "하나금융지주",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2005-12-12",
+    "firstTradingDate": "2005-12-12",
+    "firstValidPriceDate": "2005-12-12",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2005-12-12",
+        "name": "하나금융지주",
+        "ticker": "086790"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2005-12-12",
+        "sector": "금융 / 은행"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_086790",
+    "listingNewsIds": [
+      "KRX_LIST_2005_086790"
+    ],
+    "dataQuality": "HIGH",
+    "description": "하나은행, 하나증권 기반의 글로벌 금융 네트워크 그룹"
+  },
+  {
+    "canonicalCompanyId": "KR_028260",
+    "currentTicker": "028260",
+    "currentName": "삼성물산",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2014-12-18",
+    "firstTradingDate": "2014-12-18",
+    "firstValidPriceDate": "2014-12-18",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2014-12-18",
+        "name": "제일모직(현 삼성물산)",
+        "ticker": "028260"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2014-12-18",
+        "sector": "지주 / 건설·상사"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_028260",
+    "listingNewsIds": [
+      "KRX_LIST_2014_028260"
+    ],
+    "dataQuality": "HIGH",
+    "description": "삼성그룹 실질적 지주사이자 건설, 상사, 패션, 리조트 사업체"
+  },
+  {
+    "canonicalCompanyId": "KR_032830",
+    "currentTicker": "032830",
+    "currentName": "삼성생명",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "2010-05-12",
+    "firstTradingDate": "2010-05-12",
+    "firstValidPriceDate": "2010-05-12",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2010-05-12",
+        "name": "삼성생명보험",
+        "ticker": "032830"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2010-05-12",
+        "sector": "금융 / 보험"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_032830",
+    "listingNewsIds": [
+      "KRX_LIST_2010_032830"
+    ],
+    "dataQuality": "HIGH",
+    "description": "한국 최대 생명보험사이자 삼성전자 주요 주주"
+  },
+  {
+    "canonicalCompanyId": "KR_017670",
+    "currentTicker": "017670",
+    "currentName": "SK텔레콤",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1989-11-08",
+    "firstTradingDate": "1989-11-08",
+    "firstValidPriceDate": "1989-11-08",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1984-03-29",
+        "validTo": "1994-06-15",
+        "name": "한국이동통신서비스",
+        "ticker": "01767"
+      },
+      {
+        "validFrom": "1997-03-21",
+        "validTo": null,
+        "name": "SK텔레콤",
+        "ticker": "017670"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1989-11-08",
+        "sector": "통신"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_017670",
+    "listingNewsIds": [
+      "KRX_LIST_1989_017670",
+      "COMP_1989_KR_017670"
+    ],
+    "dataQuality": "HIGH",
+    "description": "한국 1위 이동통신 및 AI/데이터센터 인프라 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_030200",
+    "currentTicker": "030200",
+    "currentName": "KT",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1998-12-23",
+    "firstTradingDate": "1998-12-23",
+    "firstValidPriceDate": "1998-12-23",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1998-12-23",
+        "name": "KT",
+        "ticker": "030200"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1998-12-23",
+        "sector": "통신 / IT"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_030200",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "유무선 통신망, 초고속 인터넷 및 클라우드/AICT 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_015760",
+    "currentTicker": "015760",
+    "currentName": "한국전력",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1989-08-10",
+    "firstTradingDate": "1989-08-10",
+    "firstValidPriceDate": "1989-08-10",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1989-08-10",
+        "name": "한국전력",
+        "ticker": "015760"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1989-08-10",
+        "sector": "유틸리티 / 에너지"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_015760",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "대한민국 전력망 및 발전 송배전 공기업"
+  },
+  {
+    "canonicalCompanyId": "KR_012330",
+    "currentTicker": "012330",
+    "currentName": "현대모비스",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1989-09-05",
+    "firstTradingDate": "1989-09-05",
+    "firstValidPriceDate": "1989-09-05",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1989-09-05",
+        "name": "현대정공",
+        "ticker": "012330"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1989-09-05",
+        "sector": "자동차부품"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_012330",
+    "listingNewsIds": [
+      "KRX_LIST_1989_012330"
+    ],
+    "dataQuality": "HIGH",
+    "description": "현대차그룹 핵심 부품사 및 전동화·자율주행 모듈 솔루션 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_003490",
+    "currentTicker": "003490",
+    "currentName": "대한항공",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1969-02-28",
+    "firstTradingDate": "1969-02-28",
+    "firstValidPriceDate": "1969-02-28",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1969-02-28",
+        "name": "대한항공",
+        "ticker": "003490"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1969-02-28",
+        "sector": "운송 / 항공"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_003490",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "글로벌 네트워크를 보유한 대한민국 대표 대형 항공사(FSC)"
+  },
+  {
+    "canonicalCompanyId": "KR_010950",
+    "currentTicker": "010950",
+    "currentName": "S-Oil",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1987-05-27",
+    "firstTradingDate": "1987-05-27",
+    "firstValidPriceDate": "1987-05-27",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1987-05-27",
+        "name": "S-Oil",
+        "ticker": "010950"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1987-05-27",
+        "sector": "에너지 / 정유"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_010950",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "아람코 자회사로서 정유, 윤활기유, 석유화학 종합 에너지 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_000100",
+    "currentTicker": "000100",
+    "currentName": "유한양행",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1962-11-01",
+    "firstTradingDate": "1962-11-01",
+    "firstValidPriceDate": "1962-11-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1962-11-01",
+        "name": "유한양행",
+        "ticker": "000100"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1962-11-01",
+        "sector": "제약 / 헬스케어"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_000100",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "1926년 설립된 역사 깊은 전통 제약 및 혁신 신약(렉라자 등) 기업"
+  },
+  {
+    "canonicalCompanyId": "KR_004370",
+    "currentTicker": "004370",
+    "currentName": "농심",
+    "market": "KR",
+    "currency": "KRW",
+    "listingDate": "1976-06-30",
+    "firstTradingDate": "1976-06-30",
+    "firstValidPriceDate": "1976-06-30",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1976-06-30",
+        "name": "농심",
+        "ticker": "004370"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1976-06-30",
+        "sector": "음식료 / 필수소비재"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_KR_004370",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "신라면, 짜파게티 등 K-푸드 글로벌 확장을 주도하는 식품 기업"
+  },
+  {
+    "canonicalCompanyId": "US_AAPL",
+    "currentTicker": "AAPL",
+    "currentName": "애플",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-12-12",
+    "firstTradingDate": "1980-12-12",
+    "firstValidPriceDate": "1980-12-12",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1977-01-03",
+        "validTo": "2007-01-08",
+        "name": "Apple Computer, Inc.",
+        "ticker": "AAPL"
+      },
+      {
+        "validFrom": "2007-01-09",
+        "validTo": null,
+        "name": "Apple Inc.",
+        "ticker": "AAPL"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-12-12",
+        "sector": "Consumer Tech / Hardware"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_AAPL",
+    "listingNewsIds": [
+      "SEC_IPO_1980_AAPL",
+      "COMP_1980_US_AAPL"
+    ],
+    "dataQuality": "HIGH",
+    "description": "iPhone, Mac, 서비스 생태계를 갖춘 글로벌 시가총액 1위 테크 기업"
+  },
+  {
+    "canonicalCompanyId": "US_MSFT",
+    "currentTicker": "MSFT",
+    "currentName": "마이크로소프트",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1986-03-13",
+    "firstTradingDate": "1986-03-13",
+    "firstValidPriceDate": "1986-03-13",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1981-06-25",
+        "validTo": null,
+        "name": "Microsoft Corporation",
+        "ticker": "MSFT"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1986-03-13",
+        "sector": "Software / OS"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_MSFT",
+    "listingNewsIds": [
+      "SEC_IPO_1986_MSFT",
+      "COMP_1986_US_MSFT"
+    ],
+    "dataQuality": "HIGH",
+    "description": "Windows, Azure 클라우드, 오피스 및 AI(Copilot) 선도 소프트웨어 기업"
+  },
+  {
+    "canonicalCompanyId": "US_IBM",
+    "currentTicker": "IBM",
+    "currentName": "IBM",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1911-06-16",
+    "firstTradingDate": "1911-06-16",
+    "firstValidPriceDate": "1911-06-16",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1924-02-14",
+        "validTo": null,
+        "name": "International Business Machines Corp.",
+        "ticker": "IBM"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1911-06-16",
+        "sector": "IT / 엔터프라이즈"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_IBM",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "100년 역사의 기업용 하이브리드 클라우드, 메인프레임, AI 솔루션 기업"
+  },
+  {
+    "canonicalCompanyId": "US_INTC",
+    "currentTicker": "INTC",
+    "currentName": "인텔",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1971-10-13",
+    "firstTradingDate": "1971-10-13",
+    "firstValidPriceDate": "1971-10-13",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1971-10-13",
+        "name": "인텔",
+        "ticker": "INTC"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1971-10-13",
+        "sector": "반도체"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_INTC",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "x86 CPU 아키텍처를 창시한 미국의 대표 반도체 제조 기업"
+  },
+  {
+    "canonicalCompanyId": "US_NVDA",
+    "currentTicker": "NVDA",
+    "currentName": "엔비디아",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1999-01-22",
+    "firstTradingDate": "1999-01-22",
+    "firstValidPriceDate": "1999-01-22",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1993-04-05",
+        "validTo": null,
+        "name": "NVIDIA Corporation",
+        "ticker": "NVDA"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1999-01-22",
+        "sector": "Semiconductors / GPU"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_NVDA",
+    "listingNewsIds": [
+      "SEC_IPO_1999_NVDA",
+      "COMP_1999_US_NVDA"
+    ],
+    "dataQuality": "HIGH",
+    "description": "AI 훈련·추론 가속 GPU와 CUDA 생태계를 지배하는 AI 혁명 주역"
+  },
+  {
+    "canonicalCompanyId": "US_AMZN",
+    "currentTicker": "AMZN",
+    "currentName": "아마존",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1997-05-15",
+    "firstTradingDate": "1997-05-15",
+    "firstValidPriceDate": "1997-05-15",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1994-07-05",
+        "validTo": null,
+        "name": "Amazon.com, Inc.",
+        "ticker": "AMZN"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1997-05-15",
+        "sector": "E-Commerce / Cloud"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_AMZN",
+    "listingNewsIds": [
+      "SEC_IPO_1997_AMZN",
+      "COMP_1997_US_AMZN"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 1위 이커머스 및 AWS 클라우드 컴퓨팅 플랫폼 기업"
+  },
+  {
+    "canonicalCompanyId": "US_GOOGL",
+    "currentTicker": "GOOGL",
+    "currentName": "알파벳 Class A",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "2004-08-19",
+    "firstTradingDate": "2004-08-19",
+    "firstValidPriceDate": "2004-08-19",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1998-09-04",
+        "validTo": "2015-10-01",
+        "name": "Google Inc.",
+        "ticker": "GOOG"
+      },
+      {
+        "validFrom": "2015-10-02",
+        "validTo": null,
+        "name": "Alphabet Inc.",
+        "ticker": "GOOGL"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2004-08-19",
+        "sector": "Internet Search / Advertising"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_GOOGL",
+    "listingNewsIds": [
+      "SEC_IPO_2004_GOOGL",
+      "COMP_2004_US_GOOGL"
+    ],
+    "dataQuality": "HIGH",
+    "description": "Google 검색, YouTube, Android, Google Cloud를 보유한 인터넷 거인"
+  },
+  {
+    "canonicalCompanyId": "US_META",
+    "currentTicker": "META",
+    "currentName": "메타 플랫폼스",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "2012-05-18",
+    "firstTradingDate": "2012-05-18",
+    "firstValidPriceDate": "2012-05-18",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2012-05-18",
+        "name": "Facebook, Inc.",
+        "ticker": "FB"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2012-05-18",
+        "sector": "Social Media / Digital Ads"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_META",
+    "listingNewsIds": [
+      "SEC_IPO_2012_META",
+      "COMP_2012_US_META"
+    ],
+    "dataQuality": "HIGH",
+    "description": "Instagram, WhatsApp, Facebook을 운영하는 글로벌 소셜/AI 리더"
+  },
+  {
+    "canonicalCompanyId": "US_TSLA",
+    "currentTicker": "TSLA",
+    "currentName": "테슬라",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "2010-06-29",
+    "firstTradingDate": "2010-06-29",
+    "firstValidPriceDate": "2010-06-29",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "2010-06-29",
+        "name": "Tesla Motors, Inc.",
+        "ticker": "TSLA"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "2010-06-29",
+        "sector": "Electric Vehicles / Clean Energy"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_TSLA",
+    "listingNewsIds": [
+      "SEC_IPO_2010_TSLA",
+      "COMP_2010_US_TSLA"
+    ],
+    "dataQuality": "HIGH",
+    "description": "글로벌 전기차(EV), 자율주행 FSD, 에너지 스토리지 혁신 기업"
+  },
+  {
+    "canonicalCompanyId": "US_JPM",
+    "currentTicker": "JPM",
+    "currentName": "JP모건 체이스",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "Chemical Bank / J.P. Morgan & Co.",
+        "ticker": "JPM"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Banking / Financial Services"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_JPM",
+    "listingNewsIds": [
+      "SEC_1980_JPM"
+    ],
+    "dataQuality": "HIGH",
+    "description": "자산 기준 미국 최대 상업은행 및 글로벌 투자은행(IB)"
+  },
+  {
+    "canonicalCompanyId": "US_BAC",
+    "currentTicker": "BAC",
+    "currentName": "뱅크오브아메리카",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1973-01-02",
+    "firstTradingDate": "1973-01-02",
+    "firstValidPriceDate": "1973-01-02",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1973-01-02",
+        "name": "뱅크오브아메리카",
+        "ticker": "BAC"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1973-01-02",
+        "sector": "금융 / 상업은행"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_BAC",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "미국 전역의 탄탄한 리테일 및 자산관리 네트워크를 갖춘 초대형 은행"
+  },
+  {
+    "canonicalCompanyId": "US_BRK_B",
+    "currentTicker": "BRK.B",
+    "currentName": "버크셔 해서웨이 Class B",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "Berkshire Hathaway Inc.",
+        "ticker": "BRK"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Financial Conglomerate / Insurance"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_BRK_B",
+    "listingNewsIds": [
+      "SEC_1980_BRK"
+    ],
+    "dataQuality": "HIGH",
+    "description": "워런 버핏이 이끄는 보험(GEICO), 에너지, 철도(BNSF) 종합 투자 지주사"
+  },
+  {
+    "canonicalCompanyId": "US_JNJ",
+    "currentTicker": "JNJ",
+    "currentName": "존슨앤드존슨",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1944-09-25",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "Johnson & Johnson",
+        "ticker": "JNJ"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Healthcare / Pharmaceuticals"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_JNJ",
+    "listingNewsIds": [
+      "SEC_1980_JNJ"
+    ],
+    "dataQuality": "HIGH",
+    "description": "60년 이상 배당을 증액한 헬스케어, 의료기기, 바이오제약 대장주"
+  },
+  {
+    "canonicalCompanyId": "US_UNH",
+    "currentTicker": "UNH",
+    "currentName": "유나이티드헬스 그룹",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1984-10-18",
+    "firstTradingDate": "1984-10-18",
+    "firstValidPriceDate": "1984-10-18",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1984-10-18",
+        "name": "United HealthCare Corporation",
+        "ticker": "UNH"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1984-10-18",
+        "sector": "Healthcare / Managed Care"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_UNH",
+    "listingNewsIds": [
+      "SEC_IPO_1984_UNH"
+    ],
+    "dataQuality": "HIGH",
+    "description": "미국 최대 민간 건강보험사 및 Optum 헬스케어 서비스 플랫폼 기업"
+  },
+  {
+    "canonicalCompanyId": "US_XOM",
+    "currentTicker": "XOM",
+    "currentName": "엑손모빌",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "Exxon Corporation",
+        "ticker": "XOM"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Energy / Oil & Gas"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_XOM",
+    "listingNewsIds": [
+      "SEC_1980_XOM"
+    ],
+    "dataQuality": "HIGH",
+    "description": "스탠더드 오일 후신의 미국 최대 석유 및 천연가스 메이저 기업"
+  },
+  {
+    "canonicalCompanyId": "US_CVX",
+    "currentTicker": "CVX",
+    "currentName": "셰브론",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1921-06-23",
+    "firstTradingDate": "1921-06-23",
+    "firstValidPriceDate": "1921-06-23",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1921-06-23",
+        "name": "셰브론",
+        "ticker": "CVX"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1921-06-23",
+        "sector": "에너지 / 오일가스"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_CVX",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "글로벌 상류 탐사 및 정제/다운스트림 사업을 영위하는 에너지 거인"
+  },
+  {
+    "canonicalCompanyId": "US_KO",
+    "currentTicker": "KO",
+    "currentName": "코카콜라",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "The Coca-Cola Company",
+        "ticker": "KO"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Beverages / Consumer Staples"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_KO",
+    "listingNewsIds": [
+      "SEC_1980_KO"
+    ],
+    "dataQuality": "HIGH",
+    "description": "워런 버핏의 영구보유 종목이자 전 세계 200여 개국에 진출한 음료 제국"
+  },
+  {
+    "canonicalCompanyId": "US_PEP",
+    "currentTicker": "PEP",
+    "currentName": "펩시코",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "PepsiCo, Inc.",
+        "ticker": "PEP"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Food & Beverage"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_PEP",
+    "listingNewsIds": [
+      "SEC_1980_PEP"
+    ],
+    "dataQuality": "HIGH",
+    "description": "펩시 콜라와 Lay's, 도리토스 등 글로벌 1위 스낵 브랜드를 보유한 식품사"
+  },
+  {
+    "canonicalCompanyId": "US_PG",
+    "currentTicker": "PG",
+    "currentName": "프록터 앤 갬블",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-01-01",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "The Procter & Gamble Company",
+        "ticker": "PG"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Consumer Staples"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_PG",
+    "listingNewsIds": [
+      "SEC_1980_PG"
+    ],
+    "dataQuality": "HIGH",
+    "description": "팸퍼스, 다우니, 질레트, 오랄비 등 65년+ 배당왕 대표 생활소비재 기업"
+  },
+  {
+    "canonicalCompanyId": "US_WMT",
+    "currentTicker": "WMT",
+    "currentName": "월마트",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1972-08-25",
+    "firstTradingDate": "1980-01-01",
+    "firstValidPriceDate": "1980-01-01",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "name": "Wal-Mart Stores, Inc.",
+        "ticker": "WMT"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-01-01",
+        "sector": "Retail / Consumer Staples"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_WMT",
+    "listingNewsIds": [
+      "SEC_1980_WMT"
+    ],
+    "dataQuality": "HIGH",
+    "description": "매출 기준 세계 최대 오프라인 유통 및 옴니채널 리테일 기업"
+  },
+  {
+    "canonicalCompanyId": "US_HD",
+    "currentTicker": "HD",
+    "currentName": "홈디포",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1981-09-22",
+    "firstTradingDate": "1981-09-22",
+    "firstValidPriceDate": "1981-09-22",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1981-09-22",
+        "name": "The Home Depot, Inc.",
+        "ticker": "HD"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1981-09-22",
+        "sector": "Retail / Home Improvement"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_HD",
+    "listingNewsIds": [
+      "SEC_IPO_1981_HD"
+    ],
+    "dataQuality": "HIGH",
+    "description": "미국 1위 건축자재, 주택수리 및 인테리어 DIY 전문 유통업체"
+  },
+  {
+    "canonicalCompanyId": "US_MCD",
+    "currentTicker": "MCD",
+    "currentName": "맥도날드",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1965-04-21",
+    "firstTradingDate": "1965-04-21",
+    "firstValidPriceDate": "1965-04-21",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1965-04-21",
+        "name": "맥도날드",
+        "ticker": "MCD"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1965-04-21",
+        "sector": "소비재 / 프랜차이즈"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_MCD",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "글로벌 1위 패스트푸드 프랜차이즈이자 강력한 부동산 자산 보유 기업"
+  },
+  {
+    "canonicalCompanyId": "US_DIS",
+    "currentTicker": "DIS",
+    "currentName": "월트 디즈니",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1957-11-12",
+    "firstTradingDate": "1957-11-12",
+    "firstValidPriceDate": "1957-11-12",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1957-11-12",
+        "name": "월트 디즈니",
+        "ticker": "DIS"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1957-11-12",
+        "sector": "미디어 / 엔터테인먼트"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_DIS",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "미키마우스, 마블, 스타워즈 IP 및 디즈니 테마파크, OTT(디즈니+) 그룹"
+  },
+  {
+    "canonicalCompanyId": "US_CAT",
+    "currentTicker": "CAT",
+    "currentName": "캐터필러",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1929-12-02",
+    "firstTradingDate": "1929-12-02",
+    "firstValidPriceDate": "1929-12-02",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1929-12-02",
+        "name": "캐터필러",
+        "ticker": "CAT"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1929-12-02",
+        "sector": "산업재 / 중장비"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_CAT",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "글로벌 건설, 광산, 에너지 장비 제조 1위의 경기민감 대표 산업재 기업"
+  },
+  {
+    "canonicalCompanyId": "US_NKE",
+    "currentTicker": "NKE",
+    "currentName": "나이키",
+    "market": "US",
+    "currency": "USD",
+    "listingDate": "1980-12-02",
+    "firstTradingDate": "1980-12-02",
+    "firstValidPriceDate": "1980-12-02",
+    "delistingDate": null,
+    "nameHistory": [
+      {
+        "validFrom": "1980-12-02",
+        "name": "나이키",
+        "ticker": "NKE"
+      }
+    ],
+    "sectorHistory": [
+      {
+        "validFrom": "1980-12-02",
+        "sector": "임의소비재 / 스포츠웨어"
+      }
+    ],
+    "listingEventId": "LISTING_EVENT_US_NKE",
+    "listingNewsIds": [],
+    "dataQuality": "HIGH",
+    "description": "에어 조던 등 압도적 브랜드 파워를 보유한 글로벌 1위 스포츠웨어 기업"
+  }
+]

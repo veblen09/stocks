@@ -4384,29 +4384,30 @@
     "availableFrom": "1998-10-20",
     "datePrecision": "DAY",
     "originalTitle": "U.S. Market & Macro Review",
-    "titleKo": "[1998년 미국 증시] S&P 500 및 경제 지표",
-    "summaryKo": "1998년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 온 국민의 금모으기 운동과 가혹한 고금리 구조조정(빅딜, 5대 은행 퇴출) 속에 한국 증시는 바닥을 찍고 연말 49.5% 반등했습니다.",
-    "sourceName": "U.S. Bureau of Economic Analysis",
+    "titleKo": "[1998년 미국 거시경제] 연준 3차례 금리 인하와 S&P 500 랠리",
+    "summaryKo": "러시아 모라토리엄 및 LTCM 파산 위기 속에서 연방준비제도(Fed)가 전격적인 3차례 금리 인하를 단행하며 금융시스템 안정을 지원했습니다. 견조한 소비와 기술주 강세로 S&P 500 지수는 견고한 상승세를 이어갔습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis & Federal Reserve",
     "sourceUrl": "https://www.bea.gov",
     "sourceType": "GOVERNMENT",
     "evidenceLevel": "PRIMARY_SOURCE",
     "categories": [
       "S&P500",
-      "연준"
+      "연준",
+      "금리"
     ],
     "affectedChannels": [
       "INTEREST_RATE",
       "DEMAND"
     ],
     "neutralAnalysis": {
-      "verifiedFacts": "1998년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "verifiedFacts": "1998년 미국 경제분석국(BEA) 공식 GDP 발표 및 연준 3차례 금리인하 발표.",
       "impactChannels": [
         "INTEREST_RATE",
         "DEMAND"
       ],
-      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
-      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
-      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+      "positiveInterpretation": "선제적 유동성 공급과 미국 내수 견조함으로 증시 반등.",
+      "negativeInterpretation": "신흥국 및 러시아 금융불안과 기술주 밸류에이션 부담.",
+      "unknownAtTheTime": "LTCM 파산 이후 헤지펀드 레버리지 시스템 위험의 완전 해소 여부."
     },
     "importanceScore": 8,
     "language": "ko",
@@ -4415,6 +4416,7 @@
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
+
   {
     "id": "NEWS_1998_KR_005930_GEN",
     "scope": "COMPANY",

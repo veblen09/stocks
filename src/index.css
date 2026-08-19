@@ -1,11 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@import "./styles/theme.css";
+@import "./styles/keycaps.css";
 
 @theme {
   --font-sans: "Noto Sans KR", "Outfit", system-ui, -apple-system, sans-serif;
   --font-display: "Outfit", "Noto Sans KR", sans-serif;
   
-  --color-brand-50: #f0fdf4; /* Emerald tint */
+  --color-brand-50: #f0fdf4;
   --color-brand-100: #dcfce7;
   --color-brand-200: #bbf7d0;
   --color-brand-500: #10b981;
@@ -27,32 +29,33 @@
   --color-growth-green: #22C55E;
   --color-soft-green: #DCFCE7;
   --color-warm-gold: #F59E0B;
-  --color-light-bg: #F8FAFC;
-  --color-card-white: rgba(255, 255, 255, 0.82);
+  --color-light-bg: #F4F7FB;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f1f5f9;
-  color: #0f172a;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
 }
 
-/* Glassmorphism custom classes */
+/* Glassmorphism Light Surfaces */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
 }
 
-.glass-panel-dark {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.glass-panel-subtle {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(213, 222, 234, 0.6);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
 /* Custom scrollbars */
@@ -76,10 +79,10 @@ body {
 
 /* Custom sliders */
 input[type="range"] {
-  accent-color: #10b981;
+  accent-color: var(--primary);
 }
 
-/* Keyframes for micro-animations */
+/* Keyframes for animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -92,41 +95,5 @@ input[type="range"] {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes pulse-subtle {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.02);
-    opacity: 0.95;
-  }
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s ease-in-out infinite;
-}
-
-/* Print optimizations */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-  .no-print {
-    display: none !important;
-  }
-  /* Expand scroll containers when printing */
-  .max-h-\[520px\] {
-    max-h: none !important;
-    overflow: visible !important;
-  }
-  /* Preserve background colors and styles in print preview */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+  animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

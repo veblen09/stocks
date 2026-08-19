@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2001_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2001-06-30",
+    "publishedAt": "2001-06-30",
+    "availableFrom": "2001-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "9·11 테러와 초저금리 시대 개막",
+    "titleKo": "[2001년 세계 경제] 9·11 테러와 초저금리 시대 개막",
+    "summaryKo": "9월 11일 뉴욕 세계무역센터 테러로 세계 증시가 충격을 받았으나, 미 연준의 파격적 금리 인하(1.75%)와 유동성으로 연말 증시는 V자 반등했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2001년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

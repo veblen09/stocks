@@ -1,0 +1,93 @@
+/**
+ * Light Theme & Color Tokens
+ * 머니트랙: 45년 한·미 주식투자 실험실 밝은 디자인 시스템
+ */
+
+:root {
+  --app-bg: #f4f7fb;
+  --app-bg-accent: #eaf0f8;
+
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-muted: #edf2f7;
+
+  --text-primary: #172033;
+  --text-secondary: #526078;
+  --text-muted: #738096;
+
+  --border: #d5deea;
+  --border-strong: #b9c6d6;
+
+  --primary: #3563e9;
+  --primary-hover: #2853cf;
+  --primary-soft: #e9efff;
+
+  --kr-market: #2563eb;
+  --kr-market-soft: #e8f1ff;
+
+  --us-market: #7c3aed;
+  --us-market-soft: #f1eafe;
+
+  --positive: #087f5b;
+  --positive-soft: #e7f7f0;
+
+  --negative: #b93848;
+  --negative-soft: #fdecef;
+
+  --warning: #b56a08;
+  --warning-soft: #fff4dc;
+
+  --focus: #2563eb;
+
+  --key-top: #ffffff;
+  --key-bottom: #e8edf4;
+  --key-side: #b9c5d4;
+  --key-border: #c8d2df;
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+  font-family: "Noto Sans KR", "Outfit", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light Surface Utility Classes */
+.bright-surface {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.bright-surface-soft {
+  background-color: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.bright-surface-muted {
+  background-color: var(--surface-muted);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* Minimum Accessible Typography */
+.text-body-main {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.text-body-sub {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.text-caption-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}

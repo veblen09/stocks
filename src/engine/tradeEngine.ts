@@ -64,7 +64,11 @@ export function executeBuy(
   year: number,
   settings: GameSettings
 ): ExecuteTradeResult {
-  const validation = validateBuyOrder(canonicalId, amountKRW, cashKRW, year, settings.feeRate);
+  // Defensively clamp to max affordable amount so rounding or max selection never exceeds cash
+  const maxAffordable = Math.max(0, Math.floor(cashKRW / (1 + settings.feeRate)));
+  const effectiveAmount = amountKRW > maxAffordable ? maxAffordable : amountKRW;
+
+  const validation = validateBuyOrder(canonicalId, effectiveAmount, cashKRW, year, settings.feeRate);
   if (!validation.valid) {
     throw new Error(validation.error);
   }
@@ -75,9 +79,10 @@ export function executeBuy(
   const priceLocal = getStockPriceLocal(canonicalId, priceYear) || 1;
   const fxRate = getFxRate(priceYear);
 
-  const fee = amountKRW * settings.feeRate;
-  const newCash = cashKRW - (amountKRW + fee);
-  const boughtShares = amountKRW / priceKRW;
+  const fee = effectiveAmount * settings.feeRate;
+  const newCash = Math.max(0, cashKRW - (effectiveAmount + fee));
+  const boughtShares = priceKRW > 0 ? effectiveAmount / priceKRW : 0;
+
 
   const currentHolding = holdings[canonicalId] || {
     canonicalId,
@@ -91,7 +96,7 @@ export function executeBuy(
   };
 
   const newShares = currentHolding.shares + boughtShares;
-  const newInvested = currentHolding.totalInvestedKRW + amountKRW;
+  const newInvested = currentHolding.totalInvestedKRW + effectiveAmount;
   const newAvgCost = newShares > 0 ? newInvested / newShares : 0;
 
   const updatedHolding: StockHolding = {
@@ -113,10 +118,11 @@ export function executeBuy(
     priceLocal,
     fxRate,
     priceKRW,
-    totalAmountKRW: amountKRW,
+    totalAmountKRW: effectiveAmount,
     feeKRW: fee,
     timestamp: Date.now(),
   };
+
 
   return {
     updatedCash: newCash,

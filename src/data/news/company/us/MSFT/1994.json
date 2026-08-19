@@ -1,0 +1,53 @@
+[
+  {
+    "id": "NEWS_1994_US_MSFT_01",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_MSFT"
+    ],
+    "relatedTickers": [
+      "MSFT"
+    ],
+    "relatedSectors": [
+      "빅테크",
+      "IT"
+    ],
+    "eventDate": "1994-11-15",
+    "publishedAt": "1994-11-15",
+    "availableFrom": "1994-11-15",
+    "datePrecision": "DAY",
+    "originalTitle": "마이크로소프트, Windows 95 출시 준비 및 Office 제품군 시장 지배",
+    "titleKo": "마이크로소프트, Windows 95 출시 준비 및 Office 제품군 시장 지배",
+    "summaryKo": "기업용 PC 시장에서 절대적 독점력을 발휘하며 사상 최대 순이익을 달성했습니다.",
+    "sourceName": "SEC EDGAR / Company 10-K",
+    "sourceUrl": "https://www.sec.gov/edgar",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "실적발표",
+      "기술혁신",
+      "M&A"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MANAGEMENT"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1994년 미국 SEC 공식 제출 연차보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "MANAGEMENT"
+      ],
+      "positiveInterpretation": "플랫폼 생태계 확장 및 장기 현금흐름 창출 능력.",
+      "negativeInterpretation": "독점 규제 조사 및 R&D 투자비용 증가.",
+      "unknownAtTheTime": "신제품 시장 점유율 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

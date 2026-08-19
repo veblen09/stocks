@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2007_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2007-06-30",
+    "publishedAt": "2007-06-30",
+    "availableFrom": "2007-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "아이폰 출시와 인사이트 펀드 광풍",
+    "titleKo": "[2007년 세계 경제] 아이폰 출시와 인사이트 펀드 광풍",
+    "summaryKo": "스티브 잡스가 1월 최초의 아이폰을 발표했습니다. 미래에셋 인사이트 펀드 등 해외 브릭스(BRICs) 투자 광풍 속에 코스피는 사상 처음 2,000p를 돌파했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2007년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

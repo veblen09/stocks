@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, ExternalLink, ShieldCheck, HelpCircle, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import type { HistoricalNewsItem, AffectedChannel } from '../types/stockNews';
+import { audioManager } from '../utils/audioManager';
 
 interface NeutralNewsAnalysisModalProps {
   newsItem: HistoricalNewsItem | null;
@@ -25,71 +26,86 @@ export const NeutralNewsAnalysisModal: React.FC<NeutralNewsAnalysisModalProps> =
   newsItem,
   onClose,
 }) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && newsItem) {
+        audioManager.playUiSound('modalClose');
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [newsItem, onClose]);
+
   if (!newsItem) return null;
 
   const { neutralAnalysis, sourceName, sourceUrl, evidenceLevel, publishedAt, titleKo } = newsItem;
 
+  const handleClose = () => {
+    audioManager.playUiSound('modalClose');
+    onClose();
+  };
+
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="neutral-analysis-title"
     >
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-slate-800">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200">
               <HelpCircle className="w-5 h-5" />
             </span>
             <div>
-              <h3 id="neutral-analysis-title" className="text-lg font-bold text-white">
-                왜 투자자에게 중요할까? (중립적 영향 경로 해설)
+              <h3 id="neutral-analysis-title" className="text-lg font-bold text-slate-900">
+                중립적 영향 경로 해설 & 당시 확인된 사실
               </h3>
-              <p className="text-xs text-slate-400">
-                발표일: {publishedAt} | 출처: {sourceName}
+              <p className="text-xs text-slate-500 mt-0.5">
+                발표일: {publishedAt} · 출처: {sourceName}
               </p>
             </div>
           </div>
           <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            type="button"
+            onClick={handleClose}
+            className="p-2 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
             aria-label="닫기"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-5 text-sm text-slate-300">
-          {/* Article Title */}
-          <div className="p-3.5 bg-slate-800/60 border border-slate-700/50 rounded-xl">
-            <div className="text-xs text-slate-400 font-semibold mb-1">대상 뉴스 / 공시</div>
-            <div className="text-base font-bold text-white">{titleKo}</div>
+        {/* Content Body */}
+        <div className="p-6 space-y-4 overflow-y-auto text-xs leading-relaxed text-slate-700">
+          {/* Target News Title */}
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+            <span className="text-[11px] font-bold text-blue-700 uppercase block">해당 기사 제목</span>
+            <p className="text-sm font-bold text-slate-900">{titleKo}</p>
           </div>
 
-          {/* 1. Verified Facts */}
-          <div>
-            <div className="flex items-center gap-2 font-bold text-emerald-400 mb-1.5">
-              <ShieldCheck className="w-4 h-4" />
-              <span>1. 당시 확인된 사실 (Verified Facts)</span>
+          {/* 1. Verified Facts (당시 확인된 사실) */}
+          <div className="space-y-1.5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="flex items-center gap-1.5 text-slate-900 font-bold">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>1. 당시 공식 확인된 사실 (Fact)</span>
             </div>
-            <p className="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl text-slate-200 leading-relaxed">
+            <p className="text-xs text-slate-800 leading-relaxed font-medium pl-5">
               {neutralAnalysis.verifiedFacts}
             </p>
           </div>
 
-          {/* 2. Impact Channels */}
-          <div>
-            <div className="font-bold text-sky-400 mb-1.5">
-              2. 주요 영향 경로 (Affected Channels)
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {neutralAnalysis.impactChannels.map(ch => (
+          {/* 2. Impact Channels (영향 경로 태그) */}
+          <div className="space-y-1.5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span className="font-bold text-slate-900 block">2. 기업 및 시장 영향 경로</span>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {neutralAnalysis.impactChannels.map((ch) => (
                 <span
                   key={ch}
-                  className="px-2.5 py-1 text-xs font-semibold bg-sky-500/10 text-sky-300 border border-sky-500/30 rounded-lg"
+                  className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 text-xs font-semibold"
                 >
                   #{CHANNEL_LABELS[ch] || ch}
                 </span>
@@ -97,71 +113,69 @@ export const NeutralNewsAnalysisModal: React.FC<NeutralNewsAnalysisModalProps> =
             </div>
           </div>
 
-          {/* 3. Positive & Negative Interpretations */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-3.5 bg-emerald-900/10 border border-emerald-500/20 rounded-xl">
-              <div className="flex items-center gap-1.5 font-bold text-emerald-400 mb-1">
-                <TrendingUp className="w-4 h-4" />
-                <span>긍정적으로 해석할 수 있는 점</span>
+          {/* 3. Positive vs Negative Interpretations */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Positive */}
+            <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
+                <span>긍정적으로 볼 수 있었던 점</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-emerald-950 leading-relaxed font-medium">
                 {neutralAnalysis.positiveInterpretation}
               </p>
             </div>
 
-            <div className="p-3.5 bg-rose-900/10 border border-rose-500/20 rounded-xl">
-              <div className="flex items-center gap-1.5 font-bold text-rose-400 mb-1">
-                <TrendingDown className="w-4 h-4" />
-                <span>부정적으로 해석할 수 있는 점</span>
+            {/* Negative */}
+            <div className="p-4 rounded-xl bg-rose-50/70 border border-rose-200 space-y-1.5">
+              <div className="flex items-center gap-1.5 text-rose-800 font-bold">
+                <TrendingDown className="w-4 h-4 text-rose-600" />
+                <span>부정적 또는 우려 요인</span>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-rose-950 leading-relaxed font-medium">
                 {neutralAnalysis.negativeInterpretation}
               </p>
             </div>
           </div>
 
-          {/* 4. Unknown at the time */}
-          <div>
-            <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-1.5">
-              <AlertCircle className="w-4 h-4" />
-              <span>3. 당시에는 알 수 없었던 점 (Unknown Uncertainties)</span>
+          {/* 4. Unknown at the time (당시에는 알 수 없었던 점) */}
+          <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-amber-900 font-bold">
+              <AlertCircle className="w-4 h-4 text-amber-600" />
+              <span>3. 당시 투자자가 알 수 없었던 점 (미래 정보 차단 고지)</span>
             </div>
-            <p className="p-3 bg-amber-950/20 border border-amber-500/20 rounded-xl text-slate-200 leading-relaxed text-xs">
+            <p className="text-xs text-amber-950 leading-relaxed font-medium pl-5">
               {neutralAnalysis.unknownAtTheTime}
             </p>
           </div>
+        </div>
 
-          {/* Source & Fair Use Notice */}
-          <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-400">
-            <div>
-              <span className="text-slate-500">자료 출처: </span>
-              <span className="text-slate-300 font-medium">{sourceName}</span>
-              <span className="mx-1.5">|</span>
-              <span className="text-slate-500">증거수준: </span>
-              <span className="text-indigo-400">{evidenceLevel}</span>
-            </div>
+        {/* Footer */}
+        <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+          <div className="text-slate-500 font-medium">
+            증거 수준: <strong className="text-slate-800 font-bold">{evidenceLevel === 'PRIMARY_SOURCE' ? '공식 1차 원자료' : '당대 정규 언론보도'}</strong>
+          </div>
+
+          <div className="flex items-center gap-2">
             {sourceUrl && (
               <a
                 href={sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-blue-700 font-bold border border-slate-200 transition flex items-center gap-1.5"
               >
-                <span>공식 원문/출처 확인</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span>원문 출처 확인</span>
+                <ExternalLink size={12} />
               </a>
             )}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition shadow-xs"
+            >
+              닫기
+            </button>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-slate-950/80 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm rounded-xl transition-all shadow-lg shadow-indigo-600/30"
-          >
-            확인 및 닫기
-          </button>
         </div>
       </div>
     </div>

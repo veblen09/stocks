@@ -8,50 +8,61 @@ import {
   LineChart,
   Edit3,
   ExternalLink,
-  Lock,
-  Calendar,
-  AlertTriangle,
-  HelpCircle,
-  ShoppingCart,
-  Layers,
+  Sparkles,
+  PieChart,
+  CheckCircle2,
 } from 'lucide-react';
 import { useStockGame } from '../store/stockGameStore';
 import {
   getCompanyOverviewAtYear,
   getAvailableNewsForYear,
-  getDecisionCutoffDate,
 } from '../engine/newsEngine';
-import { getHistoricalStockStats, getStockPriceKRW } from '../engine/returnEngine';
+import { getHistoricalStockStats, STOCKS_BY_ID } from '../engine/returnEngine';
+import { getListingEventByCompanyId, isNewlyListedInYear } from '../engine/universeEngine';
 import { formatKRW, formatPercent } from '../utils/formatMoney';
+import { audioManager } from '../utils/audioManager';
 import { NeutralNewsAnalysisModal } from './NeutralNewsAnalysisModal';
 import type { HistoricalNewsItem } from '../types/stockNews';
 
 interface CompanyDetailModalProps {
   canonicalId: string | null;
+  initialTab?: 'OVERVIEW' | 'NEWS' | 'LISTING' | 'FILINGS' | 'PRICES' | 'ALLOCATION' | 'NOTES';
+  draftTargetWeight?: number;
+  onUpdateDraftTargetWeight?: (canonicalId: string, weight: number) => void;
   onClose: () => void;
   onSelectForTrade?: (canonicalId: string) => void;
   onAddToCompare?: (canonicalId: string) => void;
 }
 
-type TabType = 'OVERVIEW' | 'NEWS' | 'FILINGS' | 'PRICES' | 'NOTES';
+export type TabType = 'OVERVIEW' | 'NEWS' | 'LISTING' | 'FILINGS' | 'PRICES' | 'ALLOCATION' | 'NOTES';
 
 export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   canonicalId,
+  initialTab = 'OVERVIEW',
+  draftTargetWeight = 0,
+  onUpdateDraftTargetWeight,
   onClose,
-  onSelectForTrade,
-  onAddToCompare,
 }) => {
   const { state, dispatch } = useStockGame();
-  const [activeTab, setActiveTab] = useState<TabType>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [newsFilter, setNewsFilter] = useState<'ALL' | '1Y' | 'FILING' | 'PRODUCT'>('ALL');
   const [selectedNewsForAnalysis, setSelectedNewsForAnalysis] = useState<HistoricalNewsItem | null>(null);
   const [noteText, setNoteText] = useState('');
   const [isNoteSaved, setIsNoteSaved] = useState(false);
+  const [targetSliderVal, setTargetSliderVal] = useState<number>(draftTargetWeight);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (canonicalId && state.investmentNotes[canonicalId]) {
+    setActiveTab(initialTab);
+  }, [initialTab, canonicalId]);
+
+  useEffect(() => {
+    setTargetSliderVal(draftTargetWeight);
+  }, [draftTargetWeight, canonicalId]);
+
+  useEffect(() => {
+    if (canonicalId && state.investmentNotes && state.investmentNotes[canonicalId]) {
       setNoteText(state.investmentNotes[canonicalId]);
     } else {
       setNoteText('');
@@ -63,6 +74,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        audioManager.playUiSound('modalClose');
         onClose();
       }
     };
@@ -73,14 +85,28 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   if (!canonicalId) return null;
 
   const currentYear = state.currentYear;
-  const cutoffDate = getDecisionCutoffDate(currentYear);
   const overview = getCompanyOverviewAtYear(canonicalId, currentYear);
+  const baseStock = STOCKS_BY_ID[canonicalId];
   const stats = getHistoricalStockStats(canonicalId, currentYear - 1, state.settings.includeFxEffect);
-  const isWatchlisted = state.watchlist.includes(canonicalId);
+  const isWatchlisted = (state.watchlist || []).includes(canonicalId);
   const userHolding = state.holdings[canonicalId];
+  const listingEvent = getListingEventByCompanyId(canonicalId);
+  const isNew = isNewlyListedInYear(canonicalId, currentYear);
+
+  // Portfolio value calculations
+  const holdingStockValues = Object.values(state.holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
+  const totalPortfolioValue = state.cashKRW + holdingStockValues;
+
+  // Headroom calculation: ensure sum of all stock targets never exceeds 100%
+  const otherStocksSum = Object.entries(state.draftTargetWeights || {})
+    .filter(([cid]) => cid !== canonicalId)
+    .reduce((sum, [_, w]) => sum + w, 0);
+  const maxAllowedWeight = Math.max(0, Math.round((1.0 - otherStocksSum) * 100) / 100);
 
   // News available strictly up to cutoffDate
   const allAvailableNews = getAvailableNewsForYear(currentYear, { canonicalCompanyId: canonicalId });
+  const filingsNews = allAvailableNews.filter(n => n.sourceType === 'FILING');
+
   const filteredNews = allAvailableNews.filter(n => {
     if (newsFilter === '1Y') {
       const priorYearStr = (currentYear - 1).toString();
@@ -91,490 +117,597 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
     return true;
   });
 
+  const handleTabChange = (tab: TabType) => {
+    audioManager.playUiSound('tab');
+    setActiveTab(tab);
+  };
+
   const handleSaveNote = () => {
+    audioManager.playUiSound('success');
     dispatch({ type: 'SAVE_NOTE', payload: { canonicalId, note: noteText } });
     setIsNoteSaved(true);
     setTimeout(() => setIsNoteSaved(false), 2000);
   };
 
   const handleToggleWatchlist = () => {
+    audioManager.playUiSound('keyTap');
     dispatch({ type: 'TOGGLE_WATCHLIST', payload: canonicalId });
   };
 
-  // Price history points up to decision cutoff
-  const priceHistory: { year: number; priceKRW: number | null }[] = [];
-  for (let y = overview.firstValidYear - 1; y <= currentYear - 1; y++) {
-    priceHistory.push({
-      year: y,
-      priceKRW: getStockPriceKRW(canonicalId, y),
-    });
-  }
+  const handleApplyWeight = (val: number, isIncrease?: boolean) => {
+    const clamped = Math.max(0, Math.min(maxAllowedWeight, Math.round(val * 100) / 100));
+    if (isIncrease !== undefined) {
+      if (isIncrease) {
+        audioManager.playUiSound('allocationUp');
+      } else {
+        audioManager.playUiSound('allocationDown');
+      }
+    }
+    setTargetSliderVal(clamped);
+    if (onUpdateDraftTargetWeight) {
+      onUpdateDraftTargetWeight(canonicalId, clamped);
+    }
+  };
+
+  const handleNormalizeAll = () => {
+    audioManager.playUiSound('success');
+    dispatch({ type: 'NORMALIZE_DRAFT_TARGET_WEIGHTS' });
+  };
+
+  const handleClose = () => {
+    audioManager.playUiSound('modalClose');
+    onClose();
+  };
+
+  const officialName = baseStock ? baseStock.nameKo : overview.nameKo;
 
   return (
-    <>
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex justify-end animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="company-detail-title"
+    >
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="company-modal-title"
+        ref={modalRef}
+        className="w-full max-w-2xl bg-white border-l border-slate-200 shadow-2xl flex flex-col h-full text-slate-800 overflow-hidden"
       >
-        <div
-          ref={modalRef}
-          className="relative w-full max-w-4xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
-        >
-          {/* Top Banner Notice */}
-          <div className="px-6 py-2 bg-indigo-950/80 border-b border-indigo-500/30 flex items-center justify-between text-xs text-indigo-300">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5 text-indigo-400" />
-              <span>
-                현재 표시되는 정보는 <strong className="text-white">{cutoffDate}</strong>까지 당시 투자자가 확인할 수 있었던 자료입니다.
-              </span>
-            </div>
-            <span className="hidden sm:inline-flex px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-200 font-medium">
-              {currentYear}년 투자 결정 시점
-            </span>
-          </div>
-
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4 bg-slate-950/50">
+        {/* Top Header */}
+        <div className="p-5 border-b border-slate-200 shrink-0 space-y-3.5 bg-slate-50/70">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-black text-xl shadow-inner">
-                {overview.nameKo.slice(0, 2)}
-              </div>
+              <span className="text-2xl shrink-0">{overview.market === 'KR' ? '🇰🇷' : '🇺🇸'}</span>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 id="company-modal-title" className="text-xl font-bold text-white">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 id="company-detail-title" className="text-xl font-bold text-slate-900 tracking-tight">
                     {overview.nameKo}
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                    {overview.ticker}
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${overview.market === 'KR' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
-                    {overview.market === 'KR' ? '한국(KRX)' : '미국(US)'}
-                  </span>
-                  {!overview.isListed && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                      <Lock className="w-3 h-3" />
-                      상장 전 (Pre-IPO)
+                  {isNew && (
+                    <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300 flex items-center gap-1">
+                      <Sparkles size={12} className="text-amber-600" />
+                      {currentYear}년 신규 상장
                     </span>
                   )}
-                  {userHolding && userHolding.shares > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                      보유 중
+                  {overview.nameKo !== officialName && (
+                    <span className="text-xs font-semibold text-slate-500">
+                      (현 {officialName})
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  업종: {overview.sector} | 상장일: {overview.listingDate}
-                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-600 font-medium mt-0.5">
+                  <span className="text-blue-700 font-mono font-bold">{overview.ticker}</span>
+                  <span>·</span>
+                  <span>{overview.sector}</span>
+                  <span>·</span>
+                  <span>{overview.market === 'KR' ? '원화(KRW)' : '달러(USD)'}</span>
+                </div>
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
+                type="button"
                 onClick={handleToggleWatchlist}
-                className={`p-2 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-semibold ${isWatchlisted ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-white'}`}
-                title={isWatchlisted ? '관심종목 해제' : '관심종목 추가'}
+                className={`p-2 rounded-xl transition cursor-pointer border ${
+                  isWatchlisted
+                    ? 'bg-amber-50 border-amber-300 text-amber-600'
+                    : 'bg-white border-slate-200 text-slate-400 hover:text-slate-600'
+                }`}
+                title={isWatchlisted ? '관심종목 해제' : '관심종목 등록'}
+                aria-label={isWatchlisted ? '관심종목 해제' : '관심종목 등록'}
               >
-                <Star className={`w-4 h-4 ${isWatchlisted ? 'fill-amber-400 text-amber-400' : ''}`} />
-                <span>{isWatchlisted ? '관심종목' : '관심 추가'}</span>
+                <Star className={`w-4 h-4 ${isWatchlisted ? 'fill-amber-400' : ''}`} />
               </button>
 
-              {onAddToCompare && (
-                <button
-                  onClick={() => onAddToCompare(canonicalId)}
-                  className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5"
-                >
-                  <Layers className="w-4 h-4 text-indigo-400" />
-                  <span>기업 비교</span>
-                </button>
-              )}
-
-              {onSelectForTrade && overview.isListed && (
-                <button
-                  onClick={() => onSelectForTrade(canonicalId)}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-1.5"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  <span>주문창 열기</span>
-                </button>
-              )}
-
               <button
-                onClick={onClose}
-                className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+                type="button"
+                onClick={handleClose}
+                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 transition cursor-pointer"
                 aria-label="닫기"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex border-b border-slate-800 bg-slate-950/40 px-6 gap-2 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('OVERVIEW')}
-              className={`py-3 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'OVERVIEW' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>1. 기업 개요</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('NEWS')}
-              className={`py-3 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'NEWS' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
-            >
-              <Newspaper className="w-3.5 h-3.5" />
-              <span>2. 당시 뉴스 ({allAvailableNews.length})</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('FILINGS')}
-              className={`py-3 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'FILINGS' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>3. 공시·실적</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('PRICES')}
-              className={`py-3 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'PRICES' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
-            >
-              <LineChart className="w-3.5 h-3.5" />
-              <span>4. 과거 주가·통계</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('NOTES')}
-              className={`py-3 px-3 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${activeTab === 'NOTES' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>5. 투자 메모</span>
-            </button>
+          {/* Quick Holding / Target Status Pill */}
+          <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 text-xs shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 font-medium">현재 보유:</span>
+              {userHolding && userHolding.shares > 0 ? (
+                <span className="font-mono font-bold text-slate-900">
+                  {formatKRW(userHolding.currentValueKRW)} ({userHolding.shares.toFixed(2)}주)
+                </span>
+              ) : (
+                <span className="text-slate-400 font-medium">미보유</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 font-medium">설정 목표비중:</span>
+              <span className="font-mono font-bold text-blue-600 text-sm">
+                {Math.round(targetSliderVal * 100)}%
+              </span>
+            </div>
           </div>
 
-          {/* Tab Content Body */}
-          <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-300">
-            {/* TAB 1: OVERVIEW */}
-            {activeTab === 'OVERVIEW' && (
-              <div className="space-y-5">
-                <div className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-2xl">
-                  <div className="text-xs font-bold text-indigo-400 mb-1">
-                    {currentYear}년 기준 당시 주요 사업 및 영업 구조
-                  </div>
-                  <p className="text-slate-200 leading-relaxed text-sm">
-                    {overview.contemporaryBusiness}
-                  </p>
-                </div>
-
-                {/* Historical Aliases & Renaming Table */}
-                {overview.historicalAliases.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      사명 및 티커 변천사 (Historical Aliases)
-                    </h4>
-                    <div className="overflow-hidden border border-slate-800 rounded-xl">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-950 text-slate-400 font-semibold">
-                          <tr>
-                            <th className="p-2.5">적용 기간</th>
-                            <th className="p-2.5">당시 사명</th>
-                            <th className="p-2.5">티커</th>
-                            <th className="p-2.5">관계</th>
-                            <th className="p-2.5">당시 사업</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800 text-slate-300">
-                          {overview.historicalAliases.map((a, idx) => (
-                            <tr key={idx} className="hover:bg-slate-800/40">
-                              <td className="p-2.5 text-slate-400 font-mono">
-                                {a.validFrom.slice(0, 4)} ~ {a.validTo ? a.validTo.slice(0, 4) : '현재'}
-                              </td>
-                              <td className="p-2.5 font-bold text-white">{a.historicalName}</td>
-                              <td className="p-2.5 font-mono">{a.ticker || '-'}</td>
-                              <td className="p-2.5 text-indigo-400">{a.relationship}</td>
-                              <td className="p-2.5 text-slate-400">{a.contemporaryBusinessKo}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Data Coverage Status */}
-                <div className="p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center justify-between text-xs">
-                  <div>
-                    <span className="text-slate-400">데이터 신뢰도 및 커버리지: </span>
-                    <span className="font-bold text-emerald-400">
-                      {overview.coverageStatus === 'SUFFICIENT' ? '충분 (공식공시 및 언론기사)' : overview.coverageStatus === 'PARTIAL' ? '일부 공식자료 중심' : '검증된 역사적 기록'}
-                    </span>
-                  </div>
-                  <span className="text-slate-500">DART/EDGAR/KRX 검증 완료</span>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: CONTEMPORARY NEWS */}
-            {activeTab === 'NEWS' && (
-              <div className="space-y-4">
-                {/* News Filter Bar */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                  <button
-                    onClick={() => setNewsFilter('ALL')}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${newsFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
-                  >
-                    전체 공개 뉴스 ({allAvailableNews.length})
-                  </button>
-                  <button
-                    onClick={() => setNewsFilter('1Y')}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${newsFilter === '1Y' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
-                  >
-                    최근 1년 뉴스
-                  </button>
-                  <button
-                    onClick={() => setNewsFilter('FILING')}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${newsFilter === 'FILING' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
-                  >
-                    공식 공시·실적
-                  </button>
-                  <button
-                    onClick={() => setNewsFilter('PRODUCT')}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${newsFilter === 'PRODUCT' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
-                  >
-                    신제품·기술투자
-                  </button>
-                </div>
-
-                {/* News Items List */}
-                {filteredNews.length === 0 ? (
-                  <div className="p-8 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl">
-                    <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto mb-2 opacity-80" />
-                    <p className="text-slate-300 font-semibold">
-                      {cutoffDate}까지 확인된 관련 뉴스/공시가 없습니다.
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      당시 디지털 공시 이전이거나 검증된 언론 기사가 제한적인 시기입니다.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {filteredNews.map(item => (
-                      <div
-                        key={item.id}
-                        className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-2xl hover:border-indigo-500/50 transition-all space-y-2.5"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-mono text-indigo-400">
-                                {item.publishedAt}
-                              </span>
-                              <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                                {item.sourceType}
-                              </span>
-                              {item.categories.map(c => (
-                                <span key={c} className="text-[11px] text-slate-400">
-                                  #{c}
-                                </span>
-                              ))}
-                            </div>
-                            <h4 className="text-base font-bold text-white leading-snug">
-                              {item.titleKo}
-                            </h4>
-                          </div>
-
-                          <button
-                            onClick={() => setSelectedNewsForAnalysis(item)}
-                            className="px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition-all flex items-center gap-1 shrink-0"
-                          >
-                            <HelpCircle className="w-3.5 h-3.5" />
-                            <span>해설 보기</span>
-                          </button>
-                        </div>
-
-                        <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-slate-800">
-                          {item.summaryKo}
-                        </p>
-
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-                          <span>출처: {item.sourceName}</span>
-                          {item.sourceUrl && (
-                            <a
-                              href={item.sourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-slate-400 hover:text-indigo-400 transition-colors"
-                            >
-                              <span>출처 링크</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* TAB 3: FILINGS & FINANCIALS */}
-            {activeTab === 'FILINGS' && (
-              <div className="space-y-4">
-                <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl">
-                  <h4 className="text-xs font-bold text-slate-300 mb-2">
-                    {cutoffDate} 기준 공식 실적 및 제출 공시
-                  </h4>
-                  <p className="text-xs text-slate-400 leading-relaxed mb-3">
-                    기업의 과거 공시자료는 당시 제출된 연차보고서 및 결산 공시를 바탕으로 제공됩니다. 회계기준 변동 시 단순 시계열 비교에 주의하십시오.
-                  </p>
-
-                  <div className="space-y-2">
-                    {allAvailableNews
-                      .filter(n => n.sourceType === 'FILING' || n.categories.includes('실적'))
-                      .map(f => (
-                        <div
-                          key={f.id}
-                          className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl flex items-center justify-between text-xs"
-                        >
-                          <div>
-                            <span className="font-mono text-indigo-400 mr-2">{f.publishedAt}</span>
-                            <span className="font-bold text-white">{f.titleKo}</span>
-                          </div>
-                          <button
-                            onClick={() => setSelectedNewsForAnalysis(f)}
-                            className="text-xs text-indigo-400 hover:underline"
-                          >
-                            공시 상세
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: PAST PRICES & STATS */}
-            {activeTab === 'PRICES' && (
-              <div className="space-y-5">
-                {/* Historical Stats Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
-                    <div className="text-xs text-slate-400 mb-1">직전 1년 수익률</div>
-                    <div className={`text-base font-bold ${stats.last1YrReturn !== null && stats.last1YrReturn >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
-                      {stats.last1YrReturn === null ? '-' : formatPercent(stats.last1YrReturn)}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
-                    <div className="text-xs text-slate-400 mb-1">과거 3년 CAGR</div>
-                    <div className={`text-base font-bold ${stats.past3YrCAGR !== null && stats.past3YrCAGR >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
-                      {stats.past3YrCAGR === null ? '-' : formatPercent(stats.past3YrCAGR)}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
-                    <div className="text-xs text-slate-400 mb-1">과거 연간 변동성</div>
-                    <div className="text-base font-bold text-slate-200">
-                      {stats.historicalVolatility === null ? '-' : formatPercent(stats.historicalVolatility)}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl">
-                    <div className="text-xs text-slate-400 mb-1">과거 최대낙폭 (MDD)</div>
-                    <div className="text-base font-bold text-amber-400">
-                      {stats.historicalMDD === null ? '-' : formatPercent(stats.historicalMDD)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Past Price History Table */}
-                <div>
-                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    과거 연말 주가 기록 ({overview.firstValidYear - 1} ~ {currentYear - 1}년)
-                  </h4>
-                  <div className="max-h-48 overflow-y-auto border border-slate-800 rounded-xl">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-950 text-slate-400 font-semibold sticky top-0">
-                        <tr>
-                          <th className="p-2.5">연말 기준</th>
-                          <th className="p-2.5">원화 환산 주가 (KRW)</th>
-                          <th className="p-2.5">데이터 품질</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800 text-slate-300">
-                        {priceHistory.map((p, idx) => (
-                          <tr key={idx} className="hover:bg-slate-800/40">
-                            <td className="p-2.5 font-mono text-slate-400">{p.year}년 말</td>
-                            <td className="p-2.5 font-bold text-white">
-                              {p.priceKRW !== null ? formatKRW(p.priceKRW) : '상장 전 / 결측'}
-                            </td>
-                            <td className="p-2.5 text-emerald-400 font-semibold">수정주가(TR)</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-amber-400" />
-                    <span>미래 연도({currentYear}~2025년) 주가 데이터는 사후지식 편향 방지를 위해 엄격히 차단되어 있습니다.</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 5: INVESTMENT NOTES */}
-            {activeTab === 'NOTES' && (
-              <div className="space-y-4">
-                <div className="p-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl">
-                  <div className="flex items-center justify-between mb-2">
-                    <label htmlFor="company-note-textarea" className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                      <Edit3 className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>{overview.nameKo} 투자 메모 및 가설 기록</span>
-                    </label>
-                    {isNoteSaved && (
-                      <span className="text-xs font-bold text-emerald-400 animate-pulse">
-                        저장되었습니다!
-                      </span>
-                    )}
-                  </div>
-                  <textarea
-                    id="company-note-textarea"
-                    rows={6}
-                    value={noteText}
-                    onChange={e => setNoteText(e.target.value)}
-                    placeholder="이 기업에 대한 투자 근거, 확인된 뉴스, 예상 기회 요인, 위험 요인, 매도 조건 등을 기록하십시오. (작성된 메모는 연말 회고 화면 및 최종 결과 보고서에 연동됩니다)"
-                    className="w-full p-3.5 bg-slate-900 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 text-xs leading-relaxed focus:outline-none focus:border-indigo-500 resize-none"
-                  />
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={handleSaveNote}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-md"
-                    >
-                      메모 저장하기
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="px-6 py-3 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between">
-            <span className="text-xs text-slate-500">
-              {overview.nameKo} ({overview.ticker}) | {overview.sector}
-            </span>
+          {/* 7 Navigation Tabs (Keyboard-style .filter-key) */}
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1 overflow-x-auto text-xs font-bold no-scrollbar">
             <button
-              onClick={onClose}
-              className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-xl transition-colors"
+              type="button"
+              onClick={() => handleTabChange('OVERVIEW')}
+              aria-pressed={activeTab === 'OVERVIEW'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'OVERVIEW' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
             >
-              닫기
+              <Building2 size={13} />
+              <span>기업 개요</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('NEWS')}
+              aria-pressed={activeTab === 'NEWS'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'NEWS' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Newspaper size={13} />
+              <span>당시 뉴스 ({allAvailableNews.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('LISTING')}
+              aria-pressed={activeTab === 'LISTING'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'LISTING' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Sparkles size={13} />
+              <span>상장 정보</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('FILINGS')}
+              aria-pressed={activeTab === 'FILINGS'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'FILINGS' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <FileText size={13} />
+              <span>공시·실적 ({filingsNews.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('PRICES')}
+              aria-pressed={activeTab === 'PRICES'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'PRICES' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <LineChart size={13} />
+              <span>과거 주가</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('ALLOCATION')}
+              aria-pressed={activeTab === 'ALLOCATION'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'ALLOCATION' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <PieChart size={13} />
+              <span>자산배분</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('NOTES')}
+              aria-pressed={activeTab === 'NOTES'}
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'NOTES' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Edit3 size={13} />
+              <span>투자 메모</span>
             </button>
           </div>
         </div>
+
+        {/* Scrollable Content Body */}
+        <div className="p-5 overflow-y-auto space-y-4 flex-1 text-sm text-slate-700">
+          {/* TAB 1: OVERVIEW */}
+          {activeTab === 'OVERVIEW' && (
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span className="text-xs text-slate-500 font-bold uppercase block">
+                  {currentYear}년 당시 주요 사업 및 사업 구조
+                </span>
+                <p className="text-sm text-slate-900 leading-relaxed font-semibold">
+                  {overview.contemporaryBusiness}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span className="text-xs text-slate-500 block font-semibold">당시 사명</span>
+                  <span className="font-bold text-slate-900 text-sm block">{overview.nameKo}</span>
+                  <span className="text-xs text-slate-500 font-mono">
+                    최초 상장명: {listingEvent?.companyNameAsOfDate || overview.nameKo}
+                  </span>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                  <span className="text-xs text-slate-500 block font-semibold">상장 거래소 / 일자</span>
+                  <span className="font-bold text-slate-900 text-sm block">
+                    {listingEvent?.exchangeAsOfDate || (overview.market === 'KR' ? '한국거래소' : 'NASDAQ/NYSE')}
+                  </span>
+                  <span className="text-xs text-slate-500 font-mono">
+                    {listingEvent?.firstTradingDate || overview.listingDate || '상장 완료'}
+                  </span>
+                </div>
+              </div>
+
+              {overview.historicalAliases && overview.historicalAliases.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-slate-800 block">당시까지 확인된 사명 변천사</span>
+                  <div className="space-y-2">
+                    {overview.historicalAliases.map((al, idx) => (
+                      <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-2.5">
+                        <span className="text-blue-700 font-bold font-mono text-xs shrink-0">{al.validFrom}</span>
+                        <span className="text-slate-800 text-xs leading-relaxed">{al.historicalName} · {al.contemporaryBusinessKo}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: NEWS */}
+          {activeTab === 'NEWS' && (
+            <div className="space-y-3.5">
+              <div className="flex gap-1.5 overflow-x-auto text-xs font-bold">
+                {[
+                  { key: 'ALL', label: '전체 뉴스' },
+                  { key: '1Y', label: '최근 1년' },
+                  { key: 'FILING', label: '공시만' },
+                  { key: 'PRODUCT', label: '신제품/기술' },
+                ].map(f => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => {
+                      audioManager.playUiSound('filter');
+                      setNewsFilter(f.key as any);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                      newsFilter === f.key
+                        ? 'bg-blue-600 text-white shadow-sm font-bold'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {filteredNews.length === 0 ? (
+                <div className="p-10 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-500 text-xs">
+                  해당 조건의 공개 뉴스가 없습니다.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredNews.map(news => (
+                    <div
+                      key={news.id}
+                      className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 hover:border-slate-300 transition"
+                    >
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
+                        <span className="text-blue-700 font-bold">{news.publishedAt}</span>
+                        <span className="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">{news.sourceName}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-sm leading-snug">{news.titleKo}</h4>
+                      <p className="text-xs text-slate-700 leading-relaxed font-normal">{news.summaryKo}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          audioManager.playUiSound('keyTap');
+                          setSelectedNewsForAnalysis(news);
+                        }}
+                        className="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 cursor-pointer pt-1"
+                      >
+                        <span>중립 해설 및 영향 분석 열기</span>
+                        <ExternalLink size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: LISTING INFO */}
+          {activeTab === 'LISTING' && (
+            <div className="space-y-4">
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-1.5">
+                <span className="text-xs text-amber-800 font-bold uppercase block">공식 상장 개요</span>
+                <p className="text-sm text-slate-900 leading-relaxed font-semibold">
+                  {listingEvent?.businessSummaryAsOfDate || overview.contemporaryBusiness}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <span className="text-xs text-slate-500 block font-semibold">첫 거래일</span>
+                  <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block">
+                    {listingEvent?.firstTradingDate || '기록 확인'}
+                  </span>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <span className="text-xs text-slate-500 block font-semibold">첫 정규장 종가</span>
+                  <span className="font-mono font-bold text-blue-700 text-sm mt-0.5 block">
+                    {listingEvent?.firstValidPrice ? formatKRW(listingEvent.firstValidPrice) : '시세 데이터 확인'}
+                  </span>
+                </div>
+
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                  <span className="text-xs text-slate-500 block font-semibold">상장 형태</span>
+                  <span className="font-mono font-bold text-slate-800 text-sm mt-0.5 block">
+                    {listingEvent?.eventType || 'IPO'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed">
+                <strong>📌 매매 기준가격 고지</strong>: 본 시뮬레이션은 공모주 청약이 아니며, 거래소의 첫 번째 정규시장 거래가격을 기준으로 매수 체결됩니다.
+              </div>
+
+              {listingEvent?.officialAnnouncementTitle && (
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-xs text-slate-500 block font-semibold">공식 상장 자료</span>
+                    <span className="font-bold text-slate-900 text-sm">{listingEvent.officialAnnouncementTitle}</span>
+                  </div>
+                  {listingEvent.officialAnnouncementUrl && (
+                    <a
+                      href={listingEvent.officialAnnouncementUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white hover:bg-slate-100 text-blue-600 rounded-lg border border-slate-200 transition"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: FILINGS */}
+          {activeTab === 'FILINGS' && (
+            <div className="space-y-3.5">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                <span className="text-xs font-bold text-slate-900 block">법정 공시 및 보고서 원자료</span>
+                <p className="text-xs text-slate-600">
+                  {currentYear - 1}년 12월 31일 기준으로 공시된 DART / SEC EDGAR 공시 자료입니다.
+                </p>
+              </div>
+
+              {filingsNews.length > 0 ? (
+                <div className="space-y-2.5">
+                  {filingsNews.map(f => (
+                    <div key={f.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                      <div className="flex justify-between text-xs text-slate-500 font-mono">
+                        <span className="text-blue-700 font-bold">{f.publishedAt}</span>
+                        <span>{f.sourceName}</span>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-sm">{f.titleKo}</h4>
+                      <p className="text-xs text-slate-700 leading-relaxed">{f.summaryKo}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-10 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-500 text-xs">
+                  당시 기준 공개된 세부 법정 공시가 없습니다.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: PRICES */}
+          {activeTab === 'PRICES' && (
+            <div className="space-y-3.5">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+                <span className="text-xs font-bold text-slate-900 block">과거 주가 및 위험 지표 ({currentYear - 1}년 말 기준)</span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <span className="text-xs text-slate-500 block font-semibold">직전 1년 수익률</span>
+                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
+                      {stats.last1YrReturn !== null ? formatPercent(stats.last1YrReturn) : '상장 초기'}
+                    </span>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <span className="text-xs text-slate-500 block font-semibold">3년 CAGR</span>
+                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
+                      {stats.past3YrCAGR !== null ? formatPercent(stats.past3YrCAGR) : '3년 자료 부족'}
+                    </span>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <span className="text-xs text-slate-500 block font-semibold">과거 변동성</span>
+                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
+                      {stats.historicalVolatility !== null ? formatPercent(stats.historicalVolatility) : '이력 미충족'}
+                    </span>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
+                    <span className="text-xs text-slate-500 block font-semibold">최대 낙폭(MDD)</span>
+                    <span className="font-bold text-sm text-rose-600 mt-0.5 block">
+                      {stats.historicalMDD !== null ? formatPercent(stats.historicalMDD) : '이력 미충족'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: ASSET ALLOCATION (Numeric Keypad Style) */}
+          {activeTab === 'ALLOCATION' && (
+            <div className="space-y-4">
+              <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-200 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs font-bold text-slate-600 block">목표 비중 설정</span>
+                    <span className="text-xs text-slate-500">
+                      설정 가능 최대: <strong className="text-blue-700 font-bold">{Math.round(maxAllowedWeight * 100)}%</strong> (다른 종목 합계: {Math.round(otherStocksSum * 100)}%)
+                    </span>
+                  </div>
+                  <span className="font-mono text-xl font-bold text-blue-700">
+                    {Math.round(targetSliderVal * 100)}% ({formatKRW(totalPortfolioValue * targetSliderVal)})
+                  </span>
+                </div>
+
+                {/* Range Slider */}
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.max(0.01, maxAllowedWeight)}
+                  step={0.01}
+                  value={targetSliderVal}
+                  onChange={e => handleApplyWeight(parseFloat(e.target.value))}
+                  onMouseUp={() => audioManager.playUiSound('keyTap')}
+                  onTouchEnd={() => audioManager.playUiSound('keyTap')}
+                  className="w-full cursor-pointer h-2 bg-slate-200 rounded-lg accent-blue-600"
+                />
+
+                {/* Keypad-Style Step Buttons (.allocation-key) */}
+                <div className="space-y-1.5">
+                  <span className="text-xs font-bold text-slate-500 block">숫자 키패드 조작</span>
+                  <div className="grid grid-cols-6 gap-2">
+                    {[-0.10, -0.05, -0.01, +0.01, +0.05, +0.10].map(delta => {
+                      const isPlus = delta > 0;
+                      const isDisabled = isPlus ? targetSliderVal >= maxAllowedWeight - 0.0001 : targetSliderVal <= 0;
+                      return (
+                        <button
+                          key={delta}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleApplyWeight(targetSliderVal + delta, isPlus)}
+                          className={`allocation-key ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+                        >
+                          {delta > 0 ? `+${delta * 100}%` : `${delta * 100}%`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Preset Quick Actions */}
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-blue-100">
+                  <button
+                    type="button"
+                    onClick={() => handleApplyWeight(0, false)}
+                    className="flex-1 py-2.5 bg-white hover:bg-rose-50 text-rose-600 rounded-xl font-bold text-xs transition cursor-pointer border border-rose-200 shadow-sm"
+                  >
+                    배분 취소 (0%)
+                  </button>
+                  <button
+                    type="button"
+                    disabled={maxAllowedWeight < 0.01}
+                    onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
+                    className="flex-1 py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
+                  >
+                    10% 설정
+                  </button>
+                  <button
+                    type="button"
+                    disabled={maxAllowedWeight < 0.01}
+                    onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
+                    className="flex-1 py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
+                  >
+                    20% 설정
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNormalizeAll}
+                    className="w-full py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl font-bold text-xs transition cursor-pointer border border-blue-300 shadow-xs flex items-center justify-center gap-1 mt-1"
+                  >
+                    <span>⚡ 전체 담은 종목 100% 비율 맞춤</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+          {/* TAB 7: INVESTMENT NOTES */}
+          {activeTab === 'NOTES' && (
+            <div className="space-y-3.5">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span>투자 판단 메모 및 가설 (Thesis)</span>
+                  {isNoteSaved && (
+                    <span className="text-emerald-600 text-xs font-bold flex items-center gap-1">
+                      <CheckCircle2 size={13} />
+                      저장되었습니다!
+                    </span>
+                  )}
+                </label>
+                <textarea
+                  value={noteText}
+                  onChange={e => setNoteText(e.target.value)}
+                  placeholder="당시 뉴스와 기업 정보를 바탕으로 어떤 기회와 위험을 보고 매수/매도를 결정했는지 기록해 보세요."
+                  className="w-full h-44 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 leading-relaxed font-sans resize-none"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveNote}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm transition cursor-pointer shadow-md shadow-blue-600/20"
+              >
+                메모 저장하기
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Neutral News Analysis Modal */}
+      {/* Neutral News Analysis Modal Integration */}
       {selectedNewsForAnalysis && (
         <NeutralNewsAnalysisModal
           newsItem={selectedNewsForAnalysis}
-          onClose={() => setSelectedNewsForAnalysis(null)}
+          onClose={() => {
+            audioManager.playUiSound('modalClose');
+            setSelectedNewsForAnalysis(null);
+          }}
         />
       )}
-    </>
+    </div>
   );
 };

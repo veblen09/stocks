@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_1999_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "1999-10-30",
+    "publishedAt": "1999-10-30",
+    "availableFrom": "1999-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "대우그룹 해체 및 바이코리아 펀드 열풍으로 증시 1,000P 회복",
+    "titleKo": "대우그룹 해체 및 바이코리아 펀드 열풍으로 증시 1,000P 회복",
+    "summaryKo": "대우그룹 12개 계열사 워크아웃 결정 속에서도 IT 벤처 육성책과 초고속인터넷 보급으로 증시가 부활했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1999년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

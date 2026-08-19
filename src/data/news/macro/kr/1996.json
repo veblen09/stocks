@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1996_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "1996-09-15",
+    "publishedAt": "1996-09-15",
+    "availableFrom": "1996-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "한국 OECD 가입과 반도체 가격 급락",
+    "titleKo": "[1996년 한국 거시] 한국 OECD 가입과 반도체 가격 급락",
+    "summaryKo": "1996년 한국 거시경제 지표 및 코스피 지수 결산: 한국이 29번째 OECD 회원국으로 가입했으나, 16M D램 가격이 80% 폭락하며 무역적자가 사상 최대치로 불어났습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1996년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

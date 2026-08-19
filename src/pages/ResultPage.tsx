@@ -4,32 +4,51 @@ import {
   Printer,
   RotateCcw,
   Home,
-  PieChart as PieChartIcon,
   BarChart3,
-  Award,
   X,
   FileText,
   Table as TableIcon,
-  Layers,
+  Clock,
+  ShieldCheck,
+  BookOpen,
+  Sparkles,
+  Award,
+  FolderOpen,
 } from 'lucide-react';
 import { GlassCard } from '../components/GlassCard';
 import { useStockGame } from '../store/stockGameStore';
-import { calculateFinalMetrics } from '../engine/metricsEngine';
-import { formatKRW, formatPercent, getReturnColor, formatWonNumber } from '../utils/formatMoney';
+import { calculateFinalMetrics, calculateDrawdownPoints } from '../engine/metricsEngine';
+import { formatKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { exportSimulationToCsv } from '../utils/csvExport';
 import { audioManager } from '../utils/audioManager';
+
+// Enhanced Game Features
+import { InvestmentYearbookModal } from '../features/yearbook/InvestmentYearbookModal';
+import { selectYearbookHighlights } from '../features/yearbook/yearbookEngine';
+import { CompanyEncyclopediaModal } from '../features/encyclopedia/CompanyEncyclopediaModal';
+import { AchievementGalleryModal } from '../features/achievements/AchievementGalleryModal';
+import { SaveSlotManagerModal } from '../features/saveSlots/SaveSlotManagerModal';
+import { ConfirmDialog } from '../features/notifications/ConfirmDialog';
 
 interface ResultPageProps {
   onNavigate: (page: string) => void;
 }
 
 export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
-  const { state, resetGame, startNewGame } = useStockGame();
+  const { state, resetGame, startNewGame, loadSavedState } = useStockGame();
   const metrics = calculateFinalMetrics(state);
 
   const [activeChartTab, setActiveChartTab] = useState<'wealth' | 'twr' | 'returns' | 'drawdown' | 'allocation'>('wealth');
   const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
   const [showTradeLogsModal, setShowTradeLogsModal] = useState<boolean>(false);
+  const [showCpiAdjusted, setShowCpiAdjusted] = useState<boolean>(state.showRealPurchasingPower ?? true);
+
+  // Modals
+  const [showYearbookModal, setShowYearbookModal] = useState<boolean>(false);
+  const [showEncyclopediaModal, setShowEncyclopediaModal] = useState<boolean>(false);
+  const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
+  const [showSaveSlotModal, setShowSaveSlotModal] = useState<boolean>(false);
+  const [showRestartConfirm, setShowRestartConfirm] = useState<boolean>(false);
 
   const handlePrint = () => {
     window.print();
@@ -41,11 +60,10 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
   };
 
   const handleRestartSameSettings = () => {
-    if (confirm('동일한 투자 조건으로 처음부터 다시 시작하시겠습니까?')) {
-      audioManager.playSound('click');
-      startNewGame(state.settings);
-      onNavigate('game');
-    }
+    audioManager.playSound('click');
+    startNewGame(state.settings);
+    setShowRestartConfirm(false);
+    onNavigate('game');
   };
 
   const handleRestartNewGame = () => {
@@ -54,364 +72,383 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
     onNavigate('setup');
   };
 
+  // Verified Drawdown Points across all 45 years
+  const drawdownPoints = metrics.drawdownPoints && metrics.drawdownPoints.length > 0
+    ? metrics.drawdownPoints
+    : calculateDrawdownPoints(state.history, state.settings.startYear);
+
   return (
-    <div className="space-y-6 animate-fade-in-up pb-16">
+    <div className="space-y-6 animate-fade-in-up pb-24">
       {/* Top Banner & Title */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 no-print">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/80 no-print">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-              최종 투자 성과 분석 보고서
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-black uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+              최종 투자 성과 & 역사적 생존 보고서
             </span>
-            <span className="text-xs text-slate-400 font-bold">
-              {state.settings.startYear}년 말 ~ {state.settings.endYear}년 말 ({state.history.length}개년 운용)
+            <span className="text-xs text-slate-500 font-bold">
+              {state.settings.startYear}년 말 ~ {state.settings.endYear}년 말 ({state.history.length}개년 완주)
             </span>
+            {state.playMode === 'REAL' ? (
+              <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                🔒 실전 모드 완주
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                🟢 연습 모드 ({state.retryCount || 0}회 재실험)
+              </span>
+            )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1 font-display">
-            {state.settings.nickname} 님의 45년 주식투자 결과 보고서
+            {state.settings.nickname} 님의 45년 투자 대장정 결산
           </h1>
         </div>
 
-        {/* Top Actions */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Global Action Toolbar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* CPI Toggle */}
           <button
+            type="button"
+            onClick={() => setShowCpiAdjusted(!showCpiAdjusted)}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
+              showCpiAdjusted
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+          >
+            <span>물가반영(CPI): {showCpiAdjusted ? 'ON' : 'OFF'}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleExportCsv}
-            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-extrabold border border-slate-200 shadow-sm transition flex items-center gap-1.5 text-xs cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
-            <Download size={15} /> CSV 내보내기
+            <Download size={15} />
+            <span>CSV 내보내기</span>
           </button>
+
           <button
+            type="button"
             onClick={handlePrint}
-            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-extrabold border border-slate-200 shadow-sm transition flex items-center gap-1.5 text-xs cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
-            <Printer size={15} /> 보고서 인쇄
+            <Printer size={15} />
+            <span>보고서 인쇄</span>
           </button>
+
           <button
-            onClick={handleRestartSameSettings}
-            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-md transition flex items-center gap-1.5 text-xs cursor-pointer"
+            type="button"
+            onClick={() => setShowRestartConfirm(true)}
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-sm"
           >
-            <RotateCcw size={15} /> 동일 조건 재도전
+            <RotateCcw size={15} />
+            <span>동일 조건 재도전</span>
           </button>
+
           <button
+            type="button"
             onClick={handleRestartNewGame}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold shadow-md transition flex items-center gap-1.5 text-xs cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
           >
-            <Home size={15} /> 새로운 게임
+            <Home size={15} />
+            <span>홈으로</span>
           </button>
         </div>
       </div>
 
-      {/* Persona Hero Card */}
-      <GlassCard className="p-6 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-2xl relative overflow-hidden" variant="strong">
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-blue-200 text-xs font-bold backdrop-blur-sm border border-white/10">
-              <span>{metrics.scoreAndPersona.personaBadge}</span>
-              <span>최종 투자자 성향 유형</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white font-display">
-              {metrics.scoreAndPersona.personaType}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-2xl leading-relaxed">
-              {metrics.scoreAndPersona.personaDescription}
-            </p>
-          </div>
+      {/* Feature Navigation Toolbar on Result Page */}
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white rounded-2xl border border-slate-200 shadow-xs">
+        <span className="text-xs font-bold text-slate-600">추가 상세 기록 및 도감 열람:</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setShowEncyclopediaModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs flex items-center gap-1 cursor-pointer"
+          >
+            <BookOpen size={14} />
+            <span>기업 도감 ({Object.keys(state.companyEncyclopedia || {}).length})</span>
+          </button>
 
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 text-center min-w-[200px] shadow-lg">
-            <span className="text-[11px] text-blue-200 font-bold block">최종 평가 자산</span>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-300 tracking-tight block">
+          <button
+            type="button"
+            onClick={() => setShowYearbookModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs flex items-center gap-1 cursor-pointer"
+          >
+            <Sparkles size={14} className="text-amber-600" />
+            <span>투자 연감</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowAchievementsModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-xs flex items-center gap-1 cursor-pointer"
+          >
+            <Award size={14} />
+            <span>해금 업적 ({state.unlockedAchievementIds?.length || 0})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowSaveSlotModal(true)}
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
+            title="저장 슬롯 관리"
+          >
+            <FolderOpen size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* 1. Core Summary Cards: Separated Principal & Pure PnL */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Final Portfolio Value */}
+        <div className="p-5 bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl shadow-lg flex flex-col justify-between">
+          <span className="text-xs font-bold text-slate-300">최종 총 평가자산</span>
+          <div className="my-2">
+            <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight block">
               {formatKRW(metrics.finalPortfolioValue)}
             </span>
-            <span className="text-[11px] text-slate-300 font-semibold block mt-0.5">
-              원금 대비 {metrics.totalInvestedPrincipal > 0 ? (metrics.finalPortfolioValue / metrics.totalInvestedPrincipal).toFixed(1) : 0}배 성장
+            {showCpiAdjusted && (
+              <span className="text-xs text-indigo-200 font-semibold block mt-0.5">
+                2025년 물가기준: {formatKRW(metrics.cpiAdjustedFinalValueKRW || metrics.finalPortfolioValue)}
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-slate-400 font-medium">
+            초기자금 {formatKRW(state.settings.initialCashKRW)} + 매년 적립
+          </span>
+        </div>
+
+        {/* Pure Investment PnL */}
+        <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span className="text-xs font-bold text-slate-500">순수 투자손익 (납입원금 제외)</span>
+          <div className="my-2">
+            <span className={`text-2xl sm:text-3xl font-black font-mono tracking-tight block ${getReturnColor(metrics.simpleProfitRate)}`}>
+              {metrics.totalNetProfitKRW >= 0 ? '+' : ''}{formatKRW(metrics.totalNetProfitKRW)}
             </span>
+            <span className={`text-xs font-bold block mt-0.5 ${getReturnColor(metrics.simpleProfitRate)}`}>
+              원금 대비 {metrics.simpleProfitRate >= 0 ? '+' : ''}{formatPercent(metrics.simpleProfitRate)}
+            </span>
+          </div>
+          <span className="text-xs text-slate-400 font-medium">
+            총 투입원금 {formatKRW(metrics.totalInvestedPrincipal)}
+          </span>
+        </div>
+
+        {/* TWR CAGR & Volatility */}
+        <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span className="text-xs font-bold text-slate-500">연평균 복리수익률 (TWR CAGR)</span>
+          <div className="my-2">
+            <span className={`text-2xl sm:text-3xl font-black font-mono tracking-tight block ${getReturnColor(metrics.twrCAGR)}`}>
+              {formatPercent(metrics.twrCAGR)}
+            </span>
+            <span className="text-xs text-slate-500 font-medium block mt-0.5">
+              누적 TWR: {formatPercent(metrics.twr)}
+            </span>
+          </div>
+          <span className="text-xs text-slate-400 font-medium">
+            연간 변동성: {formatPercent(metrics.annualVolatility)}
+          </span>
+        </div>
+
+        {/* Max Drawdown (MDD) & Underwater */}
+        <div className="p-5 bg-rose-50/60 rounded-3xl border border-rose-200 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-rose-800">역대 최대낙폭 (MDD)</span>
+            <span className="text-[10px] font-extrabold bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">
+              순수 TWR 기준
+            </span>
+          </div>
+          <div className="my-2">
+            <span className="text-2xl sm:text-3xl font-black text-rose-700 font-mono tracking-tight block">
+              -{formatPercent(metrics.maxDrawdownMDD)}
+            </span>
+            <span className="text-xs text-rose-600 font-medium block mt-0.5">
+              고점 회복 최장 소요: {metrics.recoveryMetrics?.underwaterDurationYears || 0}년
+            </span>
+          </div>
+          <span className="text-xs text-rose-800 font-medium">
+            역대 최고자산: {formatKRW(metrics.allTimePeakPortfolioValueKRW || metrics.finalPortfolioValue)}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. Recovery & Underwater Metrics Section */}
+      <GlassCard className="p-5 space-y-4 bg-white border-slate-200" variant="default">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <Clock size={18} className="text-indigo-600" />
+            <h3 className="font-extrabold text-sm text-slate-900">
+              장기투자 회복력 & 수중 기간(Underwater Duration) 분석
+            </h3>
+          </div>
+          <span className="text-[11px] text-slate-400 font-medium">위기 극복 소요 시간 정밀 집계</span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs font-mono">
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+            <span className="text-slate-500 font-sans block font-semibold text-[11px]">역대 최대낙폭(MDD)</span>
+            <span className="text-base font-black text-rose-600 mt-1 block">-{formatPercent(metrics.recoveryMetrics?.maxDrawdown || metrics.maxDrawdownMDD)}</span>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+            <span className="text-slate-500 font-sans block font-semibold text-[11px]">직전 최고점 연도</span>
+            <span className="text-base font-black text-slate-800 mt-1 block">{metrics.recoveryMetrics?.drawdownStartYear || state.settings.startYear}년</span>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+            <span className="text-slate-500 font-sans block font-semibold text-[11px]">최대 저점 연도</span>
+            <span className="text-base font-black text-rose-700 mt-1 block">{metrics.recoveryMetrics?.troughYear || state.settings.startYear}년</span>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+            <span className="text-slate-500 font-sans block font-semibold text-[11px]">원금 회복 연도</span>
+            <span className="text-base font-black text-emerald-700 mt-1 block">
+              {metrics.recoveryMetrics?.recoveryYear ? `${metrics.recoveryMetrics.recoveryYear}년` : '회복 진행 중'}
+            </span>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 col-span-2 sm:col-span-1">
+            <span className="text-slate-500 font-sans block font-semibold text-[11px]">최장 수중 기간</span>
+            <span className="text-base font-black text-indigo-700 mt-1 block">{metrics.recoveryMetrics?.underwaterDurationYears || 0}년</span>
           </div>
         </div>
       </GlassCard>
 
-      {/* Core Quantitative KPI Metrics Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">총 납입 원금</span>
-          <span className="text-lg font-black text-slate-900 block">{formatKRW(metrics.totalInvestedPrincipal)}</span>
-          <span className="text-[10px] text-slate-400 font-semibold">초기금+매년적립</span>
+      {/* 3. Benchmark Alpha & Comparison Table */}
+      <GlassCard className="p-5 space-y-4" variant="default">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <BarChart3 size={18} className="text-blue-600" />
+            <h3 className="font-extrabold text-slate-800 text-sm">3대 대표 시장 지수와의 정밀 비교</h3>
+          </div>
+          <span className="text-[11px] text-slate-400 font-bold">동일 현금흐름 기준</span>
         </div>
 
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">누적 순손익</span>
-          <span className={`text-lg font-black block ${getReturnColor(metrics.totalNetProfitKRW)}`}>
-            {metrics.totalNetProfitKRW > 0 ? '+' : ''}{formatKRW(metrics.totalNetProfitKRW)}
-          </span>
-          <span className={`text-[10px] font-bold ${getReturnColor(metrics.simpleProfitRate)}`}>
-            수익률 {formatPercent(metrics.simpleProfitRate)}
-          </span>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-500 font-bold">
+                <th className="pb-2.5">전략 / 지수</th>
+                <th className="pb-2.5 text-right font-mono">최종 자산</th>
+                <th className="pb-2.5 text-right font-mono">연평균 복리(CAGR)</th>
+                <th className="pb-2.5 text-right font-mono">최대낙폭(MDD)</th>
+                <th className="pb-2.5 text-right font-mono">초과 성과(Alpha)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 font-semibold text-slate-700 font-mono">
+              <tr className="bg-blue-50/70 font-black text-blue-900">
+                <td className="py-3 font-sans">👑 나의 포트폴리오</td>
+                <td className="py-3 text-right text-blue-700 font-bold">{formatKRW(metrics.finalPortfolioValue)}</td>
+                <td className="py-3 text-right font-bold">{formatPercent(metrics.twrCAGR)}</td>
+                <td className="py-3 text-right text-rose-600 font-bold">-{formatPercent(metrics.maxDrawdownMDD)}</td>
+                <td className="py-3 text-right text-blue-600 font-bold">-</td>
+              </tr>
+              <tr>
+                <td className="py-2.5 font-sans">🇰🇷 코스피 지수 (KOSPI)</td>
+                <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.kospiFinalValue)}</td>
+                <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.kospiTwrCAGR)}</td>
+                <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.kospiMDD)}</td>
+                <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}`}>
+                  {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2.5 font-sans">🇺🇸 S&P 500 (원화 환산)</td>
+                <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.sp500FinalValue)}</td>
+                <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.sp500TwrCAGR)}</td>
+                <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.sp500MDD)}</td>
+                <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}`}>
+                  {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2.5 font-sans">⚖️ 50:50 한·미 혼합 리밸런싱</td>
+                <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.blendFinalValue)}</td>
+                <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.blendTwrCAGR)}</td>
+                <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.blendMDD)}</td>
+                <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}`}>
+                  {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </GlassCard>
 
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">시간가중수익률 (TWR)</span>
-          <span className={`text-lg font-black block ${getReturnColor(metrics.twr)}`}>
-            {formatPercent(metrics.twr)}
-          </span>
-          <span className="text-[10px] text-slate-400 font-semibold">순수 전략 누적</span>
-        </div>
-
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">연평균 복리 (CAGR)</span>
-          <span className={`text-lg font-black block ${getReturnColor(metrics.twrCAGR)}`}>
-            {formatPercent(metrics.twrCAGR)}
-          </span>
-          <span className="text-[10px] text-slate-400 font-semibold">연간 환산 복리</span>
-        </div>
-
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">금액가중수익률 (IRR)</span>
-          <span className={`text-lg font-black block ${getReturnColor(metrics.mwrIRR)}`}>
-            {formatPercent(metrics.mwrIRR)}
-          </span>
-          <span className="text-[10px] text-slate-400 font-semibold">적립식 체감 수익률</span>
-        </div>
-
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/70 shadow-sm space-y-1">
-          <span className="text-[11px] font-extrabold text-slate-500 block">최대낙폭 (MDD)</span>
-          <span className="text-lg font-black text-rose-600 block">
-            -{formatPercent(metrics.maxDrawdownMDD)}
-          </span>
-          <span className="text-[10px] text-slate-400 font-semibold">고점 대비 최대하락</span>
-        </div>
-      </div>
-
-      {/* Benchmark Alpha & Score Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* 3 Benchmarks Comparison Table (7 Cols) */}
-        <div className="lg:col-span-7">
-          <GlassCard className="p-5 space-y-4" variant="default">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <BarChart3 size={18} className="text-blue-600" />
-                <h3 className="font-extrabold text-slate-800 text-sm">3대 대표 시장 지수와의 정밀 비교</h3>
-              </div>
-              <span className="text-[10px] text-slate-400 font-bold">동일 현금흐름 기준</span>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200/60 text-slate-400 font-bold">
-                    <th className="pb-2">전략 / 지수</th>
-                    <th className="pb-2 text-right">최종 자산</th>
-                    <th className="pb-2 text-right">연평균 복리(CAGR)</th>
-                    <th className="pb-2 text-right">최대낙폭(MDD)</th>
-                    <th className="pb-2 text-right">초과 성과(Alpha)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
-                  <tr className="bg-blue-50/50 font-black text-blue-900">
-                    <td className="py-2.5">👑 나의 포트폴리오</td>
-                    <td className="py-2.5 text-right text-blue-700">{formatKRW(metrics.finalPortfolioValue)}</td>
-                    <td className="py-2.5 text-right">{formatPercent(metrics.twrCAGR)}</td>
-                    <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.maxDrawdownMDD)}</td>
-                    <td className="py-2.5 text-right text-blue-600">-</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5">🇰🇷 코스피 지수 (KOSPI)</td>
-                    <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.kospiFinalValue)}</td>
-                    <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.kospiTwrCAGR)}</td>
-                    <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.kospiMDD)}</td>
-                    <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}`}>
-                      {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5">🇺🇸 S&P 500 (원화 환산)</td>
-                    <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.sp500FinalValue)}</td>
-                    <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.sp500TwrCAGR)}</td>
-                    <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.sp500MDD)}</td>
-                    <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}`}>
-                      {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5">⚖️ 50:50 한·미 혼합 리밸런싱</td>
-                    <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.blendFinalValue)}</td>
-                    <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.blendTwrCAGR)}</td>
-                    <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.blendMDD)}</td>
-                    <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}`}>
-                      {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className="text-[10px] text-slate-400 bg-slate-50 p-2.5 rounded-xl border border-slate-100 font-medium">
-              💡 모든 벤치마크는 사용자 포트폴리오와 100% 동일한 초기 투자금({formatKRW(state.settings.initialCashKRW)})과 매년 연초 추가 납입금({formatKRW(state.settings.annualContributionKRW)}), 동일 거래비용({state.settings.feeRate * 100}%) 및 환율을 적용하여 산출된 가상 패시브 포트폴리오입니다.
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* 5-Dimensional Quant Score Card (5 Cols) */}
-        <div className="lg:col-span-5">
-          <GlassCard className="p-5 space-y-4" variant="default">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <Award size={18} className="text-amber-500" />
-                <h3 className="font-extrabold text-slate-800 text-sm">5대 장기투자 역량 점수</h3>
-              </div>
-              <span className="text-xs font-black text-amber-600">
-                종합 {metrics.scoreAndPersona.overallAlphaScore}점
-              </span>
-            </div>
-
-            <div className="space-y-3 text-xs font-bold">
-              <div>
-                <div className="flex justify-between text-slate-700 mb-1">
-                  <span>분산투자 점수</span>
-                  <span className="text-blue-600">{metrics.scoreAndPersona.diversificationScore}점</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${metrics.scoreAndPersona.diversificationScore}%` }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-slate-700 mb-1">
-                  <span>장기 규칙 준수 점수</span>
-                  <span className="text-indigo-600">{metrics.scoreAndPersona.disciplineScore}점</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-600 rounded-full transition-all" style={{ width: `${metrics.scoreAndPersona.disciplineScore}%` }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-slate-700 mb-1">
-                  <span>하락장 방어력 점수</span>
-                  <span className="text-emerald-600">{metrics.scoreAndPersona.crisisResilienceScore}점</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-600 rounded-full transition-all" style={{ width: `${metrics.scoreAndPersona.crisisResilienceScore}%` }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-slate-700 mb-1">
-                  <span>거래비용 효율 점수</span>
-                  <span className="text-amber-600">{metrics.scoreAndPersona.costEfficiencyScore}점</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-600 rounded-full transition-all" style={{ width: `${metrics.scoreAndPersona.costEfficiencyScore}%` }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-slate-700 mb-1">
-                  <span>시장 대비 초과수익(Alpha) 점수</span>
-                  <span className="text-rose-600">{metrics.scoreAndPersona.overallAlphaScore}점</span>
-                </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-rose-600 rounded-full transition-all" style={{ width: `${metrics.scoreAndPersona.overallAlphaScore}%` }} />
-                </div>
-              </div>
-            </div>
-          </GlassCard>
-        </div>
-      </div>
-
-      {/* Interactive Charts Hub (8 Visuals) */}
+      {/* 4. Interactive Charts Hub */}
       <GlassCard className="p-5 space-y-4" variant="default">
         {/* Chart Nav Tabs */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-          <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
-            <button
-              onClick={() => setActiveChartTab('wealth')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                activeChartTab === 'wealth' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              1. 총 자산 가치 비교
-            </button>
-            <button
-              onClick={() => setActiveChartTab('twr')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                activeChartTab === 'twr' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              2. 100 기준 TWR 복리 성장
-            </button>
-            <button
-              onClick={() => setActiveChartTab('returns')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                activeChartTab === 'returns' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              3. 연도별 수익률 추이
-            </button>
-            <button
-              onClick={() => setActiveChartTab('drawdown')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                activeChartTab === 'drawdown' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              4. 낙폭 (MDD) 곡선
-            </button>
-            <button
-              onClick={() => setActiveChartTab('allocation')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
-                activeChartTab === 'allocation' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              5. 한·미 자산 배분 & 업종
-            </button>
+          <div className="flex bg-slate-100 p-1 rounded-xl gap-1 flex-wrap">
+            {(['wealth', 'twr', 'returns', 'drawdown', 'allocation'] as const).map(tab => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => { audioManager.playUiSound('tab'); setActiveChartTab(tab); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-black transition cursor-pointer ${
+                  activeChartTab === tab ? 'bg-white text-blue-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {tab === 'wealth' ? '1. 자산 가치 & 원금' : tab === 'twr' ? '2. TWR 복리 지수' : tab === 'returns' ? '3. 연도별 수익률' : tab === 'drawdown' ? '4. 낙폭 (MDD) 곡선' : '5. 자산 배분'}
+              </button>
+            ))}
           </div>
 
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => setShowHistoryModal(true)}
               className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 cursor-pointer"
             >
               <TableIcon size={14} /> 연도별 상세 표
             </button>
             <button
+              type="button"
               onClick={() => setShowTradeLogsModal(true)}
               className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 cursor-pointer"
             >
-              <FileText size={14} /> 거래내역 로그 ({state.tradeLogs.length})
+              <FileText size={14} /> 거래 내역 ({state.tradeLogs.length}건)
             </button>
           </div>
         </div>
 
-        {/* Visual Content Display */}
-        <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200/60 min-h-[320px] flex flex-col justify-center">
+        {/* Chart Tab Contents */}
+        <div className="pt-2">
+          {/* Wealth Growth Chart */}
           {activeChartTab === 'wealth' && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                <span>실제 입금 현금흐름을 반영한 최종 자산가치 성장 비교</span>
-                <div className="flex gap-4">
-                  <span className="flex items-center gap-1 text-blue-600">● 내 포트폴리오</span>
-                  <span className="flex items-center gap-1 text-indigo-600">● 코스피</span>
-                  <span className="flex items-center gap-1 text-emerald-600">● S&P 500(원화)</span>
+              <div className="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
+                <span>포트폴리오 평가액 성장 vs 누적 투입원금</span>
+                <div className="flex items-center gap-3 text-[11px]">
+                  <span className="flex items-center gap-1 text-blue-700 font-bold">
+                    <span className="w-3 h-3 bg-blue-600 rounded-sm"></span> 포트폴리오
+                  </span>
+                  <span className="flex items-center gap-1 text-slate-500 font-bold">
+                    <span className="w-3 h-1 bg-slate-400 rounded-full"></span> 누적 원금
+                  </span>
                 </div>
               </div>
-
-              {/* Bar Chart Representation of History */}
-              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2">
+              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-b border-slate-300">
                 {state.history.map(h => {
                   const maxVal = Math.max(...state.history.map(item => item.endTotalAssetsKRW), 1);
-                  const heightPct = Math.max(5, (h.endTotalAssetsKRW / maxVal) * 100);
+                  const heightPercent = Math.min(100, Math.max(8, (h.endTotalAssetsKRW / maxVal) * 100));
+                  const isFiveYearTick = h.year % 5 === 0;
 
                   return (
-                    <div key={h.year} className="flex-1 min-w-[20px] flex flex-col items-center gap-1 group relative">
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg z-20 whitespace-nowrap pointer-events-none shadow-lg">
-                        <span className="font-bold">{h.year}년말: {formatKRW(h.endTotalAssetsKRW)}</span>
+                    <div key={h.year} className="flex-1 min-w-[22px] flex flex-col items-center gap-1 group relative">
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl z-20 whitespace-nowrap font-mono pointer-events-none">
+                        <span className="font-bold text-blue-300">{h.year}년말</span>
+                        <span>자산: {formatKRW(h.endTotalAssetsKRW)}</span>
                         <span>수익률: {formatPercent(h.annualReturn)}</span>
-                        <span>코스피: {formatPercent(h.benchmarkReturns.kospi)}</span>
                       </div>
                       <div
-                        className="w-full bg-gradient-to-t from-blue-700 to-blue-500 rounded-t-md transition-all group-hover:from-blue-600 group-hover:to-blue-400 shadow-sm"
-                        style={{ height: `${heightPct}%` }}
+                        className="w-full bg-blue-600 rounded-t-sm transition-all duration-300 group-hover:bg-blue-500"
+                        style={{ height: `${heightPercent}%` }}
                       />
-                      <span className="text-[9px] text-slate-400 font-mono -rotate-45 sm:rotate-0 mt-1">
-                        {h.year.toString().slice(2)}
+                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
+                        {isFiveYearTick ? `${h.year}` : `'${h.year.toString().slice(2)}`}
                       </span>
                     </div>
                   );
@@ -420,28 +457,28 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* TWR Chart */}
           {activeChartTab === 'twr' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                <span>100으로 시작한 시간가중 순수 전략 복리 성장 지수</span>
-                <span className="text-blue-600 font-black">최종 TWR: {formatPercent(metrics.twr)}</span>
+                <span>시간가중수익률(TWR) 복리 지수 (기준점 100)</span>
+                <span className="text-blue-600 font-mono font-bold">최종 {metrics.twr.toFixed(2)}배</span>
               </div>
-              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2">
+              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-b border-slate-300">
                 {state.history.map(h => {
                   const maxTwr = Math.max(...state.history.map(item => item.twrIndexLevel), 100);
-                  const heightPct = Math.max(5, (h.twrIndexLevel / maxTwr) * 100);
+                  const heightPercent = Math.min(100, Math.max(6, (h.twrIndexLevel / maxTwr) * 100));
+                  const isFiveYearTick = h.year % 5 === 0;
 
                   return (
-                    <div key={h.year} className="flex-1 min-w-[20px] flex flex-col items-center gap-1 group relative">
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg z-20 whitespace-nowrap pointer-events-none shadow-lg">
-                        <span className="font-bold">{h.year}년 TWR 지수: {h.twrIndexLevel.toFixed(1)}</span>
-                        <span>당해 수익률: {formatPercent(h.annualReturn)}</span>
-                      </div>
+                    <div key={h.year} className="flex-1 min-w-[22px] flex flex-col items-center gap-1 group relative">
                       <div
-                        className="w-full bg-gradient-to-t from-indigo-700 to-indigo-500 rounded-t-md transition-all group-hover:from-indigo-600 group-hover:to-indigo-400 shadow-sm"
-                        style={{ height: `${heightPct}%` }}
+                        className="w-full bg-indigo-600 rounded-t-sm group-hover:bg-indigo-500"
+                        style={{ height: `${heightPercent}%` }}
                       />
-                      <span className="text-[9px] text-slate-400 font-mono mt-1">{h.year.toString().slice(2)}</span>
+                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
+                        {isFiveYearTick ? `${h.year}` : `'${h.year.toString().slice(2)}`}
+                      </span>
                     </div>
                   );
                 })}
@@ -449,32 +486,41 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* Returns Chart */}
           {activeChartTab === 'returns' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                <span>연도별 포트폴리오 수익률 막대 그래프</span>
-                <span className="text-slate-500 font-semibold">최고: {metrics.bestYear.year}년 ({formatPercent(metrics.bestYear.returnRate)}) / 최저: {metrics.worstYear.year}년 ({formatPercent(metrics.worstYear.returnRate)})</span>
+                <span>연도별 순수 포트폴리오 수익률</span>
+                <span className="text-slate-500 font-mono">최고 {formatPercent(metrics.bestYear.returnRate)} / 최저 {formatPercent(metrics.worstYear.returnRate)}</span>
               </div>
-              <div className="h-64 flex items-center gap-1.5 overflow-x-auto py-2 px-2 border-b border-t border-slate-200 relative">
+              <div className="h-64 flex items-center gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-b border-slate-300">
                 {state.history.map(h => {
-                  const ret = h.annualReturn;
-                  const absRet = Math.min(1.0, Math.abs(ret));
-                  const heightPct = Math.max(4, absRet * 100);
+                  const isPositive = h.annualReturn >= 0;
+                  const heightPercent = Math.min(50, Math.max(3, Math.abs(h.annualReturn) * 100));
+                  const isFiveYearTick = h.year % 5 === 0;
 
                   return (
-                    <div key={h.year} className="flex-1 min-w-[20px] h-full flex flex-col items-center justify-center group relative">
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg z-20 whitespace-nowrap pointer-events-none shadow-lg">
-                        <span className="font-bold">{h.year}년: {formatPercent(ret)}</span>
-                        <span>코스피: {formatPercent(h.benchmarkReturns.kospi)}</span>
-                        <span>S&P 500: {formatPercent(h.benchmarkReturns.sp500KRW)}</span>
+                    <div key={h.year} className="flex-1 min-w-[22px] flex flex-col items-center justify-center gap-1 group relative h-full">
+                      <div className="w-full h-1/2 flex items-end justify-center">
+                        {isPositive && (
+                          <div
+                            className="w-full bg-emerald-500 rounded-t-xs"
+                            style={{ height: `${heightPercent * 2}%` }}
+                          />
+                        )}
                       </div>
-                      <div
-                        className={`w-full rounded-md shadow-sm transition-all ${
-                          ret >= 0 ? 'bg-rose-500 hover:bg-rose-400 self-end mb-auto' : 'bg-blue-500 hover:bg-blue-400 self-start mt-auto'
-                        }`}
-                        style={{ height: `${heightPct / 2}%` }}
-                      />
-                      <span className="text-[8px] text-slate-400 font-mono absolute bottom-0">{h.year.toString().slice(2)}</span>
+                      <div className="w-full h-px bg-slate-300"></div>
+                      <div className="w-full h-1/2 flex items-start justify-center">
+                        {!isPositive && (
+                          <div
+                            className="w-full bg-rose-500 rounded-b-xs"
+                            style={{ height: `${heightPercent * 2}%` }}
+                          />
+                        )}
+                      </div>
+                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
+                        {isFiveYearTick ? `${h.year}` : `'${h.year.toString().slice(2)}`}
+                      </span>
                     </div>
                   );
                 })}
@@ -482,29 +528,37 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* Drawdown Chart */}
           {activeChartTab === 'drawdown' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                <span>역사적 Drawdown (MDD) 하락폭 곡선</span>
-                <span className="text-rose-600 font-black">최대 낙폭: -{formatPercent(metrics.maxDrawdownMDD)}</span>
+                <span>역사적 고점 대비 실제 낙폭(Drawdown) 추이</span>
+                <span className="text-rose-600 font-mono font-bold">최대낙폭(MDD): -{formatPercent(metrics.maxDrawdownMDD)}</span>
               </div>
-              <div className="h-64 flex items-start gap-1.5 overflow-x-auto pt-2 pb-6 px-2">
-                {state.history.map(h => {
-                  const pastTwr = state.history.filter(item => item.year <= h.year).map(item => item.twrIndexLevel);
-                  const peak = Math.max(100, ...pastTwr);
-                  const dd = (peak - h.twrIndexLevel) / peak;
-                  const heightPct = Math.max(2, dd * 100);
+              <div className="h-64 flex items-start gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-t border-slate-300">
+                {drawdownPoints.map(p => {
+                  const absDd = Math.abs(p.drawdown);
+                  const heightPercent = Math.min(100, Math.max(3, (absDd / 0.6) * 100));
+                  const isFiveYearTick = p.year % 5 === 0;
 
                   return (
-                    <div key={h.year} className="flex-1 min-w-[20px] flex flex-col items-center gap-1 group relative">
-                      <div className="absolute top-full mt-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg z-20 whitespace-nowrap pointer-events-none shadow-lg">
-                        <span className="font-bold">{h.year}년 낙폭: -{(dd * 100).toFixed(1)}%</span>
+                    <div key={p.year} className="flex-1 min-w-[22px] flex flex-col items-center gap-1 group relative">
+                      {/* Interactive Tooltip */}
+                      <div className="absolute top-full mt-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl z-20 whitespace-nowrap font-mono pointer-events-none">
+                        <span className="font-bold text-rose-300">{p.year}년</span>
+                        <span>현재 Drawdown: -{formatPercent(absDd)}</span>
+                        <span>직전 최고점: {p.peakYear}년</span>
+                        <span>수중 지속기간: {p.underwaterYears}년</span>
                       </div>
                       <div
-                        className="w-full bg-gradient-to-b from-rose-500 to-rose-700 rounded-b-md transition-all shadow-sm"
-                        style={{ height: `${heightPct}%` }}
+                        className={`w-full rounded-b-sm transition-all duration-300 ${
+                          absDd >= 0.30 ? 'bg-rose-600' : absDd >= 0.15 ? 'bg-rose-400' : 'bg-amber-400'
+                        }`}
+                        style={{ height: `${heightPercent}%` }}
                       />
-                      <span className="text-[9px] text-slate-400 font-mono">{h.year.toString().slice(2)}</span>
+                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
+                        {isFiveYearTick ? `${p.year}` : `'${p.year.toString().slice(2)}`}
+                      </span>
                     </div>
                   );
                 })}
@@ -512,66 +566,24 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* Allocation */}
           {activeChartTab === 'allocation' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-2">
-              <div className="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm space-y-3">
-                <h4 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
-                  <PieChartIcon size={16} className="text-blue-600" />
-                  최종 국가별 자산 배분 비중
-                </h4>
-                <div className="space-y-2 text-xs font-bold">
-                  <div className="flex justify-between">
-                    <span>🇰🇷 한국 주식 비중</span>
-                    <span className="text-blue-600">{formatPercent(metrics.finalAllocation.krWeight)}</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 rounded-full" style={{ width: `${metrics.finalAllocation.krWeight * 100}%` }} />
-                  </div>
-
-                  <div className="flex justify-between pt-1">
-                    <span>🇺🇸 미국 주식 비중</span>
-                    <span className="text-indigo-600">{formatPercent(metrics.finalAllocation.usWeight)}</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${metrics.finalAllocation.usWeight * 100}%` }} />
-                  </div>
-
-                  <div className="flex justify-between pt-1">
-                    <span>💵 매매 대기 현금 비중</span>
-                    <span className="text-emerald-600">{formatPercent(metrics.finalAllocation.cashWeight)}</span>
-                  </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${metrics.finalAllocation.cashWeight * 100}%` }} />
-                  </div>
-                </div>
+            <div className="p-4 space-y-4">
+              <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+                <span>최종 시점의 국가 및 자산 배분 비중</span>
               </div>
-
-              <div className="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm space-y-3">
-                <h4 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
-                  <Layers size={16} className="text-indigo-600" />
-                  거래비용 및 환율 효과 결산
-                </h4>
-                <div className="space-y-2 text-xs font-semibold">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">총 매매 거래 횟수</span>
-                    <span className="font-extrabold text-slate-800">{metrics.totalTradesCount}회</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">누적 지급 거래비용</span>
-                    <span className="font-extrabold text-rose-600">-{formatWonNumber(metrics.totalTradingFeesKRW)}원</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">환율 변동 누적 기여손익</span>
-                    <span className={`font-extrabold ${metrics.totalFxGainLossKRW >= 0 ? 'text-rose-600' : 'text-blue-600'}`}>
-                      {metrics.totalFxGainLossKRW >= 0 ? '+' : ''}{formatWonNumber(metrics.totalFxGainLossKRW)}원
-                    </span>
-                  </div>
-                  <div className="flex justify-between pt-1 border-t border-slate-100">
-                    <span className="text-slate-500">최대 비중 단일 종목</span>
-                    <span className="font-black text-slate-800">
-                      {metrics.finalAllocation.maxStockWeight.nameKo} ({formatPercent(metrics.finalAllocation.maxStockWeight.weight)})
-                    </span>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+                <div className="p-3 bg-white rounded-xl border border-slate-200">
+                  <span className="text-slate-500 font-sans block font-semibold">🇰🇷 한국 주식 비중</span>
+                  <span className="text-lg font-bold text-blue-700">{formatPercent(metrics.finalAllocation.krWeight)}</span>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200">
+                  <span className="text-slate-500 font-sans block font-semibold">🇺🇸 미국 주식 비중</span>
+                  <span className="text-lg font-bold text-purple-700">{formatPercent(metrics.finalAllocation.usWeight)}</span>
+                </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200">
+                  <span className="text-slate-500 font-sans block font-semibold">💵 보유 현금 비중</span>
+                  <span className="text-lg font-bold text-emerald-700">{formatPercent(metrics.finalAllocation.cashWeight)}</span>
                 </div>
               </div>
             </div>
@@ -579,129 +591,253 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
         </div>
       </GlassCard>
 
-      {/* Historical Annual Table Modal */}
-      {showHistoryModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-4xl p-6 relative animate-fade-in-up border-white/80 max-h-[90vh] flex flex-col" variant="strong">
-            <button
-              onClick={() => setShowHistoryModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
-            >
-              <X size={20} />
-            </button>
-
-            <h3 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
-              <TableIcon size={20} className="text-blue-600" />
-              45년 연도별 전체 운용 상세 표
+      {/* 5. Crisis Timeline ("나의 위기 연대기") */}
+      <GlassCard className="p-5 space-y-4 bg-white border-slate-200" variant="default">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-rose-600" />
+            <h3 className="font-extrabold text-sm text-slate-900">
+              나의 역사적 위기 대응 연대기 (Crisis Timeline)
             </h3>
+          </div>
+          <span className="text-[11px] text-slate-400 font-medium">위기 상황 의사결정 기록</span>
+        </div>
 
-            <div className="overflow-auto flex-grow text-xs pr-1">
-              <table className="w-full text-left">
-                <thead className="sticky top-0 bg-white border-b border-slate-200 shadow-sm font-black text-slate-500">
-                  <tr>
-                    <th className="py-2.5 px-2">연도</th>
-                    <th className="py-2.5 px-2 text-right">기초자산</th>
-                    <th className="py-2.5 px-2 text-right">추가납입</th>
-                    <th className="py-2.5 px-2 text-right">기말자산</th>
-                    <th className="py-2.5 px-2 text-right">수익률</th>
-                    <th className="py-2.5 px-2 text-right">TWR지수</th>
-                    <th className="py-2.5 px-2 text-right">코스피</th>
-                    <th className="py-2.5 px-2 text-right">S&P500(원화)</th>
-                    <th className="py-2.5 px-2 text-right">USD/KRW</th>
+        {metrics.crisisDecisionHistory && metrics.crisisDecisionHistory.length > 0 ? (
+          <div className="space-y-3">
+            {metrics.crisisDecisionHistory.map((d, idx) => (
+              <div key={idx} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-slate-900 text-sm">{d.year}년 {d.month}월</span>
+                    <span className="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                      {d.titleKo}
+                    </span>
+                  </div>
+                  {d.rationale && (
+                    <p className="text-[11px] text-slate-600 mt-1 font-medium italic">
+                      "{d.rationale}"
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3 font-mono">
+                  <div className="text-right">
+                    <span className="text-slate-400 font-sans block text-[10px]">당시 대응 선택</span>
+                    <span className="font-extrabold text-blue-700">
+                      {d.chosenAction === 'HOLD' ? '원칙 유지' : d.chosenAction === 'REBALANCE' ? '목표비중 리밸런싱' : d.chosenAction === 'RAISE_CASH' ? `현금 ${Math.round((d.targetCashWeight || 0.3) * 100)}% 확대` : '직접 배분'}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-slate-400 font-sans block text-[10px]">거래비용</span>
+                    <span className="font-bold text-slate-700">{formatKRW(d.tradingFeePaidKRW)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 text-center text-xs text-slate-500 bg-slate-50 rounded-2xl border border-slate-200">
+            운용 기간 동안 발생한 위기 대응 기록이 없습니다.
+          </div>
+        )}
+      </GlassCard>
+
+      {/* 6. Multi-Axis Quantitative Scoring & Persona */}
+      <GlassCard className="p-6 space-y-6 bg-white border-slate-200" variant="default">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{metrics.scoreAndPersona.personaBadge}</span>
+              <h2 className="text-xl font-black text-slate-900">{metrics.scoreAndPersona.personaType}</h2>
+            </div>
+            <p className="text-xs text-slate-600 mt-1 max-w-2xl font-medium leading-relaxed">
+              {metrics.scoreAndPersona.personaDescription}
+            </p>
+          </div>
+
+          <div className="p-3 bg-blue-50 rounded-2xl border border-blue-200 text-center font-mono">
+            <span className="text-[10px] font-sans font-bold text-blue-700 block">역사 챕터 생존</span>
+            <span className="text-xl font-black text-blue-900">
+              {metrics.chapterSurvivalCount.survived} / {metrics.chapterSurvivalCount.total}
+            </span>
+          </div>
+        </div>
+
+        {/* 5-Axis Radar Breakdown */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+            <span className="text-slate-500 font-bold block text-[11px]">분산 투자 점수</span>
+            <span className="text-xl font-black text-blue-700 mt-1 block font-mono">{metrics.scoreAndPersona.diversificationScore}점</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+            <span className="text-slate-500 font-bold block text-[11px]">원칙 준수(규율)</span>
+            <span className="text-xl font-black text-indigo-700 mt-1 block font-mono">{metrics.scoreAndPersona.disciplineScore}점</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+            <span className="text-slate-500 font-bold block text-[11px]">위기 회복력</span>
+            <span className="text-xl font-black text-rose-600 mt-1 block font-mono">{metrics.scoreAndPersona.crisisResilienceScore}점</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+            <span className="text-slate-500 font-bold block text-[11px]">비용 효율성</span>
+            <span className="text-xl font-black text-emerald-700 mt-1 block font-mono">{metrics.scoreAndPersona.costEfficiencyScore}점</span>
+          </div>
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-center col-span-2 sm:col-span-1">
+            <span className="text-slate-500 font-bold block text-[11px]">종합 알파 지수</span>
+            <span className="text-xl font-black text-purple-700 mt-1 block font-mono">{metrics.scoreAndPersona.overallAlphaScore}점</span>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Restart Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showRestartConfirm}
+        title="동일 조건 재도전 확인"
+        message="현재와 동일한 투자 조건과 초기 설정으로 처음부터 다시 시작하시겠습니까?"
+        confirmText="재도전 시작"
+        cancelText="취소"
+        onConfirm={handleRestartSameSettings}
+        onCancel={() => setShowRestartConfirm(false)}
+      />
+
+      {/* History Modal */}
+      {showHistoryModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200" role="dialog" aria-modal="true">
+          <GlassCard className="w-full max-w-4xl max-h-[85vh] bg-white border-slate-200 p-6 flex flex-col space-y-4 text-slate-800 overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <h3 className="font-bold text-base text-slate-900">45년 연도별 전체 성과 기록표</h3>
+              <button type="button" onClick={() => setShowHistoryModal(false)} className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-bold font-sans">
+                    <th className="pb-2">연도</th>
+                    <th className="pb-2 text-right">기초자산</th>
+                    <th className="pb-2 text-right">연간납입</th>
+                    <th className="pb-2 text-right">기말자산</th>
+                    <th className="pb-2 text-right">연간수익률</th>
+                    <th className="pb-2 text-right">TWR지수</th>
+                    <th className="pb-2 text-right">코스피</th>
+                    <th className="pb-2 text-right">S&P 500</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {state.history.map(h => (
                     <tr key={h.year} className="hover:bg-slate-50">
-                      <td className="py-2 px-2 font-bold">{h.year}년</td>
-                      <td className="py-2 px-2 text-right">{formatWonNumber(h.startTotalAssetsKRW)}원</td>
-                      <td className="py-2 px-2 text-right text-indigo-600">{formatWonNumber(h.annualDepositKRW)}원</td>
-                      <td className="py-2 px-2 text-right font-black text-slate-900">{formatWonNumber(h.endTotalAssetsKRW)}원</td>
-                      <td className={`py-2 px-2 text-right font-black ${getReturnColor(h.annualReturn)}`}>
+                      <td className="py-2 font-bold text-slate-900">{h.year}년</td>
+                      <td className="py-2 text-right">{formatKRW(h.startTotalAssetsKRW)}</td>
+                      <td className="py-2 text-right text-blue-600">+{formatKRW(h.annualDepositKRW)}</td>
+                      <td className="py-2 text-right font-bold text-slate-900">{formatKRW(h.endTotalAssetsKRW)}</td>
+                      <td className={`py-2 text-right font-bold ${getReturnColor(h.annualReturn)}`}>
                         {formatPercent(h.annualReturn)}
                       </td>
-                      <td className="py-2 px-2 text-right">{h.twrIndexLevel.toFixed(1)}</td>
-                      <td className={`py-2 px-2 text-right ${getReturnColor(h.benchmarkReturns.kospi)}`}>
-                        {formatPercent(h.benchmarkReturns.kospi)}
-                      </td>
-                      <td className={`py-2 px-2 text-right ${getReturnColor(h.benchmarkReturns.sp500KRW)}`}>
-                        {formatPercent(h.benchmarkReturns.sp500KRW)}
-                      </td>
-                      <td className="py-2 px-2 text-right">{h.fxRate.toFixed(1)}원</td>
+                      <td className="py-2 text-right">{h.twrIndexLevel.toFixed(1)}pt</td>
+                      <td className="py-2 text-right">{formatPercent(h.benchmarkReturns.kospi)}</td>
+                      <td className="py-2 text-right">{formatPercent(h.benchmarkReturns.sp500KRW)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <button
-              onClick={() => setShowHistoryModal(false)}
-              className="w-full mt-4 py-3 bg-blue-600 text-white font-black rounded-xl text-xs"
-            >
-              닫기
-            </button>
+            <div className="pt-2 flex justify-end">
+              <button type="button" onClick={() => setShowHistoryModal(false)} className="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">
+                닫기
+              </button>
+            </div>
           </GlassCard>
         </div>
       )}
 
       {/* Trade Logs Modal */}
       {showTradeLogsModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-3xl p-6 relative animate-fade-in-up border-white/80 max-h-[85vh] flex flex-col" variant="strong">
-            <button
-              onClick={() => setShowTradeLogsModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
-            >
-              <X size={20} />
-            </button>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200" role="dialog" aria-modal="true">
+          <GlassCard className="w-full max-w-4xl max-h-[85vh] bg-white border-slate-200 p-6 flex flex-col space-y-4 text-slate-800 overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <h3 className="font-bold text-base text-slate-900">전체 매매 거래 내역 ({state.tradeLogs.length}건)</h3>
+              <button type="button" onClick={() => setShowTradeLogsModal(false)} className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700">
+                <X size={18} />
+              </button>
+            </div>
 
-            <h3 className="text-lg font-black text-slate-800 mb-3 flex items-center gap-2">
-              <FileText size={20} className="text-blue-600" />
-              전체 거래 내역 로그 (총 {state.tradeLogs.length}건)
-            </h3>
-
-            <div className="overflow-auto flex-grow text-xs pr-1">
-              <table className="w-full text-left">
-                <thead className="sticky top-0 bg-white border-b border-slate-200 shadow-sm font-black text-slate-500">
-                  <tr>
-                    <th className="py-2 px-2">연도</th>
-                    <th className="py-2 px-2">종목명</th>
-                    <th className="py-2 px-2">구분</th>
-                    <th className="py-2 px-2 text-right">수량</th>
-                    <th className="py-2 px-2 text-right">거래총액</th>
-                    <th className="py-2 px-2 text-right">수수료</th>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500 font-bold font-sans">
+                    <th className="pb-2">연도</th>
+                    <th className="pb-2">종목명</th>
+                    <th className="pb-2">구분</th>
+                    <th className="pb-2 text-right">수량</th>
+                    <th className="pb-2 text-right">체결금액</th>
+                    <th className="pb-2 text-right">수수료</th>
+                    <th className="pb-2">근거/가설</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
-                  {state.tradeLogs.map((l, idx) => (
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  {state.tradeLogs.map((t, idx) => (
                     <tr key={idx} className="hover:bg-slate-50">
-                      <td className="py-2 px-2 font-bold">{l.year}년</td>
-                      <td className="py-2 px-2 font-black text-slate-800">{l.stockNameKo}</td>
-                      <td className="py-2 px-2">
-                        <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                          l.action === 'BUY' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-800'
+                      <td className="py-2 text-slate-500">{t.year}년</td>
+                      <td className="py-2 font-bold text-slate-900">{t.stockNameKo}</td>
+                      <td className="py-2">
+                        <span className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold ${
+                          t.action === 'BUY' ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'
                         }`}>
-                          {l.action === 'BUY' ? '매수' : '매도'}
+                          {t.action === 'BUY' ? '매수' : '매도'}
                         </span>
                       </td>
-                      <td className="py-2 px-2 text-right">{l.shares.toFixed(4)}주</td>
-                      <td className="py-2 px-2 text-right font-bold">{formatWonNumber(l.totalAmountKRW)}원</td>
-                      <td className="py-2 px-2 text-right text-rose-600">{formatWonNumber(l.feeKRW)}원</td>
+                      <td className="py-2 text-right">{t.shares.toFixed(2)}주</td>
+                      <td className="py-2 text-right font-bold">{formatKRW(t.totalAmountKRW)}</td>
+                      <td className="py-2 text-right text-slate-500">{formatKRW(t.feeKRW)}</td>
+                      <td className="py-2 text-slate-500 truncate max-w-[180px]">{t.thesis || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <button
-              onClick={() => setShowTradeLogsModal(false)}
-              className="w-full mt-4 py-3 bg-blue-600 text-white font-black rounded-xl text-xs"
-            >
-              닫기
-            </button>
+            <div className="pt-2 flex justify-end">
+              <button type="button" onClick={() => setShowTradeLogsModal(false)} className="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">
+                닫기
+              </button>
+            </div>
           </GlassCard>
         </div>
       )}
+
+      {/* Encyclopedia Modal */}
+      <CompanyEncyclopediaModal
+        isOpen={showEncyclopediaModal}
+        entries={state.companyEncyclopedia || {}}
+        currentYear={state.settings.endYear}
+        onClose={() => setShowEncyclopediaModal(false)}
+      />
+
+      {/* Investment Yearbook Modal */}
+      <InvestmentYearbookModal
+        isOpen={showYearbookModal}
+        entries={state.yearbookEntries || []}
+        highlights={selectYearbookHighlights(state.yearbookEntries || [], state)}
+        onClose={() => setShowYearbookModal(false)}
+      />
+
+      {/* Achievement Gallery Modal */}
+      <AchievementGalleryModal
+        isOpen={showAchievementsModal}
+        unlockedAchievementIds={state.unlockedAchievementIds || []}
+        onClose={() => setShowAchievementsModal(false)}
+      />
+
+      {/* Save Slot Manager Modal */}
+      <SaveSlotManagerModal
+        isOpen={showSaveSlotModal}
+        currentGameState={state}
+        onLoadGame={loadSavedState}
+        onClose={() => setShowSaveSlotModal(false)}
+      />
     </div>
   );
 };

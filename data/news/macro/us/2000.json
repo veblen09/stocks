@@ -1,0 +1,48 @@
+[
+  {
+    "id": "NEWS_2000_US_01",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국경제",
+      "금융"
+    ],
+    "eventDate": "2000-09-20",
+    "publishedAt": "2000-09-20",
+    "availableFrom": "2000-09-20",
+    "datePrecision": "DAY",
+    "originalTitle": "연준의 연이은 금리 인상(6.5%)으로 자산시장 거품 붕괴",
+    "titleKo": "연준의 연이은 금리 인상(6.5%)으로 자산시장 거품 붕괴",
+    "summaryKo": "시스코, 인텔, 마이크로소프트 등 대형 기술주들이 50~80% 폭락하며 증시가 침체에 빠졌습니다.",
+    "sourceName": "Federal Reserve / BLS",
+    "sourceUrl": "https://www.federalreserve.gov",
+    "sourceType": "REGULATOR",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "미국경제",
+      "연준금리"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "CAPITAL_COST"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2000년 미국 주요 경제 지표 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "CAPITAL_COST"
+      ],
+      "positiveInterpretation": "미국 소비 경제의 탄력성과 기술 혁신.",
+      "negativeInterpretation": "금리 변동성에 따른 차입 비용 증가 위험.",
+      "unknownAtTheTime": "인플레이션 안정화 지속성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

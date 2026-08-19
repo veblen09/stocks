@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2017_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2017-06-30",
+    "publishedAt": "2017-06-30",
+    "availableFrom": "2017-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "반도체 슈퍼사이클과 코스피 2,500 돌파",
+    "titleKo": "[2017년 세계 경제] 반도체 슈퍼사이클과 코스피 2,500 돌파",
+    "summaryKo": "클라우드 데이터센터 증설로 메모리 반도체 슈퍼호황이 오며 삼성전자와 SK하이닉스가 사상 최대 실적을 경신, 코스피가 21.8% 상승해 2,500p를 돌파했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2017년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2007_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2007-09-15",
+    "publishedAt": "2007-09-15",
+    "availableFrom": "2007-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "아이폰 출시와 인사이트 펀드 광풍",
+    "titleKo": "[2007년 한국 거시] 아이폰 출시와 인사이트 펀드 광풍",
+    "summaryKo": "2007년 한국 거시경제 지표 및 코스피 지수 결산: 스티브 잡스가 1월 최초의 아이폰을 발표했습니다. 미래에셋 인사이트 펀드 등 해외 브릭스(BRICs) 투자 광풍 속에 코스피는 사상 처음 2,000p를 돌파했습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2007년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

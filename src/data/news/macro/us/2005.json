@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2005_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "2005-10-20",
+    "publishedAt": "2005-10-20",
+    "availableFrom": "2005-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[2005년 미국 증시] S&P 500 및 경제 지표",
+    "summaryKo": "2005년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 적립식 펀드 붐이 대한민국을 강타하며 매월 수조 원의 개인 자금이 유입되어 코스피가 53.9% 폭등, 16년 만에 사상 최고가를 경신했습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2005년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
+      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
+      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

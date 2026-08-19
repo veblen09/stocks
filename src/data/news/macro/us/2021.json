@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2021_US_GEN",
+    "scope": "US_MACRO",
+    "market": "US",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "미국증시"
+    ],
+    "eventDate": "2021-10-20",
+    "publishedAt": "2021-10-20",
+    "availableFrom": "2021-10-20",
+    "datePrecision": "DAY",
+    "originalTitle": "U.S. Market & Macro Review",
+    "titleKo": "[2021년 미국 증시] S&P 500 및 경제 지표",
+    "summaryKo": "2021년 미국 GDP 및 S&P 500 주요 섹터 실적 동향: 코스피가 사상 최초 3,300p(장중)를 돌파했습니다. 그러나 공급망 병목과 유동성 과잉으로 40년 만의 최악 인플레이션 압력이 가중되었습니다.",
+    "sourceName": "U.S. Bureau of Economic Analysis",
+    "sourceUrl": "https://www.bea.gov",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "S&P500",
+      "연준"
+    ],
+    "affectedChannels": [
+      "INTEREST_RATE",
+      "DEMAND"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2021년 미국 경제분석국(BEA) 공식 GDP 발표.",
+      "impactChannels": [
+        "INTEREST_RATE",
+        "DEMAND"
+      ],
+      "positiveInterpretation": "미국 기업 이익 마진 개선과 혁신 생산성 향상.",
+      "negativeInterpretation": "인플레이션 및 통화정책 긴축 위험.",
+      "unknownAtTheTime": "고용시장 견조함 유지 여부."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

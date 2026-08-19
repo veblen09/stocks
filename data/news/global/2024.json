@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2024_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2024-06-30",
+    "publishedAt": "2024-06-30",
+    "availableFrom": "2024-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "금리인하 사이클 진입과 AI 버블 논쟁",
+    "titleKo": "[2024년 세계 경제] 금리인하 사이클 진입과 AI 버블 논쟁",
+    "summaryKo": "미 연준이 9월 0.50%p 빅컷을 단행하며 글로벌 완화 기조로 복귀했습니다. AI 반도체 랠리가 이어진 반면, 원/달러 환율은 1,470원대까지 급등했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2024년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

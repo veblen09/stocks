@@ -4,8 +4,9 @@
   "description": "1980년 말부터 2025년 말까지 실제 시장 데이터로 경험하는 장기 모의주식투자",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#2563eb",
+  "background_color": "#f4f7fb",
+  "theme_color": "#f4f7fb",
+
   "orientation": "any",
   "icons": [
     {

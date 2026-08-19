@@ -1,0 +1,49 @@
+[
+  {
+    "id": "NEWS_2020_KR_01",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국경제",
+      "제조업"
+    ],
+    "eventDate": "2020-10-30",
+    "publishedAt": "2020-10-30",
+    "availableFrom": "2020-10-30",
+    "datePrecision": "DAY",
+    "originalTitle": "코스피 1,439P 바닥 찍고 개인투자자 대규모 순매수 '동학개미운동' 확산",
+    "titleKo": "코스피 1,439P 바닥 찍고 개인투자자 대규모 순매수 '동학개미운동' 확산",
+    "summaryKo": "저금리 유동성과 언택트(비대면), 배터리, 바이오, 인터넷(BBIG) 열풍으로 지수가 2,800P를 돌파했습니다.",
+    "sourceName": "한국은행 / 기획재정부",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "한국경제",
+      "환율",
+      "수출"
+    ],
+    "affectedChannels": [
+      "EXCHANGE_RATE",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2020년 한국 경상수지 및 성장률 발표.",
+      "impactChannels": [
+        "EXCHANGE_RATE",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "수출 주도형 제조업의 글로벌 시장점유율 확대.",
+      "negativeInterpretation": "원자재가 및 환율 급변동에 따른 수익성 리스크.",
+      "unknownAtTheTime": "내수 경기 회복 탄력성."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

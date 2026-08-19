@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1996_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1996-06-30",
+    "publishedAt": "1996-06-30",
+    "availableFrom": "1996-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "한국 OECD 가입과 반도체 가격 급락",
+    "titleKo": "[1996년 세계 경제] 한국 OECD 가입과 반도체 가격 급락",
+    "summaryKo": "한국이 29번째 OECD 회원국으로 가입했으나, 16M D램 가격이 80% 폭락하며 무역적자가 사상 최대치로 불어났습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1996년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

@@ -50,6 +50,35 @@ export interface NeutralNewsAnalysis {
   unknownAtTheTime: string; // 당시에는 알 수 없었던 점
 }
 
+export type NewsValidationStatus =
+  | 'VERIFIED'
+  | 'REVIEW_REQUIRED'
+  | 'SOURCE_MISMATCH'
+  | 'DATE_UNCERTAIN'
+  | 'COUNTRY_MISMATCH'
+  | 'UNVERIFIED';
+
+export interface NewsValidation {
+  validationStatus: NewsValidationStatus;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  sourceDocumentUrl?: string;
+  sourceDocumentTitle?: string;
+  validationNotes?: string;
+}
+
+export type UserFacingSourceTier = '공식 원자료' | '당시 언론보도' | '후대 역사적 정리';
+
+export function getUserFacingSourceTier(level: EvidenceLevel, sourceType?: NewsSourceType): UserFacingSourceTier {
+  if (level === 'PRIMARY_SOURCE' || sourceType === 'FILING' || sourceType === 'GOVERNMENT' || sourceType === 'REGULATOR' || sourceType === 'EXCHANGE') {
+    return '공식 원자료';
+  }
+  if (level === 'VERIFIED_RETROSPECTIVE' || sourceType === 'RETROSPECTIVE_SOURCE') {
+    return '후대 역사적 정리';
+  }
+  return '당시 언론보도';
+}
+
 export interface HistoricalNewsItem {
   id: string;
   scope: NewsScope;
@@ -71,6 +100,7 @@ export interface HistoricalNewsItem {
   sourceUrl?: string;
   sourceType: NewsSourceType;
   evidenceLevel: EvidenceLevel;
+  validation?: NewsValidation;
 
   categories: string[];
   affectedChannels: AffectedChannel[];
@@ -84,6 +114,7 @@ export interface HistoricalNewsItem {
   dataQuality: 'HIGH' | 'MEDIUM' | 'LOW' | 'MISSING';
   retrievedAt: string;
 }
+
 
 export interface CompanyAlias {
   canonicalCompanyId: string;
@@ -148,3 +179,24 @@ export interface CompanyOverviewAtYear {
   dataQuality: 'HIGH' | 'MEDIUM' | 'LOW' | 'MISSING';
   coverageStatus: 'SUFFICIENT' | 'PARTIAL' | 'OFFICIAL_ONLY' | 'NEWS_LIMITED' | 'NO_VERIFIED_DATA';
 }
+
+export interface CompanyComparisonItem {
+  canonicalCompanyId: string;
+  currentYear: number;
+  nameKo: string;
+  ticker: string;
+  market: 'KR' | 'US';
+  sector: string;
+  isListed: boolean;
+  listingDate: string;
+  contemporaryBusiness: string;
+  recentNewsCount: number;
+  recentNews: HistoricalNewsItem[];
+  last1YrReturn: number | null;
+  past3YrCAGR: number | null;
+  historicalMDD: number | null;
+  dataQuality: string;
+  coverageStatus: string;
+  riskFactors: string[];
+}
+

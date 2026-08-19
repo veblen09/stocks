@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2015_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "2015-06-30",
+    "publishedAt": "2015-06-30",
+    "availableFrom": "2015-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "중국 증시 버블 붕괴와 위안화 기습 절하",
+    "titleKo": "[2015년 세계 경제] 중국 증시 버블 붕괴와 위안화 기습 절하",
+    "summaryKo": "상하이 종합지수가 5,000p에서 반토막 나고 중국 인민은행의 기습 위안화 절하로 글로벌 금융시장이 요동쳤습니다. 미 연준은 9년 만에 첫 금리 인상을 단행했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2015년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

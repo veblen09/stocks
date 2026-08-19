@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_1991_GL_GEN",
+    "scope": "GLOBAL_MACRO",
+    "market": "GLOBAL",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "글로벌경제"
+    ],
+    "eventDate": "1991-06-30",
+    "publishedAt": "1991-06-30",
+    "availableFrom": "1991-06-30",
+    "datePrecision": "DAY",
+    "originalTitle": "소련 해체와 자본시장 개방 준비",
+    "titleKo": "[1991년 세계 경제] 소련 해체와 자본시장 개방 준비",
+    "summaryKo": "소비에트 연방이 공식 해체되며 탈냉전 시대가 열렸습니다. 한국은 1992년 외국인 주식투자 직접 허용을 앞두고 금융 개혁을 추진했습니다.",
+    "sourceName": "World Bank / IMF Historical Data",
+    "sourceUrl": "https://www.worldbank.org",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "거시경제",
+      "글로벌시장"
+    ],
+    "affectedChannels": [
+      "DEMAND",
+      "INTEREST_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1991년 공식 글로벌 거시지표.",
+      "impactChannels": [
+        "DEMAND",
+        "INTEREST_RATE"
+      ],
+      "positiveInterpretation": "세계 교역량 성장과 경제 체질 개선.",
+      "negativeInterpretation": "국가별 경기 사이클 불균형.",
+      "unknownAtTheTime": "통화정책 파급 경로."
+    },
+    "importanceScore": 7,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

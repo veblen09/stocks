@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NEWS_2014_KR_GEN",
+    "scope": "KOREA_MACRO",
+    "market": "KR",
+    "canonicalCompanyIds": [],
+    "relatedTickers": [],
+    "relatedSectors": [
+      "한국증시"
+    ],
+    "eventDate": "2014-09-15",
+    "publishedAt": "2014-09-15",
+    "availableFrom": "2014-09-15",
+    "datePrecision": "DAY",
+    "originalTitle": "유가 대폭락과 박스피의 늪",
+    "titleKo": "[2014년 한국 거시] 유가 대폭락과 박스피의 늪",
+    "summaryKo": "2014년 한국 거시경제 지표 및 코스피 지수 결산: 미국 셰일가스 혁명과 사우디의 증산 치킨게임으로 국제유가가 배럴당 100달러에서 50달러로 반토막 났습니다. 한국 증시는 1,900선 박스권에 갇혔습니다.",
+    "sourceName": "한국은행 / 통계청",
+    "sourceUrl": "https://ecos.bok.or.kr",
+    "sourceType": "GOVERNMENT",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "코스피",
+      "수출입"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "EXCHANGE_RATE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2014년 한국은행 연례 경제보고서.",
+      "impactChannels": [
+        "REVENUE",
+        "EXCHANGE_RATE"
+      ],
+      "positiveInterpretation": "한국 제조업의 설비투자와 수출 호조.",
+      "negativeInterpretation": "원화 환율 변동성 및 내수 경기 리스크.",
+      "unknownAtTheTime": "글로벌 금리 환경의 영향."
+    },
+    "importanceScore": 8,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]

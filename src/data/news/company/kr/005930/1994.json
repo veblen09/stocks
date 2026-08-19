@@ -1,0 +1,54 @@
+[
+  {
+    "id": "NEWS_1994_KR_005930_01",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "전기전자",
+      "자동차",
+      "철강"
+    ],
+    "eventDate": "1994-11-10",
+    "publishedAt": "1994-11-10",
+    "availableFrom": "1994-11-10",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 세계 최초 256M DRAM 개발로 글로벌 반도체 1위 굳히기",
+    "titleKo": "삼성전자, 세계 최초 256M DRAM 개발로 글로벌 반도체 1위 굳히기",
+    "summaryKo": "반도체 단일 품목 수출 100억 달러를 돌파하며 국가 주력 수출산업으로 확고히 자리잡았습니다.",
+    "sourceName": "한국거래소 기업공시 / DART",
+    "sourceUrl": "https://dart.fss.or.kr",
+    "sourceType": "FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "기업실적",
+      "신제품",
+      "수출"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1994년 기업 핵심 공시 내용.",
+      "impactChannels": [
+        "REVENUE",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "주력 제품의 글로벌 경쟁력 입증 및 매출 신장.",
+      "negativeInterpretation": "경쟁사 증설에 따른 마진 압박 요인.",
+      "unknownAtTheTime": "차세대 신기술 시장 반응."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-08-18T00:00:00Z"
+  }
+]
