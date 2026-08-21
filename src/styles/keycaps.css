@@ -260,13 +260,109 @@
   outline-offset: 2px;
 }
 
-/* 6. Reduced Motion Support */
+/* 6. Tactile Buy Button Styles (.buy-btn-primary, .buy-btn-chip, .buy-badge-active, .modal-sticky-buybar) */
+.buy-btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  border: 1px solid #1e40af;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  user-select: none;
+  box-shadow:
+    0 3px 0 #1e3a8a,
+    0 6px 12px rgba(37, 99, 235, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translateY(0);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    background 120ms ease,
+    filter 120ms ease;
+}
+
+.buy-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 0 #1e3a8a,
+    0 8px 16px rgba(37, 99, 235, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.buy-btn-primary:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 0 0 #1e3a8a,
+    0 2px 4px rgba(37, 99, 235, 0.20),
+    inset 0 2px 4px rgba(0, 0, 0, 0.20);
+}
+
+.buy-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: #94a3b8;
+  border-color: #64748b;
+}
+
+.buy-btn-chip {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+  transition: all 100ms ease;
+}
+
+.buy-btn-chip:hover:not(:disabled) {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+  transform: translateY(-1px);
+}
+
+.buy-btn-chip:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.buy-badge-active {
+  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #60a5fa;
+  color: #1e3a8a;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.modal-sticky-buybar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #cbd5e1;
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* 7. Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .stock-key,
   .cash-key,
   .filter-key,
-  .allocation-key {
+  .allocation-key,
+  .buy-btn-primary,
+  .buy-btn-chip {
     transition-duration: 0.01ms !important;
     transform: none !important;
   }
 }
+

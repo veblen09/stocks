@@ -11,17 +11,21 @@ import {
   Sparkles,
   PieChart,
   CheckCircle2,
+  ShoppingCart,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { useStockGame } from '../store/stockGameStore';
 import {
   getCompanyOverviewAtYear,
   getAvailableNewsForYear,
 } from '../engine/newsEngine';
-import { getHistoricalStockStats, STOCKS_BY_ID } from '../engine/returnEngine';
+import { STOCKS_BY_ID } from '../engine/returnEngine';
 import { getListingEventByCompanyId, isNewlyListedInYear } from '../engine/universeEngine';
-import { formatKRW, formatPercent } from '../utils/formatMoney';
+import { formatKRW } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { NeutralNewsAnalysisModal } from './NeutralNewsAnalysisModal';
+import { CompanyPriceChart } from './CompanyPriceChart';
 import type { HistoricalNewsItem } from '../types/stockNews';
 
 interface CompanyDetailModalProps {
@@ -45,11 +49,13 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
 }) => {
   const { state, dispatch } = useStockGame();
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [newsFilter, setNewsFilter] = useState<'ALL' | '1Y' | 'FILING' | 'PRODUCT'>('ALL');
   const [selectedNewsForAnalysis, setSelectedNewsForAnalysis] = useState<HistoricalNewsItem | null>(null);
   const [noteText, setNoteText] = useState('');
   const [isNoteSaved, setIsNoteSaved] = useState(false);
-  const [targetSliderVal, setTargetSliderVal] = useState<number>(draftTargetWeight);
+  const currentDraftWeight = canonicalId ? (state.draftTargetWeights[canonicalId] ?? draftTargetWeight) : 0;
+  const [targetSliderVal, setTargetSliderVal] = useState<number>(currentDraftWeight);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -58,8 +64,9 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   }, [initialTab, canonicalId]);
 
   useEffect(() => {
-    setTargetSliderVal(draftTargetWeight);
-  }, [draftTargetWeight, canonicalId]);
+    const w = canonicalId ? (state.draftTargetWeights[canonicalId] ?? draftTargetWeight) : 0;
+    setTargetSliderVal(w);
+  }, [canonicalId, state.draftTargetWeights, draftTargetWeight]);
 
   useEffect(() => {
     if (canonicalId && state.investmentNotes && state.investmentNotes[canonicalId]) {
@@ -87,7 +94,6 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   const currentYear = state.currentYear;
   const overview = getCompanyOverviewAtYear(canonicalId, currentYear);
   const baseStock = STOCKS_BY_ID[canonicalId];
-  const stats = getHistoricalStockStats(canonicalId, currentYear - 1, state.settings.includeFxEffect);
   const isWatchlisted = (state.watchlist || []).includes(canonicalId);
   const userHolding = state.holdings[canonicalId];
   const listingEvent = getListingEventByCompanyId(canonicalId);
@@ -146,6 +152,8 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
     setTargetSliderVal(clamped);
     if (onUpdateDraftTargetWeight) {
       onUpdateDraftTargetWeight(canonicalId, clamped);
+    } else {
+      dispatch({ type: 'SET_DRAFT_TARGET_WEIGHT', payload: { canonicalId, weight: clamped } });
     }
   };
 
@@ -170,7 +178,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="w-full max-w-2xl bg-white border-l border-slate-200 shadow-2xl flex flex-col h-full text-slate-800 overflow-hidden"
+        className={`w-full ${isExpanded ? 'max-w-4xl' : 'max-w-2xl'} bg-white border-l border-slate-200 shadow-2xl flex flex-col h-full text-slate-800 overflow-hidden transition-all duration-200`}
       >
         {/* Top Header */}
         <div className="p-5 border-b border-slate-200 shrink-0 space-y-3.5 bg-slate-50/70">
@@ -205,6 +213,16 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-700 transition cursor-pointer"
+                title={isExpanded ? '창 축소' : '창 넓게 보기'}
+                aria-label={isExpanded ? '창 축소' : '창 넓게 보기'}
+              >
+                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+
               <button
                 type="button"
                 onClick={handleToggleWatchlist}
@@ -544,35 +562,12 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
           {/* TAB 5: PRICES */}
           {activeTab === 'PRICES' && (
             <div className="space-y-3.5">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
-                <span className="text-xs font-bold text-slate-900 block">과거 주가 및 위험 지표 ({currentYear - 1}년 말 기준)</span>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-xs text-slate-500 block font-semibold">직전 1년 수익률</span>
-                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
-                      {stats.last1YrReturn !== null ? formatPercent(stats.last1YrReturn) : '상장 초기'}
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-xs text-slate-500 block font-semibold">3년 CAGR</span>
-                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
-                      {stats.past3YrCAGR !== null ? formatPercent(stats.past3YrCAGR) : '3년 자료 부족'}
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-xs text-slate-500 block font-semibold">과거 변동성</span>
-                    <span className="font-bold text-sm text-slate-900 mt-0.5 block">
-                      {stats.historicalVolatility !== null ? formatPercent(stats.historicalVolatility) : '이력 미충족'}
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-                    <span className="text-xs text-slate-500 block font-semibold">최대 낙폭(MDD)</span>
-                    <span className="font-bold text-sm text-rose-600 mt-0.5 block">
-                      {stats.historicalMDD !== null ? formatPercent(stats.historicalMDD) : '이력 미충족'}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <CompanyPriceChart
+                canonicalId={canonicalId}
+                upToYear={currentYear - 1}
+                isExpanded={isExpanded}
+                onToggleExpand={() => setIsExpanded(!isExpanded)}
+              />
             </div>
           )}
 
@@ -582,8 +577,11 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
               <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-200 space-y-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold text-slate-600 block">목표 비중 설정</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <ShoppingCart size={14} className="text-blue-600" />
+                      <span>주식 매수 및 목표 비중 설정</span>
+                    </span>
+                    <span className="text-xs text-slate-500 mt-0.5 block">
                       설정 가능 최대: <strong className="text-blue-700 font-bold">{Math.round(maxAllowedWeight * 100)}%</strong> (다른 종목 합계: {Math.round(otherStocksSum * 100)}%)
                     </span>
                   </div>
@@ -592,22 +590,33 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                   </span>
                 </div>
 
+                <div className="p-3 bg-white rounded-xl border border-blue-100 text-xs text-slate-600 leading-relaxed">
+                  💡 <strong>매수 안내</strong>: 목표 비중을 설정한 후 하단 액션바의 <strong>[투자 실행 & 1년 진행]</strong>을 누르면, 설정된 비중만큼 주식이 자동 일괄 매수 체결됩니다.
+                </div>
+
                 {/* Range Slider */}
-                <input
-                  type="range"
-                  min={0}
-                  max={Math.max(0.01, maxAllowedWeight)}
-                  step={0.01}
-                  value={targetSliderVal}
-                  onChange={e => handleApplyWeight(parseFloat(e.target.value))}
-                  onMouseUp={() => audioManager.playUiSound('keyTap')}
-                  onTouchEnd={() => audioManager.playUiSound('keyTap')}
-                  className="w-full cursor-pointer h-2 bg-slate-200 rounded-lg accent-blue-600"
-                />
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px] text-slate-500 font-mono">
+                    <span>0% (미보유)</span>
+                    <span className="font-bold text-blue-700">설정치: {Math.round(targetSliderVal * 100)}%</span>
+                    <span>최대 {Math.round(maxAllowedWeight * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={Math.max(0.01, maxAllowedWeight)}
+                    step={0.01}
+                    value={targetSliderVal}
+                    onChange={e => handleApplyWeight(parseFloat(e.target.value))}
+                    onMouseUp={() => audioManager.playUiSound('keyTap')}
+                    onTouchEnd={() => audioManager.playUiSound('keyTap')}
+                    className="w-full cursor-pointer h-2 bg-slate-200 rounded-lg accent-blue-600"
+                  />
+                </div>
 
                 {/* Keypad-Style Step Buttons (.allocation-key) */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-bold text-slate-500 block">숫자 키패드 조작</span>
+                  <span className="text-xs font-bold text-slate-500 block">비중 정밀 조절 키패드</span>
                   <div className="grid grid-cols-6 gap-2">
                     {[-0.10, -0.05, -0.01, +0.01, +0.05, +0.10].map(delta => {
                       const isPlus = delta > 0;
@@ -628,37 +637,60 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                 </div>
 
                 {/* Preset Quick Actions */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-blue-100">
-                  <button
-                    type="button"
-                    onClick={() => handleApplyWeight(0, false)}
-                    className="flex-1 py-2.5 bg-white hover:bg-rose-50 text-rose-600 rounded-xl font-bold text-xs transition cursor-pointer border border-rose-200 shadow-sm"
-                  >
-                    배분 취소 (0%)
-                  </button>
-                  <button
-                    type="button"
-                    disabled={maxAllowedWeight < 0.01}
-                    onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
-                    className="flex-1 py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
-                  >
-                    10% 설정
-                  </button>
-                  <button
-                    type="button"
-                    disabled={maxAllowedWeight < 0.01}
-                    onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
-                    className="flex-1 py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
-                  >
-                    20% 설정
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNormalizeAll}
-                    className="w-full py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl font-bold text-xs transition cursor-pointer border border-blue-300 shadow-xs flex items-center justify-center gap-1 mt-1"
-                  >
-                    <span>⚡ 전체 담은 종목 100% 비율 맞춤</span>
-                  </button>
+                <div className="space-y-2 pt-2 border-t border-blue-100">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button
+                      type="button"
+                      disabled={targetSliderVal <= 0}
+                      onClick={() => handleApplyWeight(0, false)}
+                      className="py-2.5 bg-white hover:bg-rose-50 text-rose-600 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-rose-200 shadow-sm"
+                    >
+                      매수 취소 (0%)
+                    </button>
+                    <button
+                      type="button"
+                      disabled={maxAllowedWeight < 0.01}
+                      onClick={() => handleApplyWeight(Math.min(0.05, maxAllowedWeight), true)}
+                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
+                    >
+                      +5% 매수
+                    </button>
+                    <button
+                      type="button"
+                      disabled={maxAllowedWeight < 0.01}
+                      onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
+                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
+                    >
+                      +10% 매수
+                    </button>
+                    <button
+                      type="button"
+                      disabled={maxAllowedWeight < 0.01}
+                      onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
+                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
+                    >
+                      +20% 매수
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      disabled={maxAllowedWeight <= targetSliderVal + 0.0001}
+                      onClick={() => handleApplyWeight(maxAllowedWeight, true)}
+                      className="py-2 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1"
+                    >
+                      <span>최대 매수 ({Math.round(maxAllowedWeight * 100)}%)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNormalizeAll}
+                      className="py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl font-bold text-xs transition cursor-pointer border border-blue-300 shadow-xs flex items-center justify-center gap-1"
+                    >
+                      <span>⚡ 전체 담은 종목 100% 비율 맞춤</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -695,6 +727,114 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
               </button>
             </div>
           )}
+        </div>
+
+        {/* Persistent Bottom Sticky Buy Action Bar (Always Visible Across All Tabs) */}
+        <div className="modal-sticky-buybar p-4 shrink-0 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-blue-100 text-blue-700">
+              <ShoppingCart size={18} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-900 text-sm">
+                  {targetSliderVal > 0.0001 ? (
+                    <span className="text-blue-700 font-mono">
+                      매수 목표 {Math.round(targetSliderVal * 100)}%
+                    </span>
+                  ) : (
+                    <span className="text-slate-600">매수 미설정 (0%)</span>
+                  )}
+                </span>
+                {targetSliderVal > 0.0001 && (
+                  <span className="text-xs text-slate-500 font-mono font-semibold">
+                    (약 {formatKRW(totalPortfolioValue * targetSliderVal)})
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-500">
+                {targetSliderVal > 0.0001
+                  ? '하단 바의 [투자 실행] 시 일괄 매수됩니다'
+                  : `최대 ${Math.round(maxAllowedWeight * 100)}%까지 매수 가능`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {targetSliderVal <= 0.0001 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(Math.min(0.05, maxAllowedWeight), true)}
+                  disabled={maxAllowedWeight < 0.01}
+                  className="buy-btn-chip"
+                >
+                  +5%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
+                  disabled={maxAllowedWeight < 0.01}
+                  className="buy-btn-chip"
+                >
+                  +10%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
+                  disabled={maxAllowedWeight < 0.01}
+                  className="buy-btn-chip"
+                >
+                  +20%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
+                  disabled={maxAllowedWeight < 0.01}
+                  className="buy-btn-primary py-2 px-3.5 text-xs font-bold"
+                >
+                  <ShoppingCart size={13} />
+                  <span>+ 10% 매수 담기</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(0, false)}
+                  className="py-1.5 px-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 text-xs transition cursor-pointer"
+                >
+                  매수 취소 (0%)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(targetSliderVal - 0.05, false)}
+                  disabled={targetSliderVal <= 0}
+                  className="py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300 text-xs transition cursor-pointer"
+                >
+                  -5%
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyWeight(targetSliderVal + 0.05, true)}
+                  disabled={targetSliderVal >= maxAllowedWeight - 0.0001}
+                  className="py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200 text-xs transition cursor-pointer"
+                >
+                  +5%
+                </button>
+                {activeTab !== 'ALLOCATION' && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('ALLOCATION')}
+                    className="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition cursor-pointer shadow-xs flex items-center gap-1"
+                  >
+                    <PieChart size={13} />
+                    <span>비중 정밀 조절</span>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 

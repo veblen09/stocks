@@ -1,4 +1,4 @@
-import type { RiskLevel, MonthlyReplayQuality } from '../../types/stockGame';
+import type { RiskLevel, MonthlyReplayQuality, StockHolding } from '../../types/stockGame';
 import type { HistoricalNewsItem } from '../../types/stockNews';
 
 export type ReplayStatus =
@@ -75,6 +75,7 @@ export interface YearReplayData {
   startTotalAssetsKRW: number;
   annualContributionKRW: number;
   cashBeforeReplayKRW: number;
+  holdings?: Record<string, StockHolding>;
   points: MonthlyPortfolioPoint[];
   bestMonth: { month: number; returnRate: number };
   worstMonth: { month: number; returnRate: number };

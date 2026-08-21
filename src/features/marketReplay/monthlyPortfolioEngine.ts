@@ -268,6 +268,7 @@ export function generateYearReplayData(
     startTotalAssetsKRW: startAssetsKRW,
     annualContributionKRW: historyYearsCount === 0 ? 0 : settings.annualContributionKRW,
     cashBeforeReplayKRW: startCashKRW,
+    holdings,
     points,
     bestMonth,
     worstMonth,
@@ -368,6 +369,7 @@ export function recalculateRemainingMonths(
 
   return {
     ...existingData,
+    holdings: updatedHoldings,
     points,
   };
 }

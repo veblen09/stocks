@@ -334,11 +334,11 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
               className={`py-2.5 px-5 rounded-xl font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md ${
                 isOverAllocated
                   ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
-                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'
+                  : 'buy-btn-primary py-2.5 px-5'
               }`}
             >
               <ShoppingCart size={15} />
-              <span>주문 일괄 실행하기</span>
+              <span>매수/매도 주문 확정 및 실행</span>
             </button>
           </div>
         </div>

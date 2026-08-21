@@ -6,7 +6,7 @@ import {
   CheckCircle2,
   Star,
   AlertCircle,
-  Plus,
+  ShoppingCart,
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import type { ListingEvent } from '../types/stockUniverse';
@@ -216,10 +216,10 @@ export const NewListingAlertModal: React.FC<NewListingAlertModalProps> = ({
             <button
               type="button"
               onClick={() => onAddToPortfolio(listingEvent.canonicalCompanyId)}
-              className="py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-blue-600/20"
+              className="buy-btn-primary py-2 px-4 text-xs font-bold flex items-center gap-1.5"
             >
-              <Plus size={14} />
-              <span>포트폴리오에 추가</span>
+              <ShoppingCart size={14} />
+              <span>+ 즉시 매수 담기 (10%)</span>
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
-import React from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, AlertCircle, Layers } from 'lucide-react';
 import { MarketReplayChart } from './MarketReplayChart';
+import { IndividualStockReplayChart } from './IndividualStockReplayChart';
 import { ReplayTimeline } from './ReplayTimeline';
 import { ReplayControls } from './ReplayControls';
 import { RiskLevelIndicator } from './RiskLevelIndicator';
@@ -8,6 +9,7 @@ import { MonthlyNewsNotification } from './MonthlyNewsNotification';
 import { ReplayCompletion } from './ReplayCompletion';
 import { AnimatedPortfolioValue } from './AnimatedPortfolioValue';
 import { useMarketReplayState } from './replayStateMachine';
+import { STOCKS_BY_ID } from '../../engine/returnEngine';
 import type { YearReplayData } from './marketReplayTypes';
 import type { HistoricalNewsItem } from '../../types/stockNews';
 import { formatKRW, formatPercent, getReturnColor } from '../../utils/formatMoney';
@@ -53,6 +55,8 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
     },
   });
 
+  const [selectedStockId, setSelectedStockId] = useState<string | null>(null);
+
   if (!isOpen || !yearData) return null;
 
   const visiblePoints = yearData.points.slice(0, currentMonthIndex + 1);
@@ -61,6 +65,10 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
   if (!currentPoint) return null;
 
   const isCompleted = status === 'YEAR_COMPLETE';
+  const holdingsMap = yearData.holdings || {};
+  const heldStockIds = Object.keys(holdingsMap).filter(
+    cid => (holdingsMap[cid]?.shares || 0) > 0
+  );
 
   return (
     <div
@@ -223,16 +231,64 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
               </div>
             </div>
 
-            {/* SVG Progressive Chart */}
+            {/* Chart View Mode Selector (Portfolio vs Individual Stock) */}
+            {heldStockIds.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setSelectedStockId(null)}
+                  className={`px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    selectedStockId === null
+                      ? 'bg-blue-600 text-white shadow-sm font-bold'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <Layers size={13} />
+                  <span>포트폴리오 전체</span>
+                </button>
+
+                {heldStockIds.map(cid => {
+                  const stockInfo = STOCKS_BY_ID[cid];
+                  const isSelected = selectedStockId === cid;
+                  return (
+                    <button
+                      key={cid}
+                      type="button"
+                      onClick={() => setSelectedStockId(cid)}
+                      className={`px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                        isSelected
+                          ? 'bg-blue-600 text-white shadow-sm font-bold'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <span>{stockInfo?.market === 'US' ? '🇺🇸' : '🇰🇷'}</span>
+                      <span>{stockInfo?.nameKo || cid}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* SVG Progressive Chart (Portfolio or Individual Stock) */}
             <div className="p-4 bg-slate-50/70 rounded-2xl border border-slate-200 shadow-inner">
-              <MarketReplayChart
-                points={yearData.points}
-                currentMonthIndex={currentMonthIndex}
-                startTotalAssetsKRW={yearData.startTotalAssetsKRW}
-                cumulativePrincipalKRW={currentPoint.cumulativeContributionsKRW}
-                showBenchmark={settings.showBenchmark}
-                motionPreference={settings.motionPreference}
-              />
+              {selectedStockId ? (
+                <IndividualStockReplayChart
+                  canonicalId={selectedStockId}
+                  year={yearData.year}
+                  currentMonth={currentPoint.month}
+                  motionPreference={settings.motionPreference}
+                  holding={holdingsMap[selectedStockId]}
+                />
+              ) : (
+                <MarketReplayChart
+                  points={yearData.points}
+                  currentMonthIndex={currentMonthIndex}
+                  startTotalAssetsKRW={yearData.startTotalAssetsKRW}
+                  cumulativePrincipalKRW={currentPoint.cumulativeContributionsKRW}
+                  showBenchmark={settings.showBenchmark}
+                  motionPreference={settings.motionPreference}
+                />
+              )}
             </div>
 
             {/* 12-Month Progress Timeline */}

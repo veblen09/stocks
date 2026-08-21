@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Sparkles,
   Newspaper,
   Star,
   CheckCircle2,
+  ShoppingCart,
 } from 'lucide-react';
 import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
 import { formatKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
+import { getCompany1YrSparkline } from '../engine/companyChartEngine';
 
 interface MosaicTileProps {
   stock: TradableStockItem;
   mode: MosaicViewMode;
+  currentYear?: number;
   draftTargetWeight?: number; // 0.00 to 1.00
   availableHeadroom?: number; // Maximum allowed target weight without exceeding 100% total
   currentHoldingWeight?: number; // 0.00 to 1.00
@@ -27,6 +30,7 @@ interface MosaicTileProps {
 export const MosaicTile: React.FC<MosaicTileProps> = ({
   stock,
   mode,
+  currentYear = 2000,
   draftTargetWeight = 0,
   availableHeadroom,
   currentHoldingWeight = 0,
@@ -41,6 +45,11 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   const isHolding = currentHoldingWeight > 0.0001;
   const hasTarget = draftTargetWeight > 0.0001;
   const isKR = stock.market === 'KR';
+
+  // 1-year sparkline for intuitive trend visualization
+  const sparkline = useMemo(() => {
+    return getCompany1YrSparkline(stock.canonicalId, currentYear - 1);
+  }, [stock.canonicalId, currentYear]);
 
   // Maximum allowed for this stock
   const maxCap = availableHeadroom !== undefined ? availableHeadroom : 1.0;
@@ -84,10 +93,21 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
     }
   };
 
+  // Handle quick direct buy target
+  const handleDirectBuy = (e: React.MouseEvent, targetPct: number) => {
+    e.stopPropagation();
+    if (!canIncrease && targetPct > draftTargetWeight) return;
+    audioManager.playUiSound('allocationUp');
+    if (onQuickAdjustTarget) {
+      const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 100) / 100));
+      onQuickAdjustTarget(nextVal);
+    }
+  };
+
   // Accessible descriptive label
   const ariaLabel = `${stock.nameKo}, ${stock.ticker}, ${isKR ? '한국' : '미국'}, ${stock.sector}, ${
     isHolding ? `현재 보유 ${Math.round(currentHoldingWeight * 100)}%` : '미보유'
-  }, ${hasTarget ? `목표 ${Math.round(draftTargetWeight * 100)}%` : ''}`;
+  }, ${hasTarget ? `목표 매수 ${Math.round(draftTargetWeight * 100)}%` : '매수 가능'}`;
 
   return (
     <div
@@ -98,8 +118,8 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
       onClick={handleTileClick}
       onKeyDown={handleKeyDown}
       className={`stock-key group ${isHolding ? 'is-holding' : ''} ${
-        isSelected ? 'ring-2 ring-blue-600 border-blue-600' : ''
-      }`}
+        hasTarget ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50/30' : ''
+      } ${isSelected ? 'ring-2 ring-blue-700 border-blue-700' : ''}`}
     >
       {/* 1. Top Badges & Watchlist Bar */}
       <div className="flex items-center justify-between gap-1 mb-2">
@@ -170,73 +190,160 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
           <span>·</span>
           <span className="line-clamp-1">{stock.sector}</span>
         </div>
+
+        {/* 1-Year Mini Sparkline (Naver Style Chart) */}
+        <div
+          onClick={e => {
+            e.stopPropagation();
+            handleTileClick();
+          }}
+          className="mt-1.5 mb-1 p-1.5 rounded-xl bg-slate-50/90 hover:bg-blue-50/60 border border-slate-200/60 hover:border-blue-200 transition-all flex items-center justify-between gap-2 cursor-pointer group/spark"
+          title="클릭 시 과거 주가 차트 상세 보기"
+        >
+          <div className="flex-1 min-w-0 h-6 flex items-center">
+            {sparkline && sparkline.points.length > 1 ? (
+              <svg viewBox="0 0 100 30" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id={`grad-${stock.canonicalId}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.25" />
+                    <stop offset="100%" stopColor={sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+                <path d={sparkline.svgAreaPath} fill={`url(#grad-${stock.canonicalId})`} />
+                <path
+                  d={sparkline.svgPath}
+                  fill="none"
+                  stroke={sparkline.isPositive ? '#ef4444' : '#3b82f6'}
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : (
+              <div className="w-full text-[9px] text-slate-400 font-mono text-center">차트 분석 중</div>
+            )}
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-[9px] text-slate-400 block font-medium">최근 1년</span>
+            {sparkline ? (
+              <span
+                className={`text-[11px] font-bold font-mono ${
+                  sparkline.isPositive ? 'text-red-600' : 'text-blue-600'
+                }`}
+              >
+                {sparkline.isPositive ? '▲' : '▼'} {formatPercent(Math.abs(sparkline.return1Yr))}
+              </span>
+            ) : (
+              <span className="text-[10px] text-slate-400 font-mono">-</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* 3. Bottom: Mode-specific info & Target Allocation Controls */}
       <div className="mt-3 pt-2.5 border-t border-slate-200/80 space-y-2">
         {/* Mode 1: Target Allocation Mode or Default */}
         {mode === 'TARGET_ALLOCATION' || mode === 'EXPLORE' ? (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[12px]">
-              <span className="font-medium text-slate-500">목표 비중:</span>
-              <span className="font-mono font-bold text-slate-900 text-[14px]">
-                {Math.round(draftTargetWeight * 100)}%
-              </span>
-            </div>
+          <div className="space-y-2">
+            {!hasTarget ? (
+              /* Sleek Single Full-Width Buy Button when target is 0% */
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                  <span>목표 비중</span>
+                  <span className="font-mono text-slate-400 text-[10px]">0% (미설정)</span>
+                </div>
 
-            {/* Target Weight Visual Fill Gauge */}
-            <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div
-                className="bg-blue-600 h-full rounded-full transition-all duration-200"
-                style={{ width: `${Math.min(100, Math.round(draftTargetWeight * 100))}%` }}
-              />
-            </div>
+                <button
+                  type="button"
+                  onClick={e => handleDirectBuy(e, Math.min(maxCap, 0.10))}
+                  disabled={maxCap <= 0.0001}
+                  className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap active:scale-98"
+                  title={`${stock.nameKo} 10% 매수 담기`}
+                >
+                  <ShoppingCart size={13} className="shrink-0 text-white/90" />
+                  <span>+10% 매수 담기</span>
+                </button>
+              </div>
+            ) : (
+              /* Active Target Allocation Controls when target > 0% */
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[12px]">
+                  <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center gap-1">
+                    <ShoppingCart size={10} />
+                    <span>매수 담김</span>
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-blue-700 text-sm">
+                      {Math.round(draftTargetWeight * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={e => handleDirectBuy(e, 0)}
+                      className="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-[10px] font-bold transition cursor-pointer"
+                      title="매수 취소 (0%)"
+                      aria-label={`${stock.nameKo} 매수 취소`}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
 
-            {/* Quick +/- Step Buttons (Auto-capped to 100% total) */}
-            {onQuickAdjustTarget && (
-              <div className="flex items-center justify-between pt-1 gap-1">
-                <button
-                  type="button"
-                  onClick={e => handleStepAdjust(e, -0.05)}
-                  disabled={draftTargetWeight <= 0}
-                  className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold border border-slate-300 transition-colors"
-                  aria-label={`${stock.nameKo} 목표비중 5% 감소`}
-                >
-                  -5%
-                </button>
-                <button
-                  type="button"
-                  onClick={e => handleStepAdjust(e, -0.01)}
-                  disabled={draftTargetWeight <= 0}
-                  className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold border border-slate-300 transition-colors"
-                  aria-label={`${stock.nameKo} 목표비중 1% 감소`}
-                >
-                  -1%
-                </button>
-                <button
-                  type="button"
-                  onClick={e => handleStepAdjust(e, +0.01)}
-                  disabled={!canIncrease}
-                  title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
-                  className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold border border-blue-200 transition-colors"
-                  aria-label={`${stock.nameKo} 목표비중 1% 증가`}
-                >
-                  +1%
-                </button>
-                <button
-                  type="button"
-                  onClick={e => handleStepAdjust(e, +0.05)}
-                  disabled={!canIncrease}
-                  title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
-                  className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold border border-blue-200 transition-colors"
-                  aria-label={`${stock.nameKo} 목표비중 5% 증가`}
-                >
-                  +5%
-                </button>
+                {/* Target Weight Visual Fill Gauge */}
+                <div className="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-blue-600 h-full rounded-full transition-all duration-200"
+                    style={{ width: `${Math.min(100, Math.round(draftTargetWeight * 100))}%` }}
+                  />
+                </div>
+
+                {/* Quick 4-Step Steppers (Grid 4-cols: fits with zero overflow) */}
+                {onQuickAdjustTarget && (
+                  <div className="grid grid-cols-4 gap-1 w-full pt-0.5">
+                    <button
+                      type="button"
+                      onClick={e => handleStepAdjust(e, -0.05)}
+                      disabled={draftTargetWeight <= 0}
+                      className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
+                      aria-label={`${stock.nameKo} 목표비중 5% 감소`}
+                    >
+                      -5%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => handleStepAdjust(e, -0.01)}
+                      disabled={draftTargetWeight <= 0}
+                      className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
+                      aria-label={`${stock.nameKo} 목표비중 1% 감소`}
+                    >
+                      -1%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => handleStepAdjust(e, +0.01)}
+                      disabled={!canIncrease}
+                      title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
+                      className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
+                      aria-label={`${stock.nameKo} 목표비중 1% 증가`}
+                    >
+                      +1%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => handleStepAdjust(e, +0.05)}
+                      disabled={!canIncrease}
+                      title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
+                      className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
+                      aria-label={`${stock.nameKo} 목표비중 5% 증가`}
+                    >
+                      +5%
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
         ) : null}
+
 
         {/* Mode 2: Actual Holdings Weight */}
         {mode === 'HOLDINGS_WEIGHT' && (

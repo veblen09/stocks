@@ -796,6 +796,10 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         <CompanyDetailModal
           canonicalId={selectedCanonicalIdForDetail}
           initialTab={initialDetailTab}
+          draftTargetWeight={draftTargetWeights[selectedCanonicalIdForDetail] || 0}
+          onUpdateDraftTargetWeight={(cid, w) => {
+            dispatch({ type: 'SET_DRAFT_TARGET_WEIGHT', payload: { canonicalId: cid, weight: w } });
+          }}
           onClose={() => setSelectedCanonicalIdForDetail(null)}
         />
       )}

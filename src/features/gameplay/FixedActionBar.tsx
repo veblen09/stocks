@@ -53,9 +53,12 @@ export const FixedActionBar: React.FC<FixedActionBarProps> = ({
           </div>
 
           {changedStocksCount > 0 && (
-            <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <span>변경 종목 <strong className="text-slate-800 font-mono">{changedStocksCount}개</strong></span>
-              <span>· 예상 수수료 <strong className="text-slate-800 font-mono">{formatKRW(estimatedFeesKRW)}</strong></span>
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <span className="bg-blue-100 text-blue-800 border border-blue-200 px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
+                <ShoppingCart size={12} className="text-blue-700" />
+                <span>매수 담긴 종목 <strong className="font-mono">{changedStocksCount}개</strong></span>
+              </span>
+              <span className="hidden md:inline text-slate-500">· 예상 수수료 <strong className="text-slate-800 font-mono">{formatKRW(estimatedFeesKRW)}</strong></span>
             </div>
           )}
 
@@ -109,7 +112,7 @@ export const FixedActionBar: React.FC<FixedActionBarProps> = ({
             className="py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-300 shadow-xs text-xs sm:text-sm"
           >
             <ShoppingCart size={15} className="text-slate-700" />
-            <span>주문 검토</span>
+            <span>주문 검토{changedStocksCount > 0 ? ` (${changedStocksCount})` : ''}</span>
           </button>
 
           <button

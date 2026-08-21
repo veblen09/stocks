@@ -7,12 +7,14 @@ import {
   PieChart,
   Layers,
   RotateCcw,
+  ShoppingCart,
 } from 'lucide-react';
 import { MosaicTile } from './MosaicTile';
 import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
 import type { StockHolding } from '../types/stockGame';
 import { formatKRW, formatPercent } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
+import { getCompany1YrSparkline } from '../engine/companyChartEngine';
 
 interface StockMosaicViewProps {
   tradableStocks: TradableStockItem[];
@@ -395,6 +397,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   key={stock.canonicalId}
                   stock={stock}
                   mode={mosaicMode}
+                  currentYear={currentYear}
                   draftTargetWeight={draftWeight}
                   availableHeadroom={availableHeadroom}
                   currentHoldingWeight={holdingWeight}
@@ -412,17 +415,19 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
           </div>
         ) : (
           /* Table View Alternative */
-          <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+          <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-xs">
             <table className="w-full text-xs text-left text-slate-700">
               <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
                 <tr>
                   <th className="p-3">종목명 / 티커</th>
                   <th className="p-3">국가 / 업종</th>
+                  <th className="p-3 text-center">1년 주가 추이</th>
                   <th className="p-3 text-right">보유 수량 / 금액</th>
                   <th className="p-3 text-right">보유 비중</th>
-                  <th className="p-3 text-right">목표 비중</th>
+                  <th className="p-3 text-right">목표 매수 비중</th>
+                  <th className="p-3 text-center">빠른 매수 조절</th>
                   <th className="p-3 text-center">뉴스</th>
-                  <th className="p-3 text-center">선택</th>
+                  <th className="p-3 text-center">상세</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -431,11 +436,17 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   const holdingVal = holding ? holding.currentValueKRW || 0 : 0;
                   const holdingWeight = totalPortfolioValue > 0 ? holdingVal / totalPortfolioValue : 0;
                   const draftWeight = draftTargetWeights[stock.canonicalId] || 0;
+                  const otherStocksSum = totalStockTarget - draftWeight;
+                  const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 100) / 100);
+                  const canIncrease = draftWeight < availableHeadroom - 0.0001;
+                  const sparkline = getCompany1YrSparkline(stock.canonicalId, currentYear - 1);
 
                   return (
                     <tr
                       key={stock.canonicalId}
-                      className="hover:bg-blue-50/50 transition cursor-pointer"
+                      className={`hover:bg-blue-50/50 transition cursor-pointer ${
+                        draftWeight > 0.0001 ? 'bg-blue-50/30 font-medium' : ''
+                      }`}
                       onClick={() => onSelectStock(stock.canonicalId)}
                     >
                       <td className="p-3">
@@ -447,14 +458,115 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                         <span className="text-slate-400"> · </span>
                         <span className="text-slate-600">{stock.sector}</span>
                       </td>
+                      <td className="p-3 text-center">
+                        {sparkline && sparkline.points.length > 1 ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <svg viewBox="0 0 80 24" className="w-16 h-5 overflow-visible">
+                              <path
+                                d={sparkline.svgPath}
+                                fill="none"
+                                stroke={sparkline.isPositive ? '#ef4444' : '#3b82f6'}
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                            <span
+                              className={`font-mono font-bold text-[11px] ${
+                                sparkline.isPositive ? 'text-red-600' : 'text-blue-600'
+                              }`}
+                            >
+                              {sparkline.isPositive ? '▲' : '▼'}
+                              {formatPercent(Math.abs(sparkline.return1Yr))}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 font-mono text-[11px]">-</span>
+                        )}
+                      </td>
                       <td className="p-3 text-right font-mono font-semibold">
                         {holding ? `${formatKRW(holding.currentValueKRW)} (${holding.shares.toFixed(2)}주)` : '미보유'}
                       </td>
                       <td className="p-3 text-right font-mono font-bold">
                         {formatPercent(holdingWeight)}
                       </td>
-                      <td className="p-3 text-right font-mono font-bold text-blue-600">
-                        {Math.round(draftWeight * 100)}%
+                      <td className="p-3 text-right">
+                        {draftWeight > 0.0001 ? (
+                          <span className="font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">
+                            매수 {Math.round(draftWeight * 100)}%
+                          </span>
+                        ) : (
+                          <span className="font-mono text-slate-400">0%</span>
+                        )}
+                      </td>
+                      <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
+                        {draftWeight <= 0.0001 ? (
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                audioManager.playUiSound('allocationUp');
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, 0.10));
+                              }}
+                              disabled={availableHeadroom < 0.01}
+                              className="buy-btn-primary py-1 px-2.5 text-[11px] font-bold"
+                            >
+                              <ShoppingCart size={12} />
+                              <span>+10% 매수</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                audioManager.playUiSound('allocationUp');
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, 0.05));
+                              }}
+                              disabled={availableHeadroom < 0.01}
+                              className="buy-btn-chip text-[11px]"
+                            >
+                              +5%
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                audioManager.playUiSound('allocationDown');
+                                onUpdateDraftTargetWeight(stock.canonicalId, 0);
+                              }}
+                              className="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold border border-rose-200"
+                            >
+                              취소
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                audioManager.playUiSound('allocationDown');
+                                onUpdateDraftTargetWeight(
+                                  stock.canonicalId,
+                                  Math.max(0, Math.round((draftWeight - 0.05) * 100) / 100)
+                                );
+                              }}
+                              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold border border-slate-300"
+                            >
+                              -5%
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!canIncrease}
+                              onClick={() => {
+                                if (!canIncrease) return;
+                                audioManager.playUiSound('allocationUp');
+                                onUpdateDraftTargetWeight(
+                                  stock.canonicalId,
+                                  Math.min(availableHeadroom, Math.round((draftWeight + 0.05) * 100) / 100)
+                                );
+                              }}
+                              className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 disabled:opacity-30 text-blue-700 text-[11px] font-bold border border-blue-200"
+                            >
+                              +5%
+                            </button>
+                          </div>
+                        )}
                       </td>
                       <td className="p-3 text-center">
                         <span className="px-2 py-0.5 rounded bg-slate-100 font-bold text-[11px] text-slate-700">
@@ -468,7 +580,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             e.stopPropagation();
                             onSelectStock(stock.canonicalId);
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold text-[11px] hover:bg-blue-500 transition"
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] border border-slate-300 transition"
                         >
                           상세
                         </button>
