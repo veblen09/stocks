@@ -196,14 +196,36 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
       </div>
 
       {/* 2. Center: Company Name & Identifiers (High Contrast) */}
-      <div className="space-y-1 my-1">
-        <h3 className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-blue-600 transition-colors line-clamp-1">
-          {stock.nameKo}
-        </h3>
-        <div className="flex items-center gap-1.5 text-[12px] sm:text-[13px] text-slate-500 font-medium">
+      <div className="space-y-1 my-1 relative">
+        <div className="group/name relative inline-block max-w-full">
+          <h3
+            title={`${stock.nameKo}${stock.nameEn && stock.nameEn !== stock.nameKo ? ` (${stock.nameEn})` : ''} · ${stock.ticker} · ${stock.sector}`}
+            className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-blue-600 transition-colors line-clamp-1 cursor-pointer"
+          >
+            {stock.nameKo}
+          </h3>
+
+          {/* Instant Rich Hover Tooltip for Long Company Names */}
+          <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-40 hidden group-hover/name:block bg-slate-900/95 text-white text-xs px-3 py-1.5 rounded-xl shadow-2xl border border-slate-700/80 backdrop-blur-xs animate-in fade-in zoom-in-95 duration-150 min-w-max max-w-xs break-keep">
+            <div className="font-bold text-[13px] text-white flex items-center gap-1.5 flex-wrap">
+              <span>{stock.nameKo}</span>
+              {stock.nameEn && stock.nameEn !== stock.nameKo && (
+                <span className="text-slate-300 font-normal text-xs">({stock.nameEn})</span>
+              )}
+            </div>
+            <div className="text-[11px] text-blue-300 font-mono mt-0.5">
+              {stock.ticker} · <span className="text-slate-300 font-sans">{stock.sector}</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          title={`${stock.ticker} · ${stock.sector}`}
+          className="flex items-center gap-1.5 text-[12px] sm:text-[13px] text-slate-500 font-medium cursor-help"
+        >
           <span className="font-mono font-semibold text-slate-700">{stock.ticker}</span>
           <span>·</span>
-          <span className="line-clamp-1">{stock.sector}</span>
+          <span className="line-clamp-1" title={stock.sector}>{stock.sector}</span>
         </div>
 
         {/* 1-Year Mini Sparkline (Naver Style Chart) */}

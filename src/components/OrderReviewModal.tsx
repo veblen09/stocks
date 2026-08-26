@@ -226,7 +226,12 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
                     <span className="text-base shrink-0">{item.stock.market === 'KR' ? '🇰🇷' : '🇺🇸'}</span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-slate-900 text-sm">{item.stock.nameKo}</span>
+                        <span
+                          title={`${item.stock.nameKo}${item.stock.nameEn && item.stock.nameEn !== item.stock.nameKo ? ` (${item.stock.nameEn})` : ''} · ${item.stock.ticker}`}
+                          className="font-bold text-slate-900 text-sm cursor-help"
+                        >
+                          {item.stock.nameKo}
+                        </span>
                         {item.isNewlyListed && (
                           <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300">
                             신규 상장
@@ -238,7 +243,12 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-slate-500 font-mono">{item.stock.ticker} · {item.stock.sector}</span>
+                      <span
+                        title={`${item.stock.ticker} · ${item.stock.sector}`}
+                        className="text-xs text-slate-500 font-mono cursor-help"
+                      >
+                        {item.stock.ticker} · {item.stock.sector}
+                      </span>
                     </div>
                   </div>
 
