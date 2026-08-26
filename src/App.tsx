@@ -48,8 +48,8 @@ function MainRouter() {
       </main>
 
       <footer
-        className={`text-center pt-6 text-[11px] text-slate-500 border-t border-slate-200/60 mt-12 space-y-1.5 select-text ${
-          currentPage === 'game' ? 'pb-32 sm:pb-36' : 'pb-8'
+        className={`text-center pt-4 text-[11px] text-slate-500 border-t border-slate-200/60 mt-6 space-y-1 select-text ${
+          currentPage === 'game' ? 'pb-20 sm:pb-22' : 'pb-4'
         }`}
       >
         <div className="font-bold text-slate-800 text-xs sm:text-[13px]">

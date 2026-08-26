@@ -281,7 +281,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="space-y-4 pb-28 animate-fade-in">
+    <div className="space-y-4 pb-4 animate-fade-in">
       {/* Top Header & Year Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
         <div>
