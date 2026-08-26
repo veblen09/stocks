@@ -645,6 +645,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         currentYear={currentYear}
         totalStockTarget={totalStockTarget}
         draftCashTargetWeight={draftCashTargetWeight}
+        totalPortfolioValueKRW={currentAssets}
         changedStocksCount={changedStocksCount}
         estimatedFeesKRW={0}
         isOverAllocated={totalStockTarget > 1.0001}

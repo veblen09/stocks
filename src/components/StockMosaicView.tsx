@@ -12,7 +12,7 @@ import {
 import { MosaicTile } from './MosaicTile';
 import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
 import type { StockHolding } from '../types/stockGame';
-import { formatKRW, formatPercent } from '../utils/formatMoney';
+import { formatKRW, formatCompactKRW, formatPercent } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { getCompany1YrSparkline } from '../engine/companyChartEngine';
 
@@ -390,7 +390,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               const draftWeight = draftTargetWeights[stock.canonicalId] || 0;
               const yearReturn = yearEndReturns ? yearEndReturns[stock.canonicalId] : null;
               const otherStocksSum = totalStockTarget - draftWeight;
-              const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 100) / 100);
+              const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
 
               return (
                 <MosaicTile
@@ -398,6 +398,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   stock={stock}
                   mode={mosaicMode}
                   currentYear={currentYear}
+                  totalPortfolioValue={totalPortfolioValue}
                   draftTargetWeight={draftWeight}
                   availableHeadroom={availableHeadroom}
                   currentHoldingWeight={holdingWeight}
@@ -424,8 +425,8 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   <th className="p-3 text-center">1년 주가 추이</th>
                   <th className="p-3 text-right">보유 수량 / 금액</th>
                   <th className="p-3 text-right">보유 비중</th>
-                  <th className="p-3 text-right">목표 매수 비중</th>
-                  <th className="p-3 text-center">빠른 매수 조절</th>
+                  <th className="p-3 text-right">목표 매수 금액</th>
+                  <th className="p-3 text-center">빠른 금액 조절</th>
                   <th className="p-3 text-center">뉴스</th>
                   <th className="p-3 text-center">상세</th>
                 </tr>
@@ -436,10 +437,13 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   const holdingVal = holding ? holding.currentValueKRW || 0 : 0;
                   const holdingWeight = totalPortfolioValue > 0 ? holdingVal / totalPortfolioValue : 0;
                   const draftWeight = draftTargetWeights[stock.canonicalId] || 0;
+                  const targetAmount = Math.round(draftWeight * totalPortfolioValue);
                   const otherStocksSum = totalStockTarget - draftWeight;
-                  const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 100) / 100);
-                  const canIncrease = draftWeight < availableHeadroom - 0.0001;
+                  const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
+                  const canIncrease = draftWeight < availableHeadroom - 0.000001;
                   const sparkline = getCompany1YrSparkline(stock.canonicalId, currentYear - 1);
+                  const defaultBuyAmount = totalPortfolioValue >= 2000000 ? 1000000 : Math.round(totalPortfolioValue * 0.1);
+                  const defaultBuyWeight = totalPortfolioValue > 0 ? defaultBuyAmount / totalPortfolioValue : 0.1;
 
                   return (
                     <tr
@@ -492,10 +496,10 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                       <td className="p-3 text-right">
                         {draftWeight > 0.0001 ? (
                           <span className="font-mono font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300">
-                            매수 {Math.round(draftWeight * 100)}%
+                            {formatCompactKRW(targetAmount)} ({Math.round(draftWeight * 100)}%)
                           </span>
                         ) : (
-                          <span className="font-mono text-slate-400">0%</span>
+                          <span className="font-mono text-slate-400">0원</span>
                         )}
                       </td>
                       <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
@@ -505,24 +509,13 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                               type="button"
                               onClick={() => {
                                 audioManager.playUiSound('allocationUp');
-                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, 0.10));
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, defaultBuyWeight));
                               }}
                               disabled={availableHeadroom < 0.01}
                               className="buy-btn-primary py-1 px-2.5 text-[11px] font-bold"
                             >
                               <ShoppingCart size={12} />
-                              <span>+10% 매수</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                audioManager.playUiSound('allocationUp');
-                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, 0.05));
-                              }}
-                              disabled={availableHeadroom < 0.01}
-                              className="buy-btn-chip text-[11px]"
-                            >
-                              +5%
+                              <span>+{formatCompactKRW(defaultBuyAmount)} 담기</span>
                             </button>
                           </div>
                         ) : (
@@ -534,6 +527,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                                 onUpdateDraftTargetWeight(stock.canonicalId, 0);
                               }}
                               className="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold border border-rose-200"
+                              title="매수 취소 (0원)"
                             >
                               취소
                             </button>
@@ -541,29 +535,51 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                               type="button"
                               onClick={() => {
                                 audioManager.playUiSound('allocationDown');
-                                onUpdateDraftTargetWeight(
-                                  stock.canonicalId,
-                                  Math.max(0, Math.round((draftWeight - 0.05) * 100) / 100)
-                                );
+                                const step = 1000000 / (totalPortfolioValue || 10000000);
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.max(0, draftWeight - step));
                               }}
-                              className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold border border-slate-300"
+                              className="buy-btn-chip text-[10px] py-0.5 px-1.5"
                             >
-                              -5%
+                              -100만
                             </button>
                             <button
                               type="button"
-                              disabled={!canIncrease}
+                              onClick={() => {
+                                audioManager.playUiSound('allocationDown');
+                                const step = 10000 / (totalPortfolioValue || 10000000);
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.max(0, draftWeight - step));
+                              }}
+                              className="buy-btn-chip text-[10px] py-0.5 px-1.5"
+                              title="1만원 미세 감소"
+                            >
+                              -1만
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => {
                                 if (!canIncrease) return;
                                 audioManager.playUiSound('allocationUp');
-                                onUpdateDraftTargetWeight(
-                                  stock.canonicalId,
-                                  Math.min(availableHeadroom, Math.round((draftWeight + 0.05) * 100) / 100)
-                                );
+                                const step = 10000 / (totalPortfolioValue || 10000000);
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, draftWeight + step));
                               }}
-                              className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 disabled:opacity-30 text-blue-700 text-[11px] font-bold border border-blue-200"
+                              disabled={!canIncrease}
+                              className="buy-btn-chip text-[10px] py-0.5 px-1.5"
+                              title="1만원 미세 증가"
                             >
-                              +5%
+                              +1만
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!canIncrease) return;
+                                audioManager.playUiSound('allocationUp');
+                                const step = 1000000 / (totalPortfolioValue || 10000000);
+                                onUpdateDraftTargetWeight(stock.canonicalId, Math.min(availableHeadroom, draftWeight + step));
+                              }}
+                              disabled={!canIncrease}
+                              className="buy-btn-chip text-[10px] py-0.5 px-1.5"
+                            >
+                              +100만
                             </button>
                           </div>
                         )}

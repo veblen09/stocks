@@ -125,7 +125,7 @@ export function normalizeDraftTargetWeights(
   weights: Record<string, number>,
   targetSum = 1.0
 ): Record<string, number> {
-  const entries = Object.entries(weights).filter(([_, w]) => w > 0.0001);
+  const entries = Object.entries(weights).filter(([_, w]) => w > 0.000001);
   if (entries.length === 0) return {};
   const currentTotal = entries.reduce((sum, [_, w]) => sum + w, 0);
   if (currentTotal <= 0) return {};
@@ -136,13 +136,13 @@ export function normalizeDraftTargetWeights(
   const sorted = [...entries].sort((a, b) => b[1] - a[1]);
   sorted.forEach(([cid, w], idx) => {
     if (idx === sorted.length - 1) {
-      const remainder = Math.max(0, Math.round((targetSum - allocatedSum) * 100) / 100);
-      if (remainder > 0.0001) {
+      const remainder = Math.max(0, Math.round((targetSum - allocatedSum) * 1000000) / 1000000);
+      if (remainder > 0.000001) {
         normalized[cid] = remainder;
       }
     } else {
-      const scaled = Math.round(((w / currentTotal) * targetSum) * 100) / 100;
-      if (scaled > 0.0001) {
+      const scaled = Math.round(((w / currentTotal) * targetSum) * 1000000) / 1000000;
+      if (scaled > 0.000001) {
         normalized[cid] = scaled;
         allocatedSum += scaled;
       }
@@ -323,7 +323,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
     case 'SET_DRAFT_TARGET_WEIGHT': {
       const { canonicalId, weight } = action.payload;
       const currentWeights = { ...(state.draftTargetWeights || {}) };
-      if (weight <= 0.0001) {
+      if (weight <= 0.000001) {
         delete currentWeights[canonicalId];
         return {
           ...state,
@@ -338,10 +338,10 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         }
       }
 
-      const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 100) / 100);
-      const clampedWeight = Math.min(Math.round(weight * 100) / 100, maxAllowed);
+      const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 1000000) / 1000000);
+      const clampedWeight = Math.min(Math.round(weight * 1000000) / 1000000, maxAllowed);
 
-      if (clampedWeight <= 0.0001) {
+      if (clampedWeight <= 0.000001) {
         delete currentWeights[canonicalId];
       } else {
         currentWeights[canonicalId] = clampedWeight;

@@ -7,7 +7,7 @@ import {
   ShoppingCart,
 } from 'lucide-react';
 import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
-import { formatKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
+import { formatKRW, formatCompactKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { getCompany1YrSparkline } from '../engine/companyChartEngine';
 
@@ -15,6 +15,7 @@ interface MosaicTileProps {
   stock: TradableStockItem;
   mode: MosaicViewMode;
   currentYear?: number;
+  totalPortfolioValue?: number;
   draftTargetWeight?: number; // 0.00 to 1.00
   availableHeadroom?: number; // Maximum allowed target weight without exceeding 100% total
   currentHoldingWeight?: number; // 0.00 to 1.00
@@ -31,6 +32,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   stock,
   mode,
   currentYear = 2000,
+  totalPortfolioValue = 10000000,
   draftTargetWeight = 0,
   availableHeadroom,
   currentHoldingWeight = 0,
@@ -45,6 +47,13 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   const isHolding = currentHoldingWeight > 0.0001;
   const hasTarget = draftTargetWeight > 0.0001;
   const isKR = stock.market === 'KR';
+
+  // Calculate current target amount in KRW
+  const targetAmountKRW = Math.round(draftTargetWeight * totalPortfolioValue);
+
+  // Default single buy amount based on portfolio size
+  const defaultSingleBuyAmount = totalPortfolioValue >= 2000000 ? 1000000 : Math.round(totalPortfolioValue * 0.1);
+  const defaultSingleBuyWeight = totalPortfolioValue > 0 ? defaultSingleBuyAmount / totalPortfolioValue : 0.1;
 
   // 1-year sparkline for intuitive trend visualization
   const sparkline = useMemo(() => {
@@ -78,18 +87,23 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
     }
   };
 
-  // Handle quick +/- step
-  const handleStepAdjust = (e: React.MouseEvent, delta: number) => {
+  // Handle amount-based step adjust (+/- 100만, +/- 10만, +/- 1만)
+  const handleAmountAdjust = (e: React.MouseEvent, deltaAmount: number) => {
     e.stopPropagation();
-    if (delta > 0) {
+    if (totalPortfolioValue <= 0) return;
+    const currentAmount = draftTargetWeight * totalPortfolioValue;
+    const maxAllowedAmount = maxCap * totalPortfolioValue;
+    const targetAmount = Math.max(0, Math.min(maxAllowedAmount, currentAmount + deltaAmount));
+    const nextWeight = Math.round((targetAmount / totalPortfolioValue) * 1000000) / 1000000;
+
+    if (deltaAmount > 0) {
       if (!canIncrease) return;
       audioManager.playUiSound('allocationUp');
     } else {
       audioManager.playUiSound('allocationDown');
     }
     if (onQuickAdjustTarget) {
-      const nextVal = Math.max(0, Math.min(maxCap, Math.round((draftTargetWeight + delta) * 100) / 100));
-      onQuickAdjustTarget(nextVal);
+      onQuickAdjustTarget(nextWeight);
     }
   };
 
@@ -99,15 +113,16 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
     if (!canIncrease && targetPct > draftTargetWeight) return;
     audioManager.playUiSound('allocationUp');
     if (onQuickAdjustTarget) {
-      const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 100) / 100));
+      const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 1000000) / 1000000));
       onQuickAdjustTarget(nextVal);
     }
   };
 
   // Accessible descriptive label
   const ariaLabel = `${stock.nameKo}, ${stock.ticker}, ${isKR ? '한국' : '미국'}, ${stock.sector}, ${
-    isHolding ? `현재 보유 ${Math.round(currentHoldingWeight * 100)}%` : '미보유'
-  }, ${hasTarget ? `목표 매수 ${Math.round(draftTargetWeight * 100)}%` : '매수 가능'}`;
+    isHolding ? `현재 보유 ${formatKRW(currentHoldingValueKRW)} (${Math.round(currentHoldingWeight * 100)}%)` : '미보유'
+  }, ${hasTarget ? `매수 설정 ${formatCompactKRW(targetAmountKRW)} (${Math.round(draftTargetWeight * 100)}%)` : '매수 가능'}`;
+
 
   return (
     <div
@@ -246,26 +261,26 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
         {mode === 'TARGET_ALLOCATION' || mode === 'EXPLORE' ? (
           <div className="space-y-2">
             {!hasTarget ? (
-              /* Sleek Single Full-Width Buy Button when target is 0% */
+              /* Sleek Single Full-Width Buy Button when target is 0 KRW */
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                  <span>목표 비중</span>
-                  <span className="font-mono text-slate-400 text-[10px]">0% (미설정)</span>
+                  <span>매수 설정</span>
+                  <span className="font-mono text-slate-400 text-[10px]">0원 (미설정)</span>
                 </div>
 
                 <button
                   type="button"
-                  onClick={e => handleDirectBuy(e, Math.min(maxCap, 0.10))}
+                  onClick={e => handleDirectBuy(e, Math.min(maxCap, defaultSingleBuyWeight))}
                   disabled={maxCap <= 0.0001}
                   className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap active:scale-98"
-                  title={`${stock.nameKo} 10% 매수 담기`}
+                  title={`${stock.nameKo} +${formatCompactKRW(defaultSingleBuyAmount)} 매수 담기`}
                 >
                   <ShoppingCart size={13} className="shrink-0 text-white/90" />
-                  <span>+10% 매수 담기</span>
+                  <span>+{formatCompactKRW(defaultSingleBuyAmount)} 매수 담기</span>
                 </button>
               </div>
             ) : (
-              /* Active Target Allocation Controls when target > 0% */
+              /* Active Target Allocation Controls when target > 0 KRW */
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center gap-1">
@@ -274,13 +289,16 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono font-bold text-blue-700 text-sm">
-                      {Math.round(draftTargetWeight * 100)}%
+                      {formatCompactKRW(targetAmountKRW)}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      ({Math.round(draftTargetWeight * 100)}%)
                     </span>
                     <button
                       type="button"
                       onClick={e => handleDirectBuy(e, 0)}
-                      className="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-[10px] font-bold transition cursor-pointer"
-                      title="매수 취소 (0%)"
+                      className="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-[10px] font-bold transition cursor-pointer ml-0.5"
+                      title="매수 취소 (0원)"
                       aria-label={`${stock.nameKo} 매수 취소`}
                     >
                       ✕
@@ -296,47 +314,73 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                   />
                 </div>
 
-                {/* Quick 4-Step Steppers (Grid 4-cols: fits with zero overflow) */}
+                {/* Quick Steppers: Major (100만/10만) & Fine-Tuning (1만) */}
                 {onQuickAdjustTarget && (
-                  <div className="grid grid-cols-4 gap-1 w-full pt-0.5">
-                    <button
-                      type="button"
-                      onClick={e => handleStepAdjust(e, -0.05)}
-                      disabled={draftTargetWeight <= 0}
-                      className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
-                      aria-label={`${stock.nameKo} 목표비중 5% 감소`}
-                    >
-                      -5%
-                    </button>
-                    <button
-                      type="button"
-                      onClick={e => handleStepAdjust(e, -0.01)}
-                      disabled={draftTargetWeight <= 0}
-                      className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[11px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
-                      aria-label={`${stock.nameKo} 목표비중 1% 감소`}
-                    >
-                      -1%
-                    </button>
-                    <button
-                      type="button"
-                      onClick={e => handleStepAdjust(e, +0.01)}
-                      disabled={!canIncrease}
-                      title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
-                      className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
-                      aria-label={`${stock.nameKo} 목표비중 1% 증가`}
-                    >
-                      +1%
-                    </button>
-                    <button
-                      type="button"
-                      onClick={e => handleStepAdjust(e, +0.05)}
-                      disabled={!canIncrease}
-                      title={!canIncrease ? '자산배분 100%에 도달했습니다' : undefined}
-                      className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[11px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
-                      aria-label={`${stock.nameKo} 목표비중 5% 증가`}
-                    >
-                      +5%
-                    </button>
+                  <div className="space-y-1 w-full pt-0.5">
+                    {/* Row 1: Major Adjustments */}
+                    <div className="grid grid-cols-4 gap-1">
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, -1000000)}
+                        disabled={draftTargetWeight <= 0}
+                        className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[10.5px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 100만원 감소`}
+                      >
+                        -100만
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, -100000)}
+                        disabled={draftTargetWeight <= 0}
+                        className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[10.5px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 10만원 감소`}
+                      >
+                        -10만
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, +100000)}
+                        disabled={!canIncrease}
+                        title={!canIncrease ? '자산 한도에 도달했습니다' : undefined}
+                        className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[10.5px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 10만원 증가`}
+                      >
+                        +10만
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, +1000000)}
+                        disabled={!canIncrease}
+                        title={!canIncrease ? '자산 한도에 도달했습니다' : undefined}
+                        className="w-full py-1.5 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[10.5px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 100만원 증가`}
+                      >
+                        +100만
+                      </button>
+                    </div>
+
+                    {/* Row 2: 1만원 Fine-Tuning */}
+                    <div className="grid grid-cols-2 gap-1">
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, -10000)}
+                        disabled={draftTargetWeight <= 0}
+                        className="w-full py-1 text-center rounded-lg bg-slate-50 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed text-slate-600 text-[10px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 1만원 미세 감소`}
+                      >
+                        -1만원 (미세)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => handleAmountAdjust(e, +10000)}
+                        disabled={!canIncrease}
+                        title={!canIncrease ? '자산 한도에 도달했습니다' : undefined}
+                        className="w-full py-1 text-center rounded-lg bg-blue-50/60 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-600 text-[10px] font-bold font-mono border border-blue-100 transition-colors cursor-pointer"
+                        aria-label={`${stock.nameKo} 1만원 미세 증가`}
+                      >
+                        +1만원 (미세)
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

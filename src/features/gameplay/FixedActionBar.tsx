@@ -1,12 +1,13 @@
 import React from 'react';
 import { ShoppingCart, Play, RotateCcw, Sparkles } from 'lucide-react';
-import { formatKRW } from '../../utils/formatMoney';
+import { formatKRW, formatCompactKRW } from '../../utils/formatMoney';
 import { audioManager } from '../../utils/audioManager';
 
 interface FixedActionBarProps {
   currentYear: number;
   totalStockTarget: number;
   draftCashTargetWeight: number;
+  totalPortfolioValueKRW?: number;
   changedStocksCount: number;
   estimatedFeesKRW: number;
   isOverAllocated: boolean;
@@ -19,6 +20,8 @@ interface FixedActionBarProps {
 export const FixedActionBar: React.FC<FixedActionBarProps> = ({
   currentYear,
   totalStockTarget,
+  draftCashTargetWeight,
+  totalPortfolioValueKRW = 10000000,
   changedStocksCount,
   estimatedFeesKRW,
   isOverAllocated,
@@ -29,6 +32,8 @@ export const FixedActionBar: React.FC<FixedActionBarProps> = ({
 }) => {
   const stockPct = Math.round(totalStockTarget * 100);
   const cashPct = Math.max(0, 100 - stockPct);
+  const stockAmount = Math.round(totalStockTarget * totalPortfolioValueKRW);
+  const cashAmount = Math.max(0, Math.round(draftCashTargetWeight * totalPortfolioValueKRW));
 
   return (
     <nav
@@ -40,14 +45,14 @@ export const FixedActionBar: React.FC<FixedActionBarProps> = ({
         {/* Allocation Summary & Deltas */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-slate-600 font-bold hidden sm:inline">목표 자산배분:</span>
+            <span className="text-slate-600 font-bold hidden sm:inline">목표 투자:</span>
             <div className="flex items-center gap-1.5 font-mono font-bold">
               <span className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                주식 {stockPct}%
+                주식 {formatCompactKRW(stockAmount)} ({stockPct}%)
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                현금 {cashPct}%
+                현금 {formatCompactKRW(cashAmount)} ({cashPct}%)
               </span>
             </div>
           </div>

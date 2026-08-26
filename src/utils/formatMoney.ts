@@ -1,8 +1,4 @@
 /**
- * Korean Currency & Percentage Formatting Utilities
- */
-
-/**
  * Formats a KRW amount into Korean units (조, 억, 만 원)
  * e.g. 10000000 -> 1,000만 원
  *      125000000 -> 1억 2,500만 원
@@ -28,6 +24,35 @@ export function formatKRW(amount: number): string {
 
   return `${parts.join(' ')} 원`;
 }
+
+/**
+ * Formats a KRW amount into concise Korean units without unnecessary spacing
+ * e.g. 1000000 -> 100만원
+ *      10000000 -> 1,000만원
+ *      125000000 -> 1억 2,500만원
+ */
+export function formatCompactKRW(amount: number): string {
+  if (!isFinite(amount) || isNaN(amount)) return '0원';
+  const rounded = Math.round(amount);
+  if (rounded === 0) return '0원';
+  if (rounded < 0) return `-${formatCompactKRW(Math.abs(rounded))}`;
+
+  const absVal = Math.abs(rounded);
+  const jo = Math.floor(absVal / 1000000000000);
+  const eok = Math.floor((absVal % 1000000000000) / 100000000);
+  const man = Math.floor((absVal % 100000000) / 10000);
+  const won = absVal % 10000;
+
+  const parts: string[] = [];
+  if (jo > 0) parts.push(`${jo.toLocaleString()}조`);
+  if (eok > 0) parts.push(`${eok.toLocaleString()}억`);
+  if (man > 0 && jo === 0) parts.push(`${man.toLocaleString()}만`);
+  if (won > 0 && jo === 0 && eok === 0 && man === 0) return `${won.toLocaleString()}원`;
+  if (parts.length === 0) return `${won.toLocaleString()}원`;
+
+  return `${parts.join(' ')}원`;
+}
+
 
 /**
  * Simple formatted won with commas

@@ -9,9 +9,9 @@ import {
   Edit3,
   ExternalLink,
   Sparkles,
-  PieChart,
   CheckCircle2,
   ShoppingCart,
+  Coins,
   Maximize2,
   Minimize2,
 } from 'lucide-react';
@@ -20,9 +20,9 @@ import {
   getCompanyOverviewAtYear,
   getAvailableNewsForYear,
 } from '../engine/newsEngine';
-import { STOCKS_BY_ID } from '../engine/returnEngine';
+import { STOCKS_BY_ID, getStockPriceKRW } from '../engine/returnEngine';
 import { getListingEventByCompanyId, isNewlyListedInYear } from '../engine/universeEngine';
-import { formatKRW } from '../utils/formatMoney';
+import { formatKRW, formatCompactKRW } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { NeutralNewsAnalysisModal } from './NeutralNewsAnalysisModal';
 import { CompanyPriceChart } from './CompanyPriceChart';
@@ -107,7 +107,16 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   const otherStocksSum = Object.entries(state.draftTargetWeights || {})
     .filter(([cid]) => cid !== canonicalId)
     .reduce((sum, [_, w]) => sum + w, 0);
-  const maxAllowedWeight = Math.max(0, Math.round((1.0 - otherStocksSum) * 100) / 100);
+  const maxAllowedWeight = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
+
+  // Amounts in KRW
+  const targetAmountKRW = Math.min(
+    Math.round(maxAllowedWeight * totalPortfolioValue),
+    Math.round(targetSliderVal * totalPortfolioValue)
+  );
+  const maxAllowedAmountKRW = Math.round(maxAllowedWeight * totalPortfolioValue);
+  const priceKRW = getStockPriceKRW(canonicalId, currentYear - 1) || 1;
+  const estimatedShares = priceKRW > 0 ? (targetAmountKRW / priceKRW) : 0;
 
   // News available strictly up to cutoffDate
   const allAvailableNews = getAvailableNewsForYear(currentYear, { canonicalCompanyId: canonicalId });
@@ -141,7 +150,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   };
 
   const handleApplyWeight = (val: number, isIncrease?: boolean) => {
-    const clamped = Math.max(0, Math.min(maxAllowedWeight, Math.round(val * 100) / 100));
+    const clamped = Math.max(0, Math.min(maxAllowedWeight, Math.round(val * 1000000) / 1000000));
     if (isIncrease !== undefined) {
       if (isIncrease) {
         audioManager.playUiSound('allocationUp');
@@ -155,6 +164,18 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
     } else {
       dispatch({ type: 'SET_DRAFT_TARGET_WEIGHT', payload: { canonicalId, weight: clamped } });
     }
+  };
+
+  const handleApplyAmount = (amount: number, isIncrease?: boolean) => {
+    if (totalPortfolioValue <= 0) return;
+    const clampedAmount = Math.max(0, Math.min(maxAllowedAmountKRW, amount));
+    const nextWeight = Math.round((clampedAmount / totalPortfolioValue) * 1000000) / 1000000;
+    handleApplyWeight(nextWeight, isIncrease);
+  };
+
+  const handleAmountStep = (delta: number) => {
+    const isPlus = delta > 0;
+    handleApplyAmount(targetAmountKRW + delta, isPlus);
   };
 
   const handleNormalizeAll = () => {
@@ -262,9 +283,13 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-slate-500 font-medium">설정 목표비중:</span>
+              <span className="text-slate-500 font-medium">설정 매수 금액:</span>
               <span className="font-mono font-bold text-blue-600 text-sm">
-                {Math.round(targetSliderVal * 100)}%
+                {targetAmountKRW > 0 ? (
+                  <span>{formatCompactKRW(targetAmountKRW)} ({Math.round(targetSliderVal * 100)}%)</span>
+                ) : (
+                  <span className="text-slate-400 font-normal">0원 (미설정)</span>
+                )}
               </span>
             </div>
           </div>
@@ -339,8 +364,8 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                 activeTab === 'ALLOCATION' ? 'bg-white text-blue-600 shadow-sm border border-slate-200 font-bold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <PieChart size={13} />
-              <span>자산배분</span>
+              <Coins size={13} />
+              <span>매수 금액 설정</span>
             </button>
 
             <button
@@ -571,123 +596,292 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
             </div>
           )}
 
-          {/* TAB 6: ASSET ALLOCATION (Numeric Keypad Style) */}
+          {/* TAB 6: ASSET ALLOCATION (KRW Amount & Keypad) */}
           {activeTab === 'ALLOCATION' && (
             <div className="space-y-4">
               <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-200 space-y-4 shadow-sm">
-                <div className="flex items-center justify-between">
+                {/* Hero Header Box */}
+                <div className="flex items-center justify-between flex-wrap gap-2 pb-1 border-b border-blue-200/60">
                   <div>
                     <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <ShoppingCart size={14} className="text-blue-600" />
-                      <span>주식 매수 및 목표 비중 설정</span>
+                      <ShoppingCart size={15} className="text-blue-600" />
+                      <span>{overview.nameKo} 매수 금액 설정</span>
                     </span>
                     <span className="text-xs text-slate-500 mt-0.5 block">
-                      설정 가능 최대: <strong className="text-blue-700 font-bold">{Math.round(maxAllowedWeight * 100)}%</strong> (다른 종목 합계: {Math.round(otherStocksSum * 100)}%)
+                      투자 가능 잔액 한도: <strong className="text-blue-700 font-bold">{formatKRW(maxAllowedAmountKRW)} ({formatCompactKRW(maxAllowedAmountKRW)})</strong>
                     </span>
                   </div>
-                  <span className="font-mono text-xl font-bold text-blue-700">
-                    {Math.round(targetSliderVal * 100)}% ({formatKRW(totalPortfolioValue * targetSliderVal)})
-                  </span>
-                </div>
-
-                <div className="p-3 bg-white rounded-xl border border-blue-100 text-xs text-slate-600 leading-relaxed">
-                  💡 <strong>매수 안내</strong>: 목표 비중을 설정한 후 하단 액션바의 <strong>[투자 실행 & 1년 진행]</strong>을 누르면, 설정된 비중만큼 주식이 자동 일괄 매수 체결됩니다.
-                </div>
-
-                {/* Range Slider */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[11px] text-slate-500 font-mono">
-                    <span>0% (미보유)</span>
-                    <span className="font-bold text-blue-700">설정치: {Math.round(targetSliderVal * 100)}%</span>
-                    <span>최대 {Math.round(maxAllowedWeight * 100)}%</span>
+                  <div className="text-right">
+                    <span className="font-mono text-2xl font-black text-blue-700 block tracking-tight">
+                      {formatKRW(targetAmountKRW)}
+                    </span>
+                    <span className="text-xs text-slate-500 font-mono font-medium">
+                      약 {estimatedShares.toFixed(2)}주 매수 예정 · 총 자산의 {Math.round(targetSliderVal * 100)}%
+                    </span>
                   </div>
+                </div>
+
+                {/* 1. Fine-tuning Range Slider synced with 10,000 KRW step */}
+                <div className="p-4 bg-white rounded-xl border border-blue-200/80 shadow-xs space-y-2.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                    <span className="flex items-center gap-1">
+                      <span>📏</span>
+                      <span>슬라이더 바 (1만원 단위 미세 조절)</span>
+                    </span>
+                    <span className="font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      {formatCompactKRW(targetAmountKRW)} ({formatKRW(targetAmountKRW)})
+                    </span>
+                  </div>
+
                   <input
                     type="range"
                     min={0}
-                    max={Math.max(0.01, maxAllowedWeight)}
-                    step={0.01}
-                    value={targetSliderVal}
-                    onChange={e => handleApplyWeight(parseFloat(e.target.value))}
+                    max={Math.max(10000, maxAllowedAmountKRW)}
+                    step={10000}
+                    value={targetAmountKRW}
+                    onChange={e => handleApplyAmount(parseInt(e.target.value, 10))}
                     onMouseUp={() => audioManager.playUiSound('keyTap')}
                     onTouchEnd={() => audioManager.playUiSound('keyTap')}
-                    className="w-full cursor-pointer h-2 bg-slate-200 rounded-lg accent-blue-600"
+                    className="w-full cursor-pointer h-2.5 bg-slate-200 rounded-lg accent-blue-600"
+                    aria-label="1만원 단위 매수 금액 슬라이더"
                   />
+
+                  {/* Quick-snap Chips Below Slider */}
+                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleApplyAmount(0, false)}
+                      className="px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-bold transition cursor-pointer border border-slate-200"
+                    >
+                      0원 (취소)
+                    </button>
+                    <div className="flex items-center gap-1 flex-wrap justify-end">
+                      {[1000000, 2000000, 3000000, 5000000, 10000000].map(amt => {
+                        if (amt > maxAllowedAmountKRW) return null;
+                        return (
+                          <button
+                            key={amt}
+                            type="button"
+                            onClick={() => handleApplyAmount(amt, amt > targetAmountKRW)}
+                            className={`px-2 py-0.5 rounded font-bold transition cursor-pointer border ${
+                              Math.abs(targetAmountKRW - amt) < 5000
+                                ? 'bg-blue-600 text-white border-blue-700'
+                                : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200'
+                            }`}
+                          >
+                            {formatCompactKRW(amt)}
+                          </button>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => handleApplyAmount(maxAllowedAmountKRW, true)}
+                        disabled={maxAllowedAmountKRW <= 0}
+                        className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition cursor-pointer border border-blue-200"
+                      >
+                        전액 ({formatCompactKRW(maxAllowedAmountKRW)})
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Keypad-Style Step Buttons (.allocation-key) */}
+                {/* 2. 100만원 Unit Quick Buttons */}
                 <div className="space-y-1.5">
-                  <span className="text-xs font-bold text-slate-500 block">비중 정밀 조절 키패드</span>
-                  <div className="grid grid-cols-6 gap-2">
-                    {[-0.10, -0.05, -0.01, +0.01, +0.05, +0.10].map(delta => {
-                      const isPlus = delta > 0;
-                      const isDisabled = isPlus ? targetSliderVal >= maxAllowedWeight - 0.0001 : targetSliderVal <= 0;
+                  <span className="text-xs font-bold text-slate-700 block flex items-center justify-between">
+                    <span>⚡ 100만원 단위 빠른 매수 담기</span>
+                    <span className="text-[11px] text-slate-400 font-normal">원하는 100만 단위 버튼을 눌러 담으세요</span>
+                  </span>
+                  
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                    {[
+                      { label: '+100만원', delta: 1000000 },
+                      { label: '+200만원', delta: 2000000 },
+                      { label: '+300만원', delta: 3000000 },
+                      { label: '+500만원', delta: 5000000 },
+                      { label: '+1,000만원', delta: 10000000 },
+                    ].map(item => {
+                      const isDisabled = targetAmountKRW + item.delta > maxAllowedAmountKRW + 10;
                       return (
                         <button
-                          key={delta}
+                          key={item.label}
                           type="button"
                           disabled={isDisabled}
-                          onClick={() => handleApplyWeight(targetSliderVal + delta, isPlus)}
-                          className={`allocation-key ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+                          onClick={() => handleAmountStep(item.delta)}
+                          className={`allocation-key font-mono text-xs py-2 font-bold ${isDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
                         >
-                          {delta > 0 ? `+${delta * 100}%` : `${delta * 100}%`}
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => handleApplyAmount(maxAllowedAmountKRW, true)}
+                      disabled={maxAllowedAmountKRW <= targetAmountKRW + 100}
+                      className="allocation-key font-mono text-xs py-2 font-bold bg-blue-50 text-blue-800 border-blue-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      전액 매수
+                    </button>
+                  </div>
+
+                  {/* 100만원 단위 감소 */}
+                  <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+                    {[
+                      { label: '-100만원', delta: -1000000 },
+                      { label: '-200만원', delta: -2000000 },
+                      { label: '-500만원', delta: -5000000 },
+                    ].map(item => {
+                      const isDisabled = targetAmountKRW <= 0;
+                      return (
+                        <button
+                          key={item.label}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleAmountStep(item.delta)}
+                          className={`py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed font-bold text-xs border border-slate-200 transition cursor-pointer font-mono ${
+                            isDisabled ? 'opacity-30 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() => handleApplyAmount(0, false)}
+                      disabled={targetAmountKRW <= 0}
+                      className="py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 disabled:opacity-30 disabled:cursor-not-allowed font-bold text-xs border border-rose-200 transition cursor-pointer"
+                    >
+                      초기화 (0원)
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. 1만원 Unit Fine-Tuning Keypad */}
+                <div className="space-y-1.5">
+                  <span className="text-xs font-bold text-slate-700 block flex items-center justify-between">
+                    <span>🎯 1만원 단위 미세 조정</span>
+                    <span className="text-[11px] text-slate-400 font-normal">1만원~50만원 단위로 정밀 조절</span>
+                  </span>
+
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { label: '+1만 (미세)', delta: 10000 },
+                      { label: '+5만', delta: 50000 },
+                      { label: '+10만', delta: 100000 },
+                      { label: '+50만', delta: 500000 },
+                    ].map(item => {
+                      const isDisabled = targetAmountKRW + item.delta > maxAllowedAmountKRW + 10;
+                      return (
+                        <button
+                          key={item.label}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleAmountStep(item.delta)}
+                          className={`py-2 rounded-xl bg-blue-50/70 hover:bg-blue-100 text-blue-700 font-bold text-xs border border-blue-200 transition cursor-pointer font-mono ${
+                            isDisabled ? 'opacity-30 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { label: '-1만 (미세)', delta: -10000 },
+                      { label: '-5만', delta: -50000 },
+                      { label: '-10만', delta: -100000 },
+                      { label: '-50만', delta: -500000 },
+                    ].map(item => {
+                      const isDisabled = targetAmountKRW <= 0;
+                      return (
+                        <button
+                          key={item.label}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleAmountStep(item.delta)}
+                          className={`py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed font-bold text-xs border border-slate-200 transition cursor-pointer font-mono ${
+                            isDisabled ? 'opacity-30 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          {item.label}
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Preset Quick Actions */}
-                <div className="space-y-2 pt-2 border-t border-blue-100">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* 4. Direct Amount Input Card */}
+                <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-xs space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                    <span>직접 매수 금액 입력 (원)</span>
+                    <span className="text-[11px] text-slate-400 font-normal">
+                      키보드로 원하는 금액 직접 입력
+                    </span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={targetAmountKRW > 0 ? targetAmountKRW.toLocaleString() : ''}
+                        placeholder="0"
+                        onChange={e => {
+                          const raw = e.target.value.replace(/[^0-9]/g, '');
+                          const val = raw ? parseInt(raw, 10) : 0;
+                          handleApplyAmount(val);
+                        }}
+                        className="w-full py-2 px-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-mono font-bold text-base focus:bg-white focus:border-blue-600 focus:outline-none pr-8 text-right"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">
+                        원
+                      </span>
+                    </div>
+
                     <button
                       type="button"
-                      disabled={targetSliderVal <= 0}
-                      onClick={() => handleApplyWeight(0, false)}
-                      className="py-2.5 bg-white hover:bg-rose-50 text-rose-600 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-rose-200 shadow-sm"
+                      onClick={() => handleApplyAmount(0, false)}
+                      disabled={targetAmountKRW <= 0}
+                      className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 disabled:opacity-30 disabled:cursor-not-allowed font-bold text-xs border border-slate-300 transition cursor-pointer"
                     >
-                      매수 취소 (0%)
-                    </button>
-                    <button
-                      type="button"
-                      disabled={maxAllowedWeight < 0.01}
-                      onClick={() => handleApplyWeight(Math.min(0.05, maxAllowedWeight), true)}
-                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
-                    >
-                      +5% 매수
-                    </button>
-                    <button
-                      type="button"
-                      disabled={maxAllowedWeight < 0.01}
-                      onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
-                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
-                    >
-                      +10% 매수
-                    </button>
-                    <button
-                      type="button"
-                      disabled={maxAllowedWeight < 0.01}
-                      onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
-                      className="py-2.5 bg-white hover:bg-blue-50 text-blue-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-sm"
-                    >
-                      +20% 매수
+                      초기화
                     </button>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      disabled={maxAllowedWeight <= targetSliderVal + 0.0001}
-                      onClick={() => handleApplyWeight(maxAllowedWeight, true)}
-                      className="py-2 bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-30 disabled:cursor-not-allowed rounded-xl font-bold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1"
-                    >
-                      <span>최대 매수 ({Math.round(maxAllowedWeight * 100)}%)</span>
-                    </button>
+                {/* Estimated Execution Info Box */}
+                <div className="p-3.5 bg-white rounded-xl border border-slate-200 space-y-2 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-slate-700">
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-[11px] text-slate-500 block">1주당 기준 주가</span>
+                      <span className="font-mono font-bold text-slate-900 text-xs">
+                        {formatKRW(priceKRW)}
+                      </span>
+                    </div>
 
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-[11px] text-slate-500 block">예상 매수 수량</span>
+                      <span className="font-mono font-bold text-blue-700 text-xs">
+                        약 {estimatedShares.toFixed(2)}주
+                      </span>
+                    </div>
+
+                    <div className="p-2 rounded-lg bg-slate-50 border border-slate-100 col-span-2 sm:col-span-1">
+                      <span className="text-[11px] text-slate-500 block">매수 후 예상 잔여 현금</span>
+                      <span className="font-mono font-bold text-emerald-700 text-xs">
+                        {formatKRW(Math.max(0, totalPortfolioValue - targetAmountKRW))}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                     <button
                       type="button"
                       onClick={handleNormalizeAll}
-                      className="py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl font-bold text-xs transition cursor-pointer border border-blue-300 shadow-xs flex items-center justify-center gap-1"
+                      className="py-2 px-3 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl font-bold text-xs transition cursor-pointer border border-blue-200 shadow-xs flex items-center gap-1 w-full justify-center"
                     >
+                      <Sparkles size={13} />
                       <span>⚡ 전체 담은 종목 100% 비율 맞춤</span>
                     </button>
                   </div>
@@ -736,91 +930,105 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
               <ShoppingCart size={18} />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-bold text-slate-900 text-sm">
-                  {targetSliderVal > 0.0001 ? (
-                    <span className="text-blue-700 font-mono">
-                      매수 목표 {Math.round(targetSliderVal * 100)}%
+                  {targetAmountKRW > 0 ? (
+                    <span className="text-blue-700 font-mono font-bold">
+                      매수 {formatCompactKRW(targetAmountKRW)} ({formatKRW(targetAmountKRW)})
                     </span>
                   ) : (
-                    <span className="text-slate-600">매수 미설정 (0%)</span>
+                    <span className="text-slate-600">매수 미설정 (0원)</span>
                   )}
                 </span>
-                {targetSliderVal > 0.0001 && (
+                {targetAmountKRW > 0 && (
                   <span className="text-xs text-slate-500 font-mono font-semibold">
-                    (약 {formatKRW(totalPortfolioValue * targetSliderVal)})
+                    (약 {estimatedShares.toFixed(2)}주 · {Math.round(targetSliderVal * 100)}%)
                   </span>
                 )}
               </div>
               <p className="text-[11px] text-slate-500">
-                {targetSliderVal > 0.0001
+                {targetAmountKRW > 0
                   ? '하단 바의 [투자 실행] 시 일괄 매수됩니다'
-                  : `최대 ${Math.round(maxAllowedWeight * 100)}%까지 매수 가능`}
+                  : `최대 ${formatCompactKRW(maxAllowedAmountKRW)}까지 매수 가능`}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 flex-wrap">
-            {targetSliderVal <= 0.0001 ? (
+            {targetAmountKRW <= 0 ? (
               <>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(Math.min(0.05, maxAllowedWeight), true)}
-                  disabled={maxAllowedWeight < 0.01}
+                  onClick={() => handleAmountStep(10000)}
+                  disabled={maxAllowedAmountKRW < 10000}
                   className="buy-btn-chip"
+                  title="1만원 매수 담기"
                 >
-                  +5%
+                  +1만
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
-                  disabled={maxAllowedWeight < 0.01}
+                  onClick={() => handleAmountStep(500000)}
+                  disabled={maxAllowedAmountKRW < 500000}
                   className="buy-btn-chip"
                 >
-                  +10%
+                  +50만
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(Math.min(0.20, maxAllowedWeight), true)}
-                  disabled={maxAllowedWeight < 0.01}
-                  className="buy-btn-chip"
-                >
-                  +20%
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleApplyWeight(Math.min(0.10, maxAllowedWeight), true)}
-                  disabled={maxAllowedWeight < 0.01}
+                  onClick={() => handleAmountStep(1000000)}
+                  disabled={maxAllowedAmountKRW < 1000000}
                   className="buy-btn-primary py-2 px-3.5 text-xs font-bold"
                 >
                   <ShoppingCart size={13} />
-                  <span>+ 10% 매수 담기</span>
+                  <span>+100만원 매수 담기</span>
                 </button>
               </>
             ) : (
               <>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(0, false)}
+                  onClick={() => handleApplyAmount(0, false)}
                   className="py-1.5 px-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 text-xs transition cursor-pointer"
+                  title="매수 취소 (0원)"
                 >
-                  매수 취소 (0%)
+                  취소 (0원)
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(targetSliderVal - 0.05, false)}
-                  disabled={targetSliderVal <= 0}
-                  className="py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300 text-xs transition cursor-pointer"
+                  onClick={() => handleAmountStep(-1000000)}
+                  disabled={targetAmountKRW <= 0}
+                  className="py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300 text-xs transition cursor-pointer font-mono"
+                  title="100만원 감소"
                 >
-                  -5%
+                  -100만
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleApplyWeight(targetSliderVal + 0.05, true)}
-                  disabled={targetSliderVal >= maxAllowedWeight - 0.0001}
-                  className="py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200 text-xs transition cursor-pointer"
+                  onClick={() => handleAmountStep(-10000)}
+                  disabled={targetAmountKRW <= 0}
+                  className="py-1.5 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-300 text-xs transition cursor-pointer font-mono"
+                  title="1만원 미세 감소"
                 >
-                  +5%
+                  -1만
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAmountStep(+10000)}
+                  disabled={targetAmountKRW + 10000 > maxAllowedAmountKRW + 10}
+                  className="py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200 text-xs transition cursor-pointer font-mono"
+                  title="1만원 미세 증가"
+                >
+                  +1만
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAmountStep(+1000000)}
+                  disabled={targetAmountKRW + 1000000 > maxAllowedAmountKRW + 10}
+                  className="py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200 text-xs transition cursor-pointer font-mono"
+                  title="100만원 증가"
+                >
+                  +100만
                 </button>
                 {activeTab !== 'ALLOCATION' && (
                   <button
@@ -828,8 +1036,8 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
                     onClick={() => setActiveTab('ALLOCATION')}
                     className="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition cursor-pointer shadow-xs flex items-center gap-1"
                   >
-                    <PieChart size={13} />
-                    <span>비중 정밀 조절</span>
+                    <Coins size={13} />
+                    <span>금액 직접 조절</span>
                   </button>
                 )}
               </>

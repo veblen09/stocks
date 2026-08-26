@@ -245,13 +245,13 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
                   <div className="flex items-center gap-3 text-right">
                     <div>
                       <div className="flex items-center justify-end gap-1.5 font-mono text-xs">
-                        <span className="text-slate-500">{Math.round(item.currentWeight * 100)}%</span>
+                        <span className="text-slate-500 font-semibold">{formatKRW(item.currentValueKRW)} ({Math.round(item.currentWeight * 100)}%)</span>
                         <ArrowRight size={12} className="text-slate-400" />
-                        <span className="font-bold text-blue-600">{Math.round(item.targetWeight * 100)}%</span>
+                        <span className="font-bold text-blue-600">{formatKRW(item.targetValueKRW)} ({Math.round(item.targetWeight * 100)}%)</span>
                       </div>
                       <span className="text-xs font-medium block mt-0.5">
-                        {item.action === 'BUY' && <span className="text-blue-700 font-bold">매수: +{formatKRW(item.changeKRW)}</span>}
-                        {item.action === 'SELL' && <span className="text-amber-700 font-bold">매도: -{formatKRW(Math.abs(item.changeKRW))}</span>}
+                        {item.action === 'BUY' && <span className="text-blue-700 font-bold text-sm">매수: +{formatKRW(item.changeKRW)}</span>}
+                        {item.action === 'SELL' && <span className="text-amber-700 font-bold text-sm">매도: -{formatKRW(Math.abs(item.changeKRW))}</span>}
                         {item.action === 'HOLD' && <span className="text-slate-400">변동 없음</span>}
                       </span>
                     </div>
@@ -278,29 +278,35 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
         <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl shrink-0 space-y-2 text-xs">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
             <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-              <span className="text-xs text-slate-500 block font-semibold">주식 목표 비중</span>
-              <span className="font-bold text-sm text-blue-700">
-                {Math.round(totalStockTarget * 100)}%
+              <span className="text-xs text-slate-500 block font-semibold">주식 목표 금액</span>
+              <span className="font-bold text-sm text-blue-700 block font-mono">
+                {formatKRW(totalPortfolioValue * totalStockTarget)}
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                ({Math.round(totalStockTarget * 100)}%)
               </span>
             </div>
 
             <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-              <span className="text-xs text-slate-500 block font-semibold">현금 목표 비중</span>
-              <span className="font-bold text-sm text-emerald-700">
-                {Math.round(targetCashWeight * 100)}%
+              <span className="text-xs text-slate-500 block font-semibold">현금 목표 잔액</span>
+              <span className="font-bold text-sm text-emerald-700 block font-mono">
+                {formatKRW(totalPortfolioValue * targetCashWeight)}
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                ({Math.round(targetCashWeight * 100)}%)
               </span>
             </div>
 
             <div className="p-2.5 bg-white rounded-lg border border-slate-200">
               <span className="text-xs text-slate-500 block font-semibold">예상 거래 수수료</span>
-              <span className="font-bold text-xs text-slate-700">
+              <span className="font-bold text-xs text-slate-700 font-mono block mt-1">
                 {formatKRW(estimatedFees)}
               </span>
             </div>
 
             <div className="p-2.5 bg-white rounded-lg border border-slate-200">
               <span className="text-xs text-slate-500 block font-semibold">거래 후 예상 현금</span>
-              <span className="font-bold text-xs text-emerald-700">
+              <span className="font-bold text-xs text-emerald-700 font-mono block mt-1">
                 {formatKRW(Math.max(0, estimatedRemainingCash))}
               </span>
             </div>
