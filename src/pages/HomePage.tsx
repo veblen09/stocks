@@ -352,6 +352,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <span className="text-emerald-800 font-extrabold block">3. 과정 중심 평가와 3대 축</span>
                 <p>단순한 수익률뿐만 아니라 투자 근거 수립, 원칙 유지, 예측 보정 능력을 3대 축으로 종합 평가합니다.</p>
               </div>
+              <div className="text-[10px] text-slate-400 font-semibold text-center border-t border-slate-200/60 pt-2 select-text">
+                Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)
+              </div>
             </div>
             <button
               onClick={() => { audioManager.playSound('click'); setShowGuide(false); }}
@@ -394,6 +397,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <p className="font-medium text-amber-800">
                   이 시뮬레이션의 50개 종목은 현재 2025년에 알려진 대표 기업을 중심으로 선정되어 생존자 편향이 존재할 수 있습니다. 따라서 결과를 실제 투자전략의 객관적 백테스트로 해석해서는 안 됩니다.
                 </p>
+              </div>
+              <div className="text-[10px] text-slate-400 font-semibold text-center border-t border-slate-200/60 pt-2 select-text">
+                Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)
               </div>
             </div>
             <button

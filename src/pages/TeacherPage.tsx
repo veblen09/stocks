@@ -216,6 +216,18 @@ export const TeacherPage: React.FC<TeacherPageProps> = ({ onNavigate }) => {
             </GlassCard>
           ))}
         </div>
+
+        {/* Author / Teacher Credit & Copyright Card */}
+        <GlassCard className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-600 text-xs border-slate-200/70" variant="default">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-slate-800">기획 및 개발:</span>
+            <span className="font-medium text-slate-700">하나고등학교 일반사회 교사 김윤구</span>
+            <a href="mailto:veblen@hana.hs.kr" className="text-blue-600 hover:underline font-mono text-[11px]">(veblen@hana.hs.kr)</a>
+          </div>
+          <div className="text-[11px] text-slate-400 font-semibold select-text">
+            Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved.
+          </div>
+        </GlassCard>
       </div>
     </HeroBackground>
   );

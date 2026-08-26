@@ -689,6 +689,16 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
         </div>
       </GlassCard>
 
+      {/* Report Footer & Copyright Notice */}
+      <div className="p-4 bg-white/80 rounded-2xl border border-slate-200 text-center space-y-1 select-text shadow-xs backdrop-blur-sm">
+        <div className="text-xs font-bold text-slate-700">
+          Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)
+        </div>
+        <div className="text-[10.5px] text-slate-400 font-medium">
+          머니트랙: 45년 한·미 주식투자 실험실 (1980~2025) · 고등학교 금융·경제 교육용 모의 시뮬레이션
+        </div>
+      </div>
+
       {/* Restart Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showRestartConfirm}
