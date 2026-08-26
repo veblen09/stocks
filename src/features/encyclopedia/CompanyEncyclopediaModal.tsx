@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpen, X, CheckCircle2, Calendar } from 'lucide-react';
+import { BookOpen, X, CheckCircle2, Calendar, AlertTriangle, Skull } from 'lucide-react';
 import { GlassCard } from '../../components/GlassCard';
 import type { CompanyEncyclopediaEntry } from '../../types/encyclopedia';
 import { audioManager } from '../../utils/audioManager';
+import { HISTORICAL_STOCKS_BY_ID } from '../../engine/universeEngine';
 
 interface CompanyEncyclopediaModalProps {
   isOpen: boolean;
@@ -113,6 +114,11 @@ export const CompanyEncyclopediaModal: React.FC<CompanyEncyclopediaModalProps> =
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           {filteredEntries.map(entry => {
             const isKR = entry.market === 'KR';
+            const hStock = HISTORICAL_STOCKS_BY_ID[entry.canonicalCompanyId];
+            const delistYear = hStock?.delistingDate ? parseInt(hStock.delistingDate.slice(0, 4)) : null;
+            const isDelistedNow = delistYear !== null && delistYear <= currentYear;
+            const isFallenGiant = (entry.canonicalCompanyId === 'US_BB' || entry.canonicalCompanyId === 'US_NOK') && currentYear >= 2011;
+
             return (
               <div
                 key={entry.canonicalCompanyId}
@@ -122,7 +128,11 @@ export const CompanyEncyclopediaModal: React.FC<CompanyEncyclopediaModalProps> =
                     onOpenCompanyDetail(entry.canonicalCompanyId);
                   }
                 }}
-                className="p-4 bg-white hover:bg-indigo-50/40 rounded-2xl border border-slate-200 hover:border-indigo-300 transition-all space-y-2 cursor-pointer shadow-xs group"
+                className={`p-4 rounded-2xl border transition-all space-y-2 cursor-pointer shadow-xs group ${
+                  isDelistedNow
+                    ? 'bg-rose-50/40 border-rose-200 hover:border-rose-300'
+                    : 'bg-white hover:bg-indigo-50/40 border-slate-200 hover:border-indigo-300'
+                }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -137,6 +147,16 @@ export const CompanyEncyclopediaModal: React.FC<CompanyEncyclopediaModalProps> =
                       <span className="font-mono font-semibold text-slate-500 text-[11px]">
                         {entry.tickerAtListing}
                       </span>
+                      {isDelistedNow && (
+                        <span className="px-1.5 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-bold flex items-center gap-0.5">
+                          <Skull size={10} /> 상장폐지 ({delistYear}년)
+                        </span>
+                      )}
+                      {isFallenGiant && (
+                        <span className="px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold flex items-center gap-0.5">
+                          <AlertTriangle size={10} /> 몰락 거인
+                        </span>
+                      )}
                     </div>
                     <h3 className="font-bold text-slate-900 text-sm mt-1 group-hover:text-indigo-600 transition">
                       {entry.companyNameAtListing}

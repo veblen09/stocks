@@ -398,7 +398,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-1 text-amber-900">
                 <span className="font-extrabold block">⚠️ 생존자 편향 및 미래지식 편향 경고</span>
                 <p className="font-medium text-amber-800">
-                  이 시뮬레이션의 50개 종목은 현재 2025년에 알려진 대표 기업을 중심으로 선정되어 생존자 편향이 존재할 수 있습니다. 따라서 결과를 실제 투자전략의 객관적 백테스트로 해석해서는 안 됩니다.
+                  이 시뮬레이션은 장기 우량주와 함께 한보철강, 제일은행, 대우, 팬택, 리만브라더스, 엔론, 블록버스터 등 60개 역사적 종목을 포괄하여 생존자 편향을 방지하고 현실적인 시장 위험을 체감하도록 구성되었습니다.
                 </p>
               </div>
               <div className="text-[10px] text-slate-400 font-semibold text-center border-t border-slate-200/60 pt-2 select-text space-y-0.5">

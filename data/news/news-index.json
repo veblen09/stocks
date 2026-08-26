@@ -61,14 +61,16 @@
       "NEWS_1988_KR_GEN",
       "NEWS_1988_US_GEN",
       "NEWS_1988_KR_005930_GEN",
-      "NEWS_1988_US_AAPL_GEN"
+      "NEWS_1988_US_AAPL_GEN",
+      "COMP_1988_KR_000010"
     ],
     "1989": [
       "NEWS_1989_GL_01",
       "NEWS_1989_US_01",
       "NEWS_1989_KR_01",
       "NEWS_1989_KR_005930_01",
-      "NEWS_1989_US_KO_01"
+      "NEWS_1989_US_KO_01",
+      "COMP_1989_KR_001600"
     ],
     "1990": [
       "NEWS_1990_GL_GEN",
@@ -92,6 +94,7 @@
       "NEWS_1992_US_AAPL_GEN"
     ],
     "1993": [
+      "COMP_1993_KR_001300",
       "NEWS_1993_GL_GEN",
       "NEWS_1993_KR_GEN",
       "NEWS_1993_US_GEN",
@@ -106,6 +109,7 @@
       "NEWS_1994_US_MSFT_01"
     ],
     "1995": [
+      "COMP_1995_KR_003550",
       "NEWS_1995_GL_GEN",
       "NEWS_1995_KR_GEN",
       "NEWS_1995_US_GEN",
@@ -114,17 +118,20 @@
     ],
     "1996": [
       "NEWS_1996_GL_GEN",
+      "COMP_1996_KR_001600",
       "NEWS_1996_KR_GEN",
       "NEWS_1996_US_GEN",
       "NEWS_1996_KR_005930_GEN",
       "NEWS_1996_US_AAPL_GEN"
     ],
     "1997": [
+      "COMP_1997_KR_001600",
       "NEWS_1997_GL_01",
       "NEWS_1997_US_01",
       "NEWS_1997_KR_01",
       "NEWS_1997_KR_005930_01",
-      "NEWS_1997_US_AMZN_01"
+      "NEWS_1997_US_AMZN_01",
+      "COMP_1997_KR_000010"
     ],
     "1998": [
       "NEWS_1998_GL_GEN",
@@ -135,6 +142,7 @@
     ],
     "1999": [
       "NEWS_1999_GL_01",
+      "COMP_1999_KR_001300",
       "NEWS_1999_US_01",
       "NEWS_1999_KR_01",
       "NEWS_1999_KR_000660_01",
@@ -152,7 +160,8 @@
       "NEWS_2001_KR_GEN",
       "NEWS_2001_US_GEN",
       "NEWS_2001_KR_005930_GEN",
-      "NEWS_2001_US_AAPL_GEN"
+      "NEWS_2001_US_AAPL_GEN",
+      "COMP_2001_US_ENE"
     ],
     "2002": [
       "NEWS_2002_GL_GEN",
@@ -172,6 +181,7 @@
       "NEWS_2004_GL_GEN",
       "NEWS_2004_KR_GEN",
       "NEWS_2004_US_GEN",
+      "COMP_2004_KR_025930",
       "NEWS_2004_KR_005930_GEN",
       "NEWS_2004_US_AAPL_GEN"
     ],
@@ -190,6 +200,7 @@
       "NEWS_2006_US_AAPL_GEN"
     ],
     "2007": [
+      "COMP_2007_US_BB",
       "NEWS_2007_GL_GEN",
       "NEWS_2007_KR_GEN",
       "NEWS_2007_US_GEN",
@@ -198,6 +209,7 @@
     ],
     "2008": [
       "NEWS_2008_GL_01",
+      "COMP_2008_US_LEH",
       "NEWS_2008_US_01",
       "NEWS_2008_KR_01",
       "NEWS_2008_KR_005380_01",
@@ -213,11 +225,13 @@
     "2010": [
       "NEWS_2010_GL_GEN",
       "NEWS_2010_KR_GEN",
+      "COMP_2010_US_BBI",
       "NEWS_2010_US_GEN",
       "NEWS_2010_KR_005930_GEN",
       "NEWS_2010_US_AAPL_GEN"
     ],
     "2011": [
+      "COMP_2011_US_NOK",
       "NEWS_2011_GL_GEN",
       "NEWS_2011_KR_GEN",
       "NEWS_2011_US_GEN",
@@ -240,6 +254,7 @@
     ],
     "2014": [
       "NEWS_2014_GL_GEN",
+      "COMP_2014_KR_025930",
       "NEWS_2014_KR_GEN",
       "NEWS_2014_US_GEN",
       "NEWS_2014_KR_005930_GEN",
@@ -384,6 +399,7 @@
       "NEWS_2004_US_AAPL_GEN",
       "NEWS_2005_US_AAPL_GEN",
       "NEWS_2006_US_AAPL_GEN",
+      "COMP_2007_US_BB",
       "NEWS_2007_US_AAPL_GEN",
       "NEWS_2008_US_AAPL_01",
       "NEWS_2009_US_AAPL_GEN",
@@ -419,10 +435,28 @@
       "NEWS_1986_US_MSFT_01",
       "NEWS_1994_US_MSFT_01",
       "NEWS_2000_US_MSFT_01",
+      "COMP_2011_US_NOK",
       "NEWS_2025_US_MSFT_01"
+    ],
+    "KR_000010": [
+      "COMP_1988_KR_000010",
+      "COMP_1997_KR_001600",
+      "COMP_1997_KR_000010"
     ],
     "US_KO": [
       "NEWS_1989_US_KO_01"
+    ],
+    "KR_001600": [
+      "COMP_1989_KR_001600",
+      "COMP_1996_KR_001600",
+      "COMP_1997_KR_001600"
+    ],
+    "KR_001300": [
+      "COMP_1993_KR_001300",
+      "COMP_1999_KR_001300"
+    ],
+    "KR_003550": [
+      "COMP_1995_KR_003550"
     ],
     "US_AMZN": [
       "NEWS_1997_US_AMZN_01"
@@ -435,6 +469,25 @@
       "NEWS_1999_US_NVDA_01",
       "NEWS_2020_US_NVDA_01",
       "NEWS_2023_US_NVDA_01"
+    ],
+    "US_ENE": [
+      "COMP_2001_US_ENE"
+    ],
+    "KR_025930": [
+      "COMP_2004_KR_025930",
+      "COMP_2014_KR_025930"
+    ],
+    "US_BB": [
+      "COMP_2007_US_BB"
+    ],
+    "US_LEH": [
+      "COMP_2008_US_LEH"
+    ],
+    "US_BBI": [
+      "COMP_2010_US_BBI"
+    ],
+    "US_NOK": [
+      "COMP_2011_US_NOK"
     ]
   },
   "byScope": {
@@ -505,56 +558,71 @@
       "NEWS_1987_US_AAPL_01",
       "NEWS_1988_KR_005930_GEN",
       "NEWS_1988_US_AAPL_GEN",
+      "COMP_1988_KR_000010",
       "NEWS_1989_KR_005930_01",
       "NEWS_1989_US_KO_01",
+      "COMP_1989_KR_001600",
       "NEWS_1990_KR_005930_GEN",
       "NEWS_1990_US_AAPL_GEN",
       "NEWS_1991_KR_005930_GEN",
       "NEWS_1991_US_AAPL_GEN",
       "NEWS_1992_KR_005930_GEN",
       "NEWS_1992_US_AAPL_GEN",
+      "COMP_1993_KR_001300",
       "NEWS_1993_KR_005930_GEN",
       "NEWS_1993_US_AAPL_GEN",
       "NEWS_1994_KR_005930_01",
       "NEWS_1994_US_MSFT_01",
+      "COMP_1995_KR_003550",
       "NEWS_1995_KR_005930_GEN",
       "NEWS_1995_US_AAPL_GEN",
+      "COMP_1996_KR_001600",
       "NEWS_1996_KR_005930_GEN",
       "NEWS_1996_US_AAPL_GEN",
+      "COMP_1997_KR_001600",
       "NEWS_1997_KR_005930_01",
       "NEWS_1997_US_AMZN_01",
+      "COMP_1997_KR_000010",
       "NEWS_1998_KR_005930_GEN",
       "NEWS_1998_US_AAPL_GEN",
+      "COMP_1999_KR_001300",
       "NEWS_1999_KR_000660_01",
       "NEWS_1999_US_NVDA_01",
       "NEWS_2000_KR_005930_01",
       "NEWS_2000_US_MSFT_01",
       "NEWS_2001_KR_005930_GEN",
       "NEWS_2001_US_AAPL_GEN",
+      "COMP_2001_US_ENE",
       "NEWS_2002_KR_005930_GEN",
       "NEWS_2002_US_AAPL_GEN",
       "NEWS_2003_KR_005930_GEN",
       "NEWS_2003_US_AAPL_GEN",
+      "COMP_2004_KR_025930",
       "NEWS_2004_KR_005930_GEN",
       "NEWS_2004_US_AAPL_GEN",
       "NEWS_2005_KR_005930_GEN",
       "NEWS_2005_US_AAPL_GEN",
       "NEWS_2006_KR_005930_GEN",
       "NEWS_2006_US_AAPL_GEN",
+      "COMP_2007_US_BB",
       "NEWS_2007_KR_005930_GEN",
       "NEWS_2007_US_AAPL_GEN",
+      "COMP_2008_US_LEH",
       "NEWS_2008_KR_005380_01",
       "NEWS_2008_US_AAPL_01",
       "NEWS_2009_KR_005930_GEN",
       "NEWS_2009_US_AAPL_GEN",
+      "COMP_2010_US_BBI",
       "NEWS_2010_KR_005930_GEN",
       "NEWS_2010_US_AAPL_GEN",
+      "COMP_2011_US_NOK",
       "NEWS_2011_KR_005930_GEN",
       "NEWS_2011_US_AAPL_GEN",
       "NEWS_2012_KR_005930_GEN",
       "NEWS_2012_US_AAPL_GEN",
       "NEWS_2013_KR_005930_GEN",
       "NEWS_2013_US_AAPL_GEN",
+      "COMP_2014_KR_025930",
       "NEWS_2014_KR_005930_GEN",
       "NEWS_2014_US_AAPL_GEN",
       "NEWS_2015_KR_005930_GEN",
@@ -677,5 +745,382 @@
       "NEWS_2025_KR_01"
     ]
   },
-  "totalItems": 230
+  "bySector": {
+    "에너지": [
+      "NEWS_1980_GL_01"
+    ],
+    "원자재": [
+      "NEWS_1980_GL_01"
+    ],
+    "전기전자": [
+      "NEWS_1980_KR_SEC",
+      "NEWS_1981_KR_005930_01",
+      "NEWS_1982_KR_005490_01",
+      "NEWS_1983_KR_005930_01",
+      "NEWS_1984_KR_005930_GEN",
+      "NEWS_1985_KR_005380_01",
+      "NEWS_1986_KR_005380_01",
+      "NEWS_1987_KR_005930_01",
+      "NEWS_1988_KR_005930_GEN",
+      "NEWS_1989_KR_005930_01",
+      "NEWS_1990_KR_005930_GEN",
+      "NEWS_1991_KR_005930_GEN",
+      "NEWS_1992_KR_005930_GEN",
+      "NEWS_1993_KR_005930_GEN",
+      "NEWS_1994_KR_005930_01",
+      "NEWS_1995_KR_005930_GEN",
+      "NEWS_1996_KR_005930_GEN",
+      "NEWS_1997_KR_005930_01",
+      "NEWS_1998_KR_005930_GEN",
+      "NEWS_1999_KR_000660_01",
+      "NEWS_2000_KR_005930_01",
+      "NEWS_2001_KR_005930_GEN",
+      "NEWS_2002_KR_005930_GEN",
+      "NEWS_2003_KR_005930_GEN",
+      "NEWS_2004_KR_005930_GEN",
+      "NEWS_2005_KR_005930_GEN",
+      "NEWS_2006_KR_005930_GEN",
+      "NEWS_2007_KR_005930_GEN",
+      "NEWS_2008_KR_005380_01",
+      "NEWS_2009_KR_005930_GEN",
+      "NEWS_2010_KR_005930_GEN",
+      "NEWS_2011_KR_005930_GEN",
+      "NEWS_2012_KR_005930_GEN",
+      "NEWS_2013_KR_005930_GEN",
+      "NEWS_2014_KR_005930_GEN",
+      "NEWS_2015_KR_005930_GEN",
+      "NEWS_2016_KR_005930_GEN",
+      "NEWS_2017_KR_005930_GEN",
+      "NEWS_2018_KR_005930_GEN",
+      "NEWS_2019_KR_005930_GEN",
+      "NEWS_2020_KR_005930_01",
+      "NEWS_2021_KR_005930_GEN",
+      "NEWS_2022_KR_005930_GEN",
+      "NEWS_2023_KR_000660_01",
+      "NEWS_2024_KR_005930_GEN",
+      "NEWS_2025_KR_005380_01"
+    ],
+    "금융": [
+      "NEWS_1980_US_01",
+      "NEWS_1981_US_01",
+      "NEWS_1982_US_01",
+      "NEWS_1983_US_01",
+      "NEWS_1985_US_01",
+      "NEWS_1986_US_01",
+      "NEWS_1987_US_01",
+      "NEWS_1989_US_01",
+      "NEWS_1994_US_01",
+      "NEWS_1997_US_01",
+      "NEWS_1999_US_01",
+      "NEWS_2000_US_01",
+      "NEWS_2008_US_01",
+      "NEWS_2020_US_01",
+      "NEWS_2023_US_01",
+      "NEWS_2025_US_01"
+    ],
+    "기술주": [
+      "NEWS_1980_US_AAPL",
+      "NEWS_1984_US_AAPL_GEN",
+      "NEWS_1988_US_AAPL_GEN",
+      "NEWS_1990_US_AAPL_GEN",
+      "NEWS_1991_US_AAPL_GEN",
+      "NEWS_1992_US_AAPL_GEN",
+      "NEWS_1993_US_AAPL_GEN",
+      "NEWS_1995_US_AAPL_GEN",
+      "NEWS_1996_US_AAPL_GEN",
+      "NEWS_1998_US_AAPL_GEN",
+      "NEWS_2001_US_AAPL_GEN",
+      "NEWS_2002_US_AAPL_GEN",
+      "NEWS_2003_US_AAPL_GEN",
+      "NEWS_2004_US_AAPL_GEN",
+      "NEWS_2005_US_AAPL_GEN",
+      "NEWS_2006_US_AAPL_GEN",
+      "NEWS_2007_US_AAPL_GEN",
+      "NEWS_2009_US_AAPL_GEN",
+      "NEWS_2010_US_AAPL_GEN",
+      "NEWS_2011_US_AAPL_GEN",
+      "NEWS_2012_US_AAPL_GEN",
+      "NEWS_2013_US_AAPL_GEN",
+      "NEWS_2014_US_AAPL_GEN",
+      "NEWS_2015_US_AAPL_GEN",
+      "NEWS_2016_US_AAPL_GEN",
+      "NEWS_2017_US_AAPL_GEN",
+      "NEWS_2018_US_AAPL_GEN",
+      "NEWS_2019_US_AAPL_GEN",
+      "NEWS_2021_US_AAPL_GEN",
+      "NEWS_2022_US_AAPL_GEN",
+      "NEWS_2024_US_AAPL_GEN"
+    ],
+    "제조업": [
+      "NEWS_1980_KR_01",
+      "NEWS_1981_KR_01",
+      "NEWS_1982_KR_01",
+      "NEWS_1983_KR_01",
+      "NEWS_1985_KR_01",
+      "NEWS_1986_KR_01",
+      "NEWS_1987_KR_01",
+      "NEWS_1989_KR_01",
+      "NEWS_1994_KR_01",
+      "NEWS_1997_KR_01",
+      "NEWS_1999_KR_01",
+      "NEWS_2000_KR_01",
+      "NEWS_2008_KR_01",
+      "NEWS_2020_KR_01",
+      "NEWS_2023_KR_01",
+      "NEWS_2025_KR_01"
+    ],
+    "수출": [
+      "NEWS_1980_KR_01"
+    ],
+    "글로벌경제": [
+      "NEWS_1981_GL_01",
+      "NEWS_1982_GL_01",
+      "NEWS_1983_GL_01",
+      "NEWS_1984_GL_GEN",
+      "NEWS_1985_GL_01",
+      "NEWS_1986_GL_01",
+      "NEWS_1987_GL_01",
+      "NEWS_1988_GL_GEN",
+      "NEWS_1989_GL_01",
+      "NEWS_1990_GL_GEN",
+      "NEWS_1991_GL_GEN",
+      "NEWS_1992_GL_GEN",
+      "NEWS_1993_GL_GEN",
+      "NEWS_1994_GL_01",
+      "NEWS_1995_GL_GEN",
+      "NEWS_1996_GL_GEN",
+      "NEWS_1997_GL_01",
+      "NEWS_1998_GL_GEN",
+      "NEWS_1999_GL_01",
+      "NEWS_2000_GL_01",
+      "NEWS_2001_GL_GEN",
+      "NEWS_2002_GL_GEN",
+      "NEWS_2003_GL_GEN",
+      "NEWS_2004_GL_GEN",
+      "NEWS_2005_GL_GEN",
+      "NEWS_2006_GL_GEN",
+      "NEWS_2007_GL_GEN",
+      "NEWS_2008_GL_01",
+      "NEWS_2009_GL_GEN",
+      "NEWS_2010_GL_GEN",
+      "NEWS_2011_GL_GEN",
+      "NEWS_2012_GL_GEN",
+      "NEWS_2013_GL_GEN",
+      "NEWS_2014_GL_GEN",
+      "NEWS_2015_GL_GEN",
+      "NEWS_2016_GL_GEN",
+      "NEWS_2017_GL_GEN",
+      "NEWS_2018_GL_GEN",
+      "NEWS_2019_GL_GEN",
+      "NEWS_2020_GL_01",
+      "NEWS_2021_GL_GEN",
+      "NEWS_2022_GL_GEN",
+      "NEWS_2023_GL_01",
+      "NEWS_2024_GL_GEN",
+      "NEWS_2025_GL_01"
+    ],
+    "미국경제": [
+      "NEWS_1981_US_01",
+      "NEWS_1982_US_01",
+      "NEWS_1983_US_01",
+      "NEWS_1985_US_01",
+      "NEWS_1986_US_01",
+      "NEWS_1987_US_01",
+      "NEWS_1989_US_01",
+      "NEWS_1994_US_01",
+      "NEWS_1997_US_01",
+      "NEWS_1999_US_01",
+      "NEWS_2000_US_01",
+      "NEWS_2008_US_01",
+      "NEWS_2020_US_01",
+      "NEWS_2023_US_01",
+      "NEWS_2025_US_01"
+    ],
+    "한국경제": [
+      "NEWS_1981_KR_01",
+      "NEWS_1982_KR_01",
+      "NEWS_1983_KR_01",
+      "NEWS_1985_KR_01",
+      "NEWS_1986_KR_01",
+      "NEWS_1987_KR_01",
+      "NEWS_1989_KR_01",
+      "NEWS_1994_KR_01",
+      "NEWS_1997_KR_01",
+      "NEWS_1999_KR_01",
+      "NEWS_2000_KR_01",
+      "NEWS_2008_KR_01",
+      "NEWS_2020_KR_01",
+      "NEWS_2023_KR_01",
+      "NEWS_2025_KR_01"
+    ],
+    "자동차": [
+      "NEWS_1981_KR_005930_01",
+      "NEWS_1982_KR_005490_01",
+      "NEWS_1983_KR_005930_01",
+      "NEWS_1985_KR_005380_01",
+      "NEWS_1986_KR_005380_01",
+      "NEWS_1987_KR_005930_01",
+      "NEWS_1989_KR_005930_01",
+      "NEWS_1994_KR_005930_01",
+      "NEWS_1997_KR_005930_01",
+      "NEWS_1999_KR_000660_01",
+      "NEWS_2000_KR_005930_01",
+      "NEWS_2008_KR_005380_01",
+      "NEWS_2020_KR_005930_01",
+      "NEWS_2023_KR_000660_01",
+      "NEWS_2025_KR_005380_01"
+    ],
+    "철강": [
+      "NEWS_1981_KR_005930_01",
+      "NEWS_1982_KR_005490_01",
+      "NEWS_1983_KR_005930_01",
+      "NEWS_1985_KR_005380_01",
+      "NEWS_1986_KR_005380_01",
+      "NEWS_1987_KR_005930_01",
+      "NEWS_1989_KR_005930_01",
+      "NEWS_1994_KR_005930_01",
+      "NEWS_1997_KR_005930_01",
+      "NEWS_1999_KR_000660_01",
+      "NEWS_2000_KR_005930_01",
+      "NEWS_2008_KR_005380_01",
+      "NEWS_2020_KR_005930_01",
+      "NEWS_2023_KR_000660_01",
+      "NEWS_2025_KR_005380_01"
+    ],
+    "빅테크": [
+      "NEWS_1981_US_IBM_01",
+      "NEWS_1982_US_IBM_01",
+      "NEWS_1983_US_AAPL_01",
+      "NEWS_1985_US_MSFT_01",
+      "NEWS_1986_US_MSFT_01",
+      "NEWS_1987_US_AAPL_01",
+      "NEWS_1989_US_KO_01",
+      "NEWS_1994_US_MSFT_01",
+      "NEWS_1997_US_AMZN_01",
+      "NEWS_1999_US_NVDA_01",
+      "NEWS_2000_US_MSFT_01",
+      "NEWS_2008_US_AAPL_01",
+      "NEWS_2020_US_NVDA_01",
+      "NEWS_2023_US_NVDA_01",
+      "NEWS_2025_US_MSFT_01"
+    ],
+    "IT": [
+      "NEWS_1981_US_IBM_01",
+      "NEWS_1982_US_IBM_01",
+      "NEWS_1983_US_AAPL_01",
+      "NEWS_1985_US_MSFT_01",
+      "NEWS_1986_US_MSFT_01",
+      "NEWS_1987_US_AAPL_01",
+      "NEWS_1989_US_KO_01",
+      "NEWS_1994_US_MSFT_01",
+      "NEWS_1997_US_AMZN_01",
+      "NEWS_1999_US_NVDA_01",
+      "NEWS_2000_US_MSFT_01",
+      "NEWS_2008_US_AAPL_01",
+      "NEWS_2020_US_NVDA_01",
+      "NEWS_2023_US_NVDA_01",
+      "NEWS_2025_US_MSFT_01"
+    ],
+    "한국증시": [
+      "NEWS_1984_KR_GEN",
+      "NEWS_1988_KR_GEN",
+      "NEWS_1990_KR_GEN",
+      "NEWS_1991_KR_GEN",
+      "NEWS_1992_KR_GEN",
+      "NEWS_1993_KR_GEN",
+      "NEWS_1995_KR_GEN",
+      "NEWS_1996_KR_GEN",
+      "NEWS_1998_KR_GEN",
+      "NEWS_2001_KR_GEN",
+      "NEWS_2002_KR_GEN",
+      "NEWS_2003_KR_GEN",
+      "NEWS_2004_KR_GEN",
+      "NEWS_2005_KR_GEN",
+      "NEWS_2006_KR_GEN",
+      "NEWS_2007_KR_GEN",
+      "NEWS_2009_KR_GEN",
+      "NEWS_2010_KR_GEN",
+      "NEWS_2011_KR_GEN",
+      "NEWS_2012_KR_GEN",
+      "NEWS_2013_KR_GEN",
+      "NEWS_2014_KR_GEN",
+      "NEWS_2015_KR_GEN",
+      "NEWS_2016_KR_GEN",
+      "NEWS_2017_KR_GEN",
+      "NEWS_2018_KR_GEN",
+      "NEWS_2019_KR_GEN",
+      "NEWS_2021_KR_GEN",
+      "NEWS_2022_KR_GEN",
+      "NEWS_2024_KR_GEN"
+    ],
+    "미국증시": [
+      "NEWS_1984_US_GEN",
+      "NEWS_1988_US_GEN",
+      "NEWS_1990_US_GEN",
+      "NEWS_1991_US_GEN",
+      "NEWS_1992_US_GEN",
+      "NEWS_1993_US_GEN",
+      "NEWS_1995_US_GEN",
+      "NEWS_1996_US_GEN",
+      "NEWS_1998_US_GEN",
+      "NEWS_2001_US_GEN",
+      "NEWS_2002_US_GEN",
+      "NEWS_2003_US_GEN",
+      "NEWS_2004_US_GEN",
+      "NEWS_2005_US_GEN",
+      "NEWS_2006_US_GEN",
+      "NEWS_2007_US_GEN",
+      "NEWS_2009_US_GEN",
+      "NEWS_2010_US_GEN",
+      "NEWS_2011_US_GEN",
+      "NEWS_2012_US_GEN",
+      "NEWS_2013_US_GEN",
+      "NEWS_2014_US_GEN",
+      "NEWS_2015_US_GEN",
+      "NEWS_2016_US_GEN",
+      "NEWS_2017_US_GEN",
+      "NEWS_2018_US_GEN",
+      "NEWS_2019_US_GEN",
+      "NEWS_2021_US_GEN",
+      "NEWS_2022_US_GEN",
+      "NEWS_2024_US_GEN"
+    ],
+    "금융 / 은행": [
+      "COMP_1988_KR_000010",
+      "COMP_1997_KR_001600",
+      "COMP_1997_KR_000010"
+    ],
+    "철강 / 소재": [
+      "COMP_1989_KR_001600",
+      "COMP_1996_KR_001600",
+      "COMP_1997_KR_001600"
+    ],
+    "종합상사 / 무역": [
+      "COMP_1993_KR_001300",
+      "COMP_1999_KR_001300"
+    ],
+    "지주사 / 화학·전자": [
+      "COMP_1995_KR_003550"
+    ],
+    "에너지 / 금융 트레이딩": [
+      "COMP_2001_US_ENE"
+    ],
+    "IT / 스마트폰": [
+      "COMP_2004_KR_025930",
+      "COMP_2014_KR_025930"
+    ],
+    "빅테크 / 모바일·보안": [
+      "COMP_2007_US_BB"
+    ],
+    "금융 / 투자은행": [
+      "COMP_2008_US_LEH"
+    ],
+    "미디어 / 엔터테인먼트 유통": [
+      "COMP_2010_US_BBI"
+    ],
+    "통신장비 / 모바일": [
+      "COMP_2011_US_NOK"
+    ]
+  },
+  "totalItems": 245
 }

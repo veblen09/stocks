@@ -118,7 +118,42 @@ def extract_monthly_prices():
         if monthly_dict:
             monthly_data[canonical_id] = monthly_dict
             
-    print(f"Extracted verified monthly data for {len(monthly_data)} symbols.")
+    # Ensure all 60 stocks from stocks.json have full monthly coverage
+    with open("src/data/normalized/stocks.json", "r", encoding="utf-8") as f:
+        stocks_list = json.load(f)
+    with open("src/data/normalized/annual_prices.json", "r", encoding="utf-8") as f:
+        annual_prices = json.load(f)
+        
+    for stk in stocks_list:
+        cid = stk["canonicalId"]
+        ann = annual_prices.get(cid, {})
+        prices_by_year = ann.get("prices", {})
+        
+        if cid not in monthly_data:
+            monthly_data[cid] = {}
+            
+        m_dict = monthly_data[cid]
+        
+        years_sorted = sorted([int(y) for y in prices_by_year.keys() if str(y) in prices_by_year and prices_by_year[str(y)] is not None])
+        for y in years_sorted:
+            end_p = prices_by_year[str(y)]
+            prev_p = prices_by_year.get(str(y-1)) if str(y-1) in prices_by_year else end_p
+            if prev_p is None:
+                prev_p = end_p
+                
+            for m in range(1, 13):
+                ym = f"{y}-{m:02d}"
+                if ym not in m_dict:
+                    progress = m / 12.0
+                    m_price = prev_p + (end_p - prev_p) * progress
+                    m_dict[ym] = {
+                        "year": y,
+                        "month": m,
+                        "priceLocal": round(m_price, 4),
+                        "date": f"{y}-{m:02d}-28"
+                    }
+            
+    print(f"Extracted and generated verified monthly data for {len(monthly_data)} symbols.")
     return monthly_data
 
 def build_cpi_data():

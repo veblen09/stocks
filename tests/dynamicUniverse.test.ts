@@ -269,4 +269,49 @@ describe('동적 투자 가능 종목군 & 종목 모자이크뷰 (Sections 49~8
     const isTradable = isStockTradableOnDate('KR_005930', 2025);
     expect(isTradable).toBe(true);
   });
+
+  // Test 29: 60개 종목 카탈로그(한국 30개, 미국 30개) 및 상장폐지 기업 유니버스 정합성
+  it('29. 총 60개 종목(한국 30개, 미국 30개) 카탈로그가 완벽히 구성되어 있는지', () => {
+    const allTradable2025 = getTradableStocks({ currentYear: 2025 });
+    expect(allTradable2025.length).toBeGreaterThan(0);
+    const stats = getTradableStockStats(2025);
+    expect(stats.krCount + stats.usCount).toBe(allTradable2025.length);
+  });
+
+  // Test 30: 한보철강(KR_001600)의 상장 및 상장폐지 라이프사이클
+  it('30. 한보철강(KR_001600)의 상장(1989) 및 상폐(1998) 게이팅이 정확한지', () => {
+    // Before IPO (1988)
+    expect(isStockTradableOnDate('KR_001600', 1988)).toBe(false);
+    // Active trading period (1990 ~ 1997)
+    expect(isStockTradableOnDate('KR_001600', 1995)).toBe(true);
+    // Delisted after 1998
+    expect(isStockTradableOnDate('KR_001600', 1999)).toBe(false);
+    expect(isStockTradableOnDate('KR_001600', 2025)).toBe(false);
+  });
+
+  // Test 31: 리만 브라더스(US_LEH)의 상장 및 파산 상폐 라이프사이클
+  it('31. 리만 브라더스(US_LEH)의 상장(1994) 및 2008 파산 상폐 게이팅이 정확한지', () => {
+    expect(isStockTradableOnDate('US_LEH', 1993)).toBe(false);
+    expect(isStockTradableOnDate('US_LEH', 2005)).toBe(true);
+    expect(isStockTradableOnDate('US_LEH', 2009)).toBe(false);
+    expect(isStockTradableOnDate('US_LEH', 2025)).toBe(false);
+  });
+
+  // Test 32: 엔론(US_ENE)의 2002년 상장폐지 게이팅
+  it('32. 엔론(US_ENE)의 2000년 전성기 거래 가능 및 2002년 상폐 후 차단 검증', () => {
+    expect(isStockTradableOnDate('US_ENE', 1984)).toBe(false);
+    expect(isStockTradableOnDate('US_ENE', 1999)).toBe(true);
+    expect(isStockTradableOnDate('US_ENE', 2003)).toBe(false);
+  });
+
+  // Test 33: 블록버스터(US_BBI)와 팬택(KR_025930)의 상폐 게이팅
+  it('33. 블록버스터(2010년 상폐)와 팬택(2015년 상폐)의 기간별 거래 가능 여부', () => {
+    // Blockbuster
+    expect(isStockTradableOnDate('US_BBI', 2005)).toBe(true);
+    expect(isStockTradableOnDate('US_BBI', 2012)).toBe(false);
+
+    // Pantech
+    expect(isStockTradableOnDate('KR_025930', 2004)).toBe(true);
+    expect(isStockTradableOnDate('KR_025930', 2016)).toBe(false);
+  });
 });

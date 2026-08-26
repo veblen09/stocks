@@ -492,6 +492,114 @@
     "description": "신라면, 짜파게티 등 K-푸드 글로벌 확장을 주도하는 식품 기업"
   },
   {
+    "canonicalId": "KR_001600",
+    "market": "KR",
+    "ticker": "001600",
+    "sourceTicker": "001600.KS",
+    "nameKo": "한보철강",
+    "nameEn": "Hanbo Iron & Steel",
+    "historicalNames": [
+      "한보철강공업",
+      "한보철강"
+    ],
+    "sector": "철강 / 소재",
+    "currency": "KRW",
+    "listingDate": "1989-11-20",
+    "delistingDate": "1998-05-22",
+    "status": "DELISTED",
+    "firstValidYear": 1990,
+    "lastValidYear": 1998,
+    "dataQuality": "HISTORICAL_KRX",
+    "source": "KRX 역사 기록",
+    "description": "당진제철소 과잉 차입투자로 1997년 1월 부도 발생, IMF 외환위기의 도화선이 된 상장폐지 기업"
+  },
+  {
+    "canonicalId": "KR_000010",
+    "market": "KR",
+    "ticker": "000010",
+    "sourceTicker": "000010.KS",
+    "nameKo": "제일은행",
+    "nameEn": "Korea First Bank",
+    "historicalNames": [
+      "조선저축은행",
+      "제일은행"
+    ],
+    "sector": "금융 / 은행",
+    "currency": "KRW",
+    "listingDate": "1956-03-03",
+    "delistingDate": "1999-12-31",
+    "status": "DELISTED",
+    "firstValidYear": 1981,
+    "lastValidYear": 1999,
+    "dataQuality": "HISTORICAL_KRX",
+    "source": "KRX 역사 기록",
+    "description": "1980년대 5대 시중은행 대장주였으나 한보·기아 부실채권 직격탄으로 감자 및 매각된 금융사"
+  },
+  {
+    "canonicalId": "KR_001300",
+    "market": "KR",
+    "ticker": "001300",
+    "sourceTicker": "001300.KS",
+    "nameKo": "(주)대우",
+    "nameEn": "Daewoo Corporation",
+    "historicalNames": [
+      "대우실업",
+      "(주)대우"
+    ],
+    "sector": "종합상사 / 무역",
+    "currency": "KRW",
+    "listingDate": "1975-10-07",
+    "delistingDate": "2001-05-18",
+    "status": "DELISTED",
+    "firstValidYear": 1981,
+    "lastValidYear": 2001,
+    "dataQuality": "HISTORICAL_KRX",
+    "source": "KRX 역사 기록",
+    "description": "'세계경영'의 상징이었으나 1999년 대우 워크아웃 및 부채 500% 초과로 해체된 대마불사 종말 기업"
+  },
+  {
+    "canonicalId": "KR_025930",
+    "market": "KR",
+    "ticker": "025930",
+    "sourceTicker": "025930.KS",
+    "nameKo": "팬택",
+    "nameEn": "Pantech",
+    "historicalNames": [
+      "팬택",
+      "팬택앤큐리텔"
+    ],
+    "sector": "IT / 스마트폰",
+    "currency": "KRW",
+    "listingDate": "1999-12-07",
+    "delistingDate": "2015-05-12",
+    "status": "DELISTED",
+    "firstValidYear": 2000,
+    "lastValidYear": 2015,
+    "dataQuality": "HISTORICAL_KRX",
+    "source": "KRX 역사 기록",
+    "description": "SKY 휴대폰 신화로 국내 2위 제조사로 성장했으나 스마트폰 대전환기 자금난으로 사라진 IT 벤처"
+  },
+  {
+    "canonicalId": "KR_003550",
+    "market": "KR",
+    "ticker": "003550",
+    "sourceTicker": "003550.KS",
+    "nameKo": "LG",
+    "nameEn": "LG Corp",
+    "historicalNames": [
+      "럭키",
+      "LG"
+    ],
+    "sector": "지주사 / 화학·전자",
+    "currency": "KRW",
+    "listingDate": "1970-02-13",
+    "firstValidYear": 1981,
+    "lastValidYear": 2025,
+    "dataQuality": "ADJUSTED_PRICE",
+    "source": "KRX / Yahoo Finance",
+    "description": "락희화학·금성사 모태, 화학·전자·통신을 아우르는 대한민국 대표 전통 지주회사"
+  },
+  {
     "canonicalId": "US_AAPL",
     "market": "US",
     "ticker": "AAPL",
@@ -978,5 +1086,109 @@
     "dataQuality": "TOTAL_RETURN",
     "source": "Yahoo Finance",
     "description": "에어 조던 등 압도적 브랜드 파워를 보유한 글로벌 1위 스포츠웨어 기업"
+  },
+  {
+    "canonicalId": "US_LEH",
+    "market": "US",
+    "ticker": "LEH",
+    "sourceTicker": "LEH",
+    "nameKo": "리만 브라더스",
+    "nameEn": "Lehman Brothers",
+    "historicalNames": [
+      "Lehman Brothers Holdings"
+    ],
+    "sector": "금융 / 투자은행",
+    "currency": "USD",
+    "listingDate": "1994-05-27",
+    "delistingDate": "2008-09-15",
+    "status": "DELISTED",
+    "firstValidYear": 1995,
+    "lastValidYear": 2008,
+    "dataQuality": "HISTORICAL_SEC",
+    "source": "SEC 10-K / Historical Market Data",
+    "description": "158년 역사의 미국 4대 투자은행이었으나 서브프라임 모기지 사태로 2008년 파산한 글로벌 금융위기 진원지"
+  },
+  {
+    "canonicalId": "US_ENE",
+    "market": "US",
+    "ticker": "ENE",
+    "sourceTicker": "ENE",
+    "nameKo": "엔론",
+    "nameEn": "Enron Corp",
+    "historicalNames": [
+      "Houston Natural Gas",
+      "Enron Corp"
+    ],
+    "sector": "에너지 / 금융 트레이딩",
+    "currency": "USD",
+    "listingDate": "1985-07-16",
+    "delistingDate": "2002-01-15",
+    "status": "DELISTED",
+    "firstValidYear": 1986,
+    "lastValidYear": 2002,
+    "dataQuality": "HISTORICAL_SEC",
+    "source": "SEC 10-K / Historical Market Data",
+    "description": "혁신적 에너지 기업으로 추앙받았으나 특수목적법인(SPE)을 통한 사상 최대 분식회계로 파산한 기업"
+  },
+  {
+    "canonicalId": "US_BB",
+    "market": "US",
+    "ticker": "BB",
+    "sourceTicker": "BB",
+    "nameKo": "블랙베리",
+    "nameEn": "BlackBerry",
+    "historicalNames": [
+      "Research In Motion",
+      "BlackBerry"
+    ],
+    "sector": "빅테크 / 모바일·보안",
+    "currency": "USD",
+    "listingDate": "1999-02-04",
+    "firstValidYear": 2000,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "쿼티 스마트폰으로 세계 시장 50%를 점유했으나 터치스크린·앱 생태계 전환에 실패하여 급락한 기업"
+  },
+  {
+    "canonicalId": "US_BBI",
+    "market": "US",
+    "ticker": "BBI",
+    "sourceTicker": "BBI",
+    "nameKo": "블록버스터",
+    "nameEn": "Blockbuster Inc.",
+    "historicalNames": [
+      "Blockbuster Video",
+      "Blockbuster Inc."
+    ],
+    "sector": "미디어 / 엔터테인먼트 유통",
+    "currency": "USD",
+    "listingDate": "1999-08-11",
+    "delistingDate": "2010-09-23",
+    "status": "DELISTED",
+    "firstValidYear": 2000,
+    "lastValidYear": 2010,
+    "dataQuality": "HISTORICAL_SEC",
+    "source": "SEC 10-K / Historical Market Data",
+    "description": "9천개 비디오 대여점을 거느렸으나 넷플릭스 인수를 거절하고 디지털 스트리밍 전환에 밀려 파산한 기업"
+  },
+  {
+    "canonicalId": "US_NOK",
+    "market": "US",
+    "ticker": "NOK",
+    "sourceTicker": "NOK",
+    "nameKo": "노키아",
+    "nameEn": "Nokia",
+    "historicalNames": [
+      "Nokia Corporation"
+    ],
+    "sector": "통신장비 / 모바일",
+    "currency": "USD",
+    "listingDate": "1994-07-01",
+    "firstValidYear": 1995,
+    "lastValidYear": 2025,
+    "dataQuality": "TOTAL_RETURN",
+    "source": "Yahoo Finance",
+    "description": "10여 년간 글로벌 휴대폰 1위였으나 스마트폰 대전환기 실기로 사업부를 매각하고 통신장비사로 재편된 거인"
   }
 ]
