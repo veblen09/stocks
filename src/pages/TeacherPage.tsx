@@ -224,8 +224,13 @@ export const TeacherPage: React.FC<TeacherPageProps> = ({ onNavigate }) => {
             <span className="font-medium text-slate-700">하나고등학교 일반사회 교사 김윤구</span>
             <a href="mailto:veblen@hana.hs.kr" className="text-blue-600 hover:underline font-mono text-[11px]">(veblen@hana.hs.kr)</a>
           </div>
-          <div className="text-[11px] text-slate-400 font-semibold select-text">
-            Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved.
+          <div className="text-right space-y-0.5 select-text">
+            <div className="text-[11px] text-slate-500 font-semibold">
+              Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved.
+            </div>
+            <div className="text-[10px] text-slate-400">
+              © 2026 머니트랙: 45년 한·미 주식투자 실험실 (1980~2025). 본 프로그램은 금융교육을 위한 실제 역사 데이터 기반 모의 시뮬레이션입니다.
+            </div>
           </div>
         </GlassCard>
       </div>
