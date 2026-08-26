@@ -352,9 +352,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 <span className="text-emerald-800 font-extrabold block">3. 과정 중심 평가와 3대 축</span>
                 <p>단순한 수익률뿐만 아니라 투자 근거 수립, 원칙 유지, 예측 보정 능력을 3대 축으로 종합 평가합니다.</p>
               </div>
-              <div className="text-[10px] text-slate-400 font-semibold text-center border-t border-slate-200/60 pt-2 select-text space-y-0.5">
-                <div>Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)</div>
-                <div className="text-[9px] text-slate-400 font-normal">
+              <div className="text-center border-t border-slate-200/80 pt-2.5 select-text space-y-1">
+                <div className="text-xs font-bold text-slate-800">Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)</div>
+                <div className="text-[10.5px] text-slate-500 font-medium leading-relaxed">
                   © 2026 머니트랙: 45년 한·미 주식투자 실험실 (1980~2025). 본 프로그램은 금융교육을 위한 실제 역사 데이터 기반 모의 시뮬레이션입니다.
                 </div>
               </div>
@@ -401,9 +401,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   이 시뮬레이션은 장기 우량주와 함께 한보철강, 제일은행, 대우, 팬택, 리만브라더스, 엔론, 블록버스터 등 60개 역사적 종목을 포괄하여 생존자 편향을 방지하고 현실적인 시장 위험을 체감하도록 구성되었습니다.
                 </p>
               </div>
-              <div className="text-[10px] text-slate-400 font-semibold text-center border-t border-slate-200/60 pt-2 select-text space-y-0.5">
-                <div>Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)</div>
-                <div className="text-[9px] text-slate-400 font-normal">
+              <div className="text-center border-t border-slate-200/80 pt-2.5 select-text space-y-1">
+                <div className="text-xs font-bold text-slate-800">Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)</div>
+                <div className="text-[10.5px] text-slate-500 font-medium leading-relaxed">
                   © 2026 머니트랙: 45년 한·미 주식투자 실험실 (1980~2025). 본 프로그램은 금융교육을 위한 실제 역사 데이터 기반 모의 시뮬레이션입니다.
                 </div>
               </div>

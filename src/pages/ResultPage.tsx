@@ -690,11 +690,11 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
       </GlassCard>
 
       {/* Report Footer & Copyright Notice */}
-      <div className="p-4 bg-white/80 rounded-2xl border border-slate-200 text-center space-y-1 select-text shadow-xs backdrop-blur-sm">
-        <div className="text-xs font-bold text-slate-700">
+      <div className="p-4 bg-white/80 rounded-2xl border border-slate-200 text-center space-y-1.5 select-text shadow-xs backdrop-blur-sm">
+        <div className="text-xs sm:text-[13px] font-bold text-slate-800">
           Copyright 2026. 하나고등학교 일반사회 교사 김윤구 All Right Reserved. (veblen@hana.hs.kr)
         </div>
-        <div className="text-[10.5px] text-slate-400 font-medium">
+        <div className="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed">
           © 2026 머니트랙: 45년 한·미 주식투자 실험실 (1980~2025). 본 프로그램은 금융교육을 위한 실제 역사 데이터 기반 모의 시뮬레이션입니다.
         </div>
       </div>
