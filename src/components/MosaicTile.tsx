@@ -132,7 +132,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
       aria-pressed={isSelected || hasTarget}
       onClick={handleTileClick}
       onKeyDown={handleKeyDown}
-      className={`stock-key group ${isHolding ? 'is-holding' : ''} ${
+      className={`stock-key group hover:z-40 focus-within:z-40 ${isHolding ? 'is-holding' : ''} ${
         hasTarget ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50/30' : ''
       } ${isSelected ? 'ring-2 ring-blue-700 border-blue-700' : ''}`}
     >
@@ -197,16 +197,15 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
 
       {/* 2. Center: Company Name & Identifiers (High Contrast) */}
       <div className="space-y-1 my-1 relative">
-        <div className="group/name relative inline-block max-w-full">
+        <div className="group/name relative inline-block max-w-full hover:z-50 focus-within:z-50">
           <h3
-            title={`${stock.nameKo}${stock.nameEn && stock.nameEn !== stock.nameKo ? ` (${stock.nameEn})` : ''} · ${stock.ticker} · ${stock.sector}`}
             className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-blue-600 transition-colors line-clamp-1 cursor-pointer"
           >
             {stock.nameKo}
           </h3>
 
-          {/* Instant Rich Hover Tooltip for Long Company Names */}
-          <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-40 hidden group-hover/name:block bg-slate-900/95 text-white text-xs px-3 py-1.5 rounded-xl shadow-2xl border border-slate-700/80 backdrop-blur-xs animate-in fade-in zoom-in-95 duration-150 min-w-max max-w-xs break-keep">
+          {/* Instant Rich Hover Tooltip for Long Company Names (Always on Top) */}
+          <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 hidden group-hover/name:block bg-slate-950 text-white text-xs px-3.5 py-2 rounded-xl shadow-2xl border border-slate-700/80 backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 min-w-max max-w-sm break-keep ring-1 ring-white/10">
             <div className="font-bold text-[13px] text-white flex items-center gap-1.5 flex-wrap">
               <span>{stock.nameKo}</span>
               {stock.nameEn && stock.nameEn !== stock.nameKo && (

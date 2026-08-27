@@ -52,7 +52,9 @@
     background 140ms ease;
 }
 
-.stock-key:hover {
+.stock-key:hover,
+.stock-key:focus-within {
+  z-index: 40;
   transform: translateY(-1px);
   border-color: #9eacc0;
   box-shadow:
@@ -63,6 +65,7 @@
 
 .stock-key:active,
 .stock-key[data-pressed="true"] {
+  z-index: 40;
   transform: translateY(5px);
   box-shadow:
     0 1px 0 var(--key-side),
@@ -85,7 +88,9 @@
     0 0 0 2px rgba(37, 99, 235, 0.35);
 }
 
-.stock-key.is-holding:hover {
+.stock-key.is-holding:hover,
+.stock-key.is-holding:focus-within {
+  z-index: 40;
   box-shadow:
     0 7px 0 #93b5ee,
     0 12px 22px rgba(37, 99, 235, 0.25),
