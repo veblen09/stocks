@@ -12,7 +12,12 @@ import {
   TrendingDown,
   Lock,
   AlertTriangle,
+  RotateCcw,
+  Home,
+  X,
+  ChevronRight,
 } from 'lucide-react';
+import { GlassCard } from '../components/GlassCard';
 import { useStockGame } from '../store/stockGameStore';
 import { formatKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
@@ -72,6 +77,8 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     loadSavedState,
     setPerceivedRisk,
     executeCrisisDecisionAction,
+    startNewGame,
+    resetGame,
   } = useStockGame();
 
   const {
@@ -108,6 +115,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const [showYearEndModal, setShowYearEndModal] = useState<boolean>(false);
   const [showOrderReviewModal, setShowOrderReviewModal] = useState<boolean>(false);
   const [showRealLockConfirmModal, setShowRealLockConfirmModal] = useState<boolean>(false);
+  const [showRestartModal, setShowRestartModal] = useState<boolean>(false);
 
   // Live Market Replay Stage State
   const [showReplayStage, setShowReplayStage] = useState<boolean>(false);
@@ -315,6 +323,27 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
 
         {/* Global Toolbar Buttons */}
         <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
+          <button
+            type="button"
+            onClick={() => {
+              audioManager.playUiSound('tab');
+              onNavigate('home');
+            }}
+            className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1 cursor-pointer"
+            title="메인 홈 화면으로 이동"
+          >
+            <Home size={14} /> 홈
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowRestartModal(true)}
+            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1 cursor-pointer"
+            title="처음부터 다시하기 (초기화)"
+          >
+            <RotateCcw size={14} /> 다시하기
+          </button>
+
           <button
             type="button"
             onClick={() => setShowAutoInvestModal(true)}
@@ -877,6 +906,81 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         isOpen={showGlossaryModal}
         onClose={() => setShowGlossaryModal(false)}
       />
+
+      {/* Restart & Reset Confirmation Modal */}
+      {showRestartModal && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="restart-dialog-title"
+        >
+          <GlassCard className="w-full max-w-md bg-white border-slate-200 p-6 space-y-4 text-slate-800 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <RotateCcw size={20} className="text-rose-600" />
+                <h3 id="restart-dialog-title" className="font-bold text-base text-slate-900">
+                  모의투자 처음부터 다시 시작
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRestartModal(false)}
+                className="p-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              현재 <strong className="text-slate-900 font-mono">{currentYear}년</strong>까지 진행된 투자 기록을 초기화하고 처음부터 다시 시작하시겠습니까? 원하시는 재시작 방식을 선택해 주세요.
+            </p>
+
+            <div className="space-y-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playUiSound('confirm');
+                  startNewGame(settings);
+                  setShowRestartModal(false);
+                }}
+                className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition flex items-center justify-between cursor-pointer shadow-sm"
+              >
+                <span className="flex items-center gap-1.5">
+                  <RotateCcw size={14} /> 동일 조건으로 1년차({settings.startYear}년)부터 재도전
+                </span>
+                <ChevronRight size={15} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playUiSound('confirm');
+                  resetGame();
+                  setShowRestartModal(false);
+                  onNavigate('setup');
+                }}
+                className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center justify-between cursor-pointer border border-slate-200"
+              >
+                <span>⚙️ 새 투자 조건(초기자금, 모드 등) 재설정</span>
+                <ChevronRight size={15} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  audioManager.playUiSound('tab');
+                  setShowRestartModal(false);
+                  onNavigate('home');
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-600 font-semibold text-xs transition flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <Home size={14} /> 메인 홈 화면으로 이동
+              </button>
+            </div>
+          </GlassCard>
+        </div>
+      )}
     </div>
   );
 };
