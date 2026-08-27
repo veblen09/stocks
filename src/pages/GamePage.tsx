@@ -44,6 +44,7 @@ import { selectYearbookHighlights } from '../features/yearbook/yearbookEngine';
 import { AchievementGalleryModal } from '../features/achievements/AchievementGalleryModal';
 import { SaveSlotManagerModal } from '../features/saveSlots/SaveSlotManagerModal';
 import { FixedActionBar } from '../features/gameplay/FixedActionBar';
+import { PortfolioGhostRace } from '../features/gameplay/PortfolioGhostRace';
 
 import { calculatePortfolioValue } from '../engine/portfolioEngine';
 import { calculatePureInvestmentPnL, calculateRiskLevel } from '../engine/metricsEngine';
@@ -440,6 +441,14 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             비중 균등 조정
           </button>
         </div>
+      )}
+
+      {/* Live Benchmark Ghost Race Tracker (after at least 1 completed year) */}
+      {history.length > 0 && (
+        <PortfolioGhostRace
+          history={history}
+          currentYear={currentYear}
+        />
       )}
 
       {/* Main 5-Tab Navigation Bar */}

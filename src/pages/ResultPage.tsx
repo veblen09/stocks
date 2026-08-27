@@ -43,6 +43,12 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
   const [showTradeLogsModal, setShowTradeLogsModal] = useState<boolean>(false);
   const [showCpiAdjusted, setShowCpiAdjusted] = useState<boolean>(state.showRealPurchasingPower ?? true);
 
+  // Benchmark Line Toggles for Multi-Series Charts
+  const [showKospiLine, setShowKospiLine] = useState<boolean>(true);
+  const [showSp500Line, setShowSp500Line] = useState<boolean>(true);
+  const [showBlendLine, setShowBlendLine] = useState<boolean>(true);
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null);
+
   // Modals
   const [showYearbookModal, setShowYearbookModal] = useState<boolean>(false);
   const [showEncyclopediaModal, setShowEncyclopediaModal] = useState<boolean>(false);
@@ -317,20 +323,21 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
 
       {/* 3. Benchmark Alpha & Comparison Table */}
       <GlassCard className="p-5 space-y-4" variant="default">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} className="text-blue-600" />
-            <h3 className="font-extrabold text-slate-800 text-sm">3대 대표 시장 지수와의 정밀 비교</h3>
+            <h3 className="font-extrabold text-slate-800 text-sm">3대 대표 시장 지수와의 정밀 비교 (Benchmark Comparison)</h3>
           </div>
-          <span className="text-[11px] text-slate-400 font-bold">동일 현금흐름 기준</span>
+          <span className="text-[11px] text-slate-400 font-bold">동일 현금흐름(초기자금 + 적립금) 투자 기준</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-bold">
+              <tr className="border-b border-slate-200 text-slate-500 font-bold font-sans">
                 <th className="pb-2.5">전략 / 지수</th>
-                <th className="pb-2.5 text-right font-mono">최종 자산</th>
+                <th className="pb-2.5 text-right font-mono">최종 평가자산</th>
+                <th className="pb-2.5 text-right font-mono">누적 총수익률</th>
                 <th className="pb-2.5 text-right font-mono">연평균 복리(CAGR)</th>
                 <th className="pb-2.5 text-right font-mono">최대낙폭(MDD)</th>
                 <th className="pb-2.5 text-right font-mono">초과 성과(Alpha)</th>
@@ -338,41 +345,103 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
             </thead>
             <tbody className="divide-y divide-slate-100 font-semibold text-slate-700 font-mono">
               <tr className="bg-blue-50/70 font-black text-blue-900">
-                <td className="py-3 font-sans">👑 나의 포트폴리오</td>
+                <td className="py-3 font-sans flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                  <span>👑 나의 포트폴리오</span>
+                </td>
                 <td className="py-3 text-right text-blue-700 font-bold">{formatKRW(metrics.finalPortfolioValue)}</td>
+                <td className={`py-3 text-right font-bold ${getReturnColor(metrics.twr)}`}>
+                  {metrics.twr >= 0 ? '+' : ''}{formatPercent(metrics.twr)}
+                </td>
                 <td className="py-3 text-right font-bold">{formatPercent(metrics.twrCAGR)}</td>
                 <td className="py-3 text-right text-rose-600 font-bold">-{formatPercent(metrics.maxDrawdownMDD)}</td>
-                <td className="py-3 text-right text-blue-600 font-bold">-</td>
+                <td className="py-3 text-right text-blue-600 font-bold">기준 (Alpha)</td>
               </tr>
               <tr>
-                <td className="py-2.5 font-sans">🇰🇷 코스피 지수 (KOSPI)</td>
+                <td className="py-2.5 font-sans flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block"></span>
+                  <span>🇰🇷 코스피 100 지수 (KOSPI)</span>
+                </td>
                 <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.kospiFinalValue)}</td>
+                <td className={`py-2.5 text-right ${getReturnColor(metrics.benchmarkComparison.kospiTotalReturn)}`}>
+                  {metrics.benchmarkComparison.kospiTotalReturn >= 0 ? '+' : ''}{formatPercent(metrics.benchmarkComparison.kospiTotalReturn)}
+                </td>
                 <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.kospiTwrCAGR)}</td>
                 <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.kospiMDD)}</td>
                 <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}`}>
+                  {metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR >= 0 ? '+' : ''}
                   {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}
                 </td>
               </tr>
               <tr>
-                <td className="py-2.5 font-sans">🇺🇸 S&P 500 (원화 환산)</td>
+                <td className="py-2.5 font-sans flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>
+                  <span>🇺🇸 S&P 500 (원화 환산 단순투자)</span>
+                </td>
                 <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.sp500FinalValue)}</td>
+                <td className={`py-2.5 text-right ${getReturnColor(metrics.benchmarkComparison.sp500TotalReturn)}`}>
+                  {metrics.benchmarkComparison.sp500TotalReturn >= 0 ? '+' : ''}{formatPercent(metrics.benchmarkComparison.sp500TotalReturn)}
+                </td>
                 <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.sp500TwrCAGR)}</td>
                 <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.sp500MDD)}</td>
                 <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}`}>
+                  {metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR >= 0 ? '+' : ''}
                   {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.sp500TwrCAGR)}
                 </td>
               </tr>
               <tr>
-                <td className="py-2.5 font-sans">⚖️ 50:50 한·미 혼합 리밸런싱</td>
+                <td className="py-2.5 font-sans flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                  <span>⚖️ 50:50 한·미 혼합 리밸런싱</span>
+                </td>
                 <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.blendFinalValue)}</td>
+                <td className={`py-2.5 text-right ${getReturnColor(metrics.benchmarkComparison.blendTotalReturn)}`}>
+                  {metrics.benchmarkComparison.blendTotalReturn >= 0 ? '+' : ''}{formatPercent(metrics.benchmarkComparison.blendTotalReturn)}
+                </td>
                 <td className="py-2.5 text-right">{formatPercent(metrics.benchmarkComparison.blendTwrCAGR)}</td>
                 <td className="py-2.5 text-right text-rose-600">-{formatPercent(metrics.benchmarkComparison.blendMDD)}</td>
                 <td className={`py-2.5 text-right font-bold ${getReturnColor(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}`}>
+                  {metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR >= 0 ? '+' : ''}
                   {formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.blendTwrCAGR)}
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        {/* Educational Takeaways Box for Students */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+          {/* 1. KOSPI takeaway */}
+          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5 text-xs">
+            <span className="font-extrabold text-slate-800 flex items-center gap-1 text-[11px]">
+              🇰🇷 한국 코스피 단순투자 대비 분석
+            </span>
+            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+              {metrics.twrCAGR >= metrics.benchmarkComparison.kospiTwrCAGR
+                ? `축하합니다! 코스피 단순 보유 대비 연평균 +${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}의 초과 수익(Alpha)을 달성했습니다. 우수 기업 선별 및 위기 대응이 성과를 견인했습니다.`
+                : `코스피 단순 지수 대비 연평균 ${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)} 격차를 보였습니다. 특정 종목 집중 및 잦은 매매 비용이 수익률을 갉아먹지 않았는지 점검해 보세요.`}
+            </p>
+          </div>
+
+          {/* 2. S&P 500 takeaway */}
+          <div className="p-3.5 bg-purple-50/60 rounded-2xl border border-purple-200 space-y-1.5 text-xs">
+            <span className="font-extrabold text-purple-900 flex items-center gap-1 text-[11px]">
+              🇺🇸 미국 S&P 500 & 환율 효과 분석
+            </span>
+            <p className="text-[11px] text-purple-950 leading-relaxed font-medium">
+              미국 S&P 500은 45년간 미국 우량주의 폭발적 성장과 외환위기(1997년 환율 1,700원) 및 금융위기 시 달러 환율 상승 효과가 결합되어 원화 기준 연평균 {formatPercent(metrics.benchmarkComparison.sp500TwrCAGR)}의 강력한 복리 성장을 기록했습니다.
+            </p>
+          </div>
+
+          {/* 3. 50:50 Asset Allocation takeaway */}
+          <div className="p-3.5 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-1.5 text-xs">
+            <span className="font-extrabold text-emerald-900 flex items-center gap-1 text-[11px]">
+              ⚖️ 50:50 글로벌 자산배분의 교훈
+            </span>
+            <p className="text-[11px] text-emerald-950 leading-relaxed font-medium">
+              한국과 미국에 50:50으로 나누어 연 1회 리밸런싱한 포트폴리오는 단일 국가 투자 대비 최대낙폭(MDD {formatPercent(metrics.benchmarkComparison.blendMDD)})을 안정적으로 방어하면서도 연평균 {formatPercent(metrics.benchmarkComparison.blendTwrCAGR)}의 우수한 성과를 입증했습니다.
+            </p>
+          </div>
         </div>
       </GlassCard>
 
@@ -415,74 +484,455 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
 
         {/* Chart Tab Contents */}
         <div className="pt-2">
-          {/* Wealth Growth Chart */}
+          {/* Wealth Growth Multi-Series Chart */}
           {activeChartTab === 'wealth' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
-                <span>포트폴리오 평가액 성장 vs 누적 투입원금</span>
-                <div className="flex items-center gap-3 text-[11px]">
-                  <span className="flex items-center gap-1 text-blue-700 font-bold">
-                    <span className="w-3 h-3 bg-blue-600 rounded-sm"></span> 포트폴리오
+                <span>포트폴리오 평가액 성장 vs 3대 벤치마크 단순투자 비교</span>
+                <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                  <span className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 font-extrabold flex items-center gap-1">
+                    <span className="w-3 h-1 bg-blue-600 rounded-full inline-block"></span> 내 포트폴리오
                   </span>
-                  <span className="flex items-center gap-1 text-slate-500 font-bold">
-                    <span className="w-3 h-1 bg-slate-400 rounded-full"></span> 누적 원금
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowKospiLine(!showKospiLine)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showKospiLine ? 'bg-slate-100 border-slate-300 text-slate-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 지수
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSp500Line(!showSp500Line)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showSp500Line ? 'bg-purple-50 border-purple-300 text-purple-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-purple-600 inline-block"></span> S&P 500
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowBlendLine(!showBlendLine)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showBlendLine ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span> 50:50 혼합
+                  </button>
                 </div>
               </div>
-              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-b border-slate-300">
-                {state.history.map(h => {
-                  const maxVal = Math.max(...state.history.map(item => item.endTotalAssetsKRW), 1);
-                  const heightPercent = Math.min(100, Math.max(8, (h.endTotalAssetsKRW / maxVal) * 100));
-                  const isFiveYearTick = h.year % 5 === 0;
 
-                  return (
-                    <div key={h.year} className="flex-1 min-w-[22px] flex flex-col items-center gap-1 group relative">
-                      {/* Tooltip */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[10px] p-2 rounded-lg shadow-xl z-20 whitespace-nowrap font-mono pointer-events-none">
-                        <span className="font-bold text-blue-300">{h.year}년말</span>
-                        <span>자산: {formatKRW(h.endTotalAssetsKRW)}</span>
-                        <span>수익률: {formatPercent(h.annualReturn)}</span>
-                      </div>
-                      <div
-                        className="w-full bg-blue-600 rounded-t-sm transition-all duration-300 group-hover:bg-blue-500"
-                        style={{ height: `${heightPercent}%` }}
+              {/* Multi-Series SVG Wealth Chart */}
+              {(() => {
+                const history = state.history;
+                if (history.length === 0) return null;
+
+                const cWidth = 720;
+                const cHeight = 260;
+                const pad = { top: 25, right: 30, bottom: 35, left: 65 };
+                const pWidth = cWidth - pad.left - pad.right;
+                const pHeight = cHeight - pad.top - pad.bottom;
+
+                const allVals: number[] = [];
+                history.forEach((h, idx) => {
+                  allVals.push(h.endTotalAssetsKRW);
+                  if (showKospiLine) allVals.push(h.benchmarkLevels?.kospiValue ?? metrics.benchmarkComparison.kospiSimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW);
+                  if (showSp500Line) allVals.push(h.benchmarkLevels?.sp500Value ?? metrics.benchmarkComparison.sp500SimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW);
+                  if (showBlendLine) allVals.push(h.benchmarkLevels?.blend5050Value ?? metrics.benchmarkComparison.blendSimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW);
+                  allVals.push(state.settings.initialCashKRW + (idx === 0 ? 0 : idx * state.settings.annualContributionKRW));
+                });
+
+                const minVal = Math.min(...allVals) * 0.95;
+                const maxVal = Math.max(...allVals) * 1.05;
+                const range = Math.max(1, maxVal - minVal);
+
+                const getX = (idx: number) => pad.left + (idx / Math.max(1, history.length - 1)) * pWidth;
+                const getY = (val: number) => pad.top + pHeight - ((val - minVal) / range) * pHeight;
+
+                const myPath = history.reduce((acc, h, idx) => {
+                  const x = getX(idx);
+                  const y = getY(h.endTotalAssetsKRW);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '');
+
+                const kospiPath = showKospiLine ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkLevels?.kospiValue ?? metrics.benchmarkComparison.kospiSimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const sp500Path = showSp500Line ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkLevels?.sp500Value ?? metrics.benchmarkComparison.sp500SimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const blendPath = showBlendLine ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkLevels?.blend5050Value ?? metrics.benchmarkComparison.blendSimHistory?.[idx]?.totalAssetsKRW ?? h.endTotalAssetsKRW;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const principalPath = history.reduce((acc, _, idx) => {
+                  const v = state.settings.initialCashKRW + (idx === 0 ? 0 : idx * state.settings.annualContributionKRW);
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '');
+
+                const activeIdx = hoveredChartIndex !== null ? hoveredChartIndex : history.length - 1;
+                const activeRecord = history[activeIdx];
+                const activeKospi = activeRecord?.benchmarkLevels?.kospiValue ?? metrics.benchmarkComparison.kospiSimHistory?.[activeIdx]?.totalAssetsKRW ?? activeRecord?.endTotalAssetsKRW;
+                const activeSp500 = activeRecord?.benchmarkLevels?.sp500Value ?? metrics.benchmarkComparison.sp500SimHistory?.[activeIdx]?.totalAssetsKRW ?? activeRecord?.endTotalAssetsKRW;
+                const activeBlend = activeRecord?.benchmarkLevels?.blend5050Value ?? metrics.benchmarkComparison.blendSimHistory?.[activeIdx]?.totalAssetsKRW ?? activeRecord?.endTotalAssetsKRW;
+
+                return (
+                  <div className="relative w-full space-y-2">
+                    <svg
+                      viewBox={`0 0 ${cWidth} ${cHeight}`}
+                      className="w-full h-auto overflow-visible select-none font-mono text-[10px]"
+                    >
+                      <defs>
+                        <linearGradient id="wealthGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* X & Y Axis grid lines */}
+                      <line x1={pad.left} y1={pad.top + pHeight} x2={pad.left + pWidth} y2={pad.top + pHeight} stroke="#cbd5e1" strokeWidth="1" />
+
+                      {history.map((h, idx) => {
+                        const isTick = h.year % 5 === 0 || idx === 0 || idx === history.length - 1;
+                        if (!isTick) return null;
+                        const x = getX(idx);
+                        return (
+                          <g key={h.year}>
+                            <line x1={x} y1={pad.top} x2={x} y2={pad.top + pHeight} stroke="#f1f5f9" strokeWidth="1" />
+                            <text x={x} y={pad.top + pHeight + 16} textAnchor="middle" className="fill-slate-500 text-[10px] font-sans font-bold">
+                              {h.year}년
+                            </text>
+                          </g>
+                        );
+                      })}
+
+                      {/* Principal Line */}
+                      <path d={principalPath} fill="none" stroke="#94a3b8" strokeWidth="1.2" strokeDasharray="3 3" />
+
+                      {/* Benchmark Paths */}
+                      {showKospiLine && kospiPath && (
+                        <path d={kospiPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="4 3" opacity="0.85" />
+                      )}
+                      {showSp500Line && sp500Path && (
+                        <path d={sp500Path} fill="none" stroke="#9333ea" strokeWidth="2" strokeDasharray="4 3" opacity="0.85" />
+                      )}
+                      {showBlendLine && blendPath && (
+                        <path d={blendPath} fill="none" stroke="#059669" strokeWidth="2" strokeDasharray="3 3" opacity="0.85" />
+                      )}
+
+                      {/* My Portfolio Area & Path */}
+                      <path
+                        d={`${myPath} L ${getX(history.length - 1)},${pad.top + pHeight} L ${getX(0)},${pad.top + pHeight} Z`}
+                        fill="url(#wealthGrad)"
                       />
-                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
-                        {isFiveYearTick ? `${h.year}` : `'${h.year.toString().slice(2)}`}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                      <path d={myPath} fill="none" stroke="#2563eb" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" />
+
+                      {/* Hover Column Indicator */}
+                      {hoveredChartIndex !== null && (
+                        <line
+                          x1={getX(hoveredChartIndex)}
+                          y1={pad.top}
+                          x2={getX(hoveredChartIndex)}
+                          y2={pad.top + pHeight}
+                          stroke="#3b82f6"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                        />
+                      )}
+
+                      {/* Interactive Nodes */}
+                      {history.map((h, idx) => {
+                        const x = getX(idx);
+                        const y = getY(h.endTotalAssetsKRW);
+                        const isHovered = hoveredChartIndex === idx;
+
+                        return (
+                          <g
+                            key={h.year}
+                            className="cursor-pointer"
+                            onMouseEnter={() => setHoveredChartIndex(idx)}
+                            onMouseLeave={() => setHoveredChartIndex(null)}
+                          >
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r={isHovered ? 6 : 3.5}
+                              className={`transition-all ${isHovered ? 'fill-blue-600 stroke-white stroke-2' : 'fill-white stroke-blue-600 stroke-2'}`}
+                            />
+                            {/* Transparent hit area */}
+                            <rect
+                              x={x - (pWidth / history.length) / 2}
+                              y={pad.top}
+                              width={pWidth / history.length}
+                              height={pHeight}
+                              fill="transparent"
+                            />
+                          </g>
+                        );
+                      })}
+                    </svg>
+
+                    {/* Active Point Quick Info Bar */}
+                    {activeRecord && (
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between flex-wrap gap-2 text-xs font-mono">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 font-sans">
+                            {activeRecord.year}년 말 성과
+                          </span>
+                          <span>내 자산: <strong className="text-blue-700 font-black">{formatKRW(activeRecord.endTotalAssetsKRW)}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px]">
+                          {showKospiLine && (
+                            <span className="text-slate-600">🇰🇷 코스피: <strong>{formatKRW(activeKospi)}</strong></span>
+                          )}
+                          {showSp500Line && (
+                            <span className="text-purple-700">🇺🇸 S&P 500: <strong>{formatKRW(activeSp500)}</strong></span>
+                          )}
+                          {showBlendLine && (
+                            <span className="text-emerald-700">⚖️ 50:50 혼합: <strong>{formatKRW(activeBlend)}</strong></span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
-          {/* TWR Chart */}
+          {/* TWR Multi-Series Chart */}
           {activeChartTab === 'twr' && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                <span>시간가중수익률(TWR) 복리 지수 (기준점 100)</span>
-                <span className="text-blue-600 font-mono font-bold">최종 {metrics.twr.toFixed(2)}배</span>
+              <div className="flex justify-between items-center text-xs font-bold text-slate-600 flex-wrap gap-2">
+                <span>시간가중수익률(TWR) 누적 복리 성장 곡선 (기준점=100)</span>
+                <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                  <span className="px-2 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 font-extrabold flex items-center gap-1">
+                    <span className="w-3 h-1 bg-blue-600 rounded-full inline-block"></span> 내 포트폴리오
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowKospiLine(!showKospiLine)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showKospiLine ? 'bg-slate-100 border-slate-300 text-slate-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 지수
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSp500Line(!showSp500Line)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showSp500Line ? 'bg-purple-50 border-purple-300 text-purple-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-purple-600 inline-block"></span> S&P 500
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowBlendLine(!showBlendLine)}
+                    className={`px-2 py-0.5 rounded-lg border transition cursor-pointer flex items-center gap-1 ${
+                      showBlendLine ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
+                    }`}
+                  >
+                    <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span> 50:50 혼합
+                  </button>
+                </div>
               </div>
-              <div className="h-64 flex items-end gap-1.5 overflow-x-auto pt-6 pb-2 px-2 border-b border-slate-300">
-                {state.history.map(h => {
-                  const maxTwr = Math.max(...state.history.map(item => item.twrIndexLevel), 100);
-                  const heightPercent = Math.min(100, Math.max(6, (h.twrIndexLevel / maxTwr) * 100));
-                  const isFiveYearTick = h.year % 5 === 0;
 
-                  return (
-                    <div key={h.year} className="flex-1 min-w-[22px] flex flex-col items-center gap-1 group relative">
-                      <div
-                        className="w-full bg-indigo-600 rounded-t-sm group-hover:bg-indigo-500"
-                        style={{ height: `${heightPercent}%` }}
+              {/* Multi-Series SVG TWR Chart */}
+              {(() => {
+                const history = state.history;
+                if (history.length === 0) return null;
+
+                const cWidth = 720;
+                const cHeight = 260;
+                const pad = { top: 25, right: 30, bottom: 35, left: 65 };
+                const pWidth = cWidth - pad.left - pad.right;
+                const pHeight = cHeight - pad.top - pad.bottom;
+
+                const allTwr: number[] = [100.0];
+                history.forEach((h, idx) => {
+                  allTwr.push(h.twrIndexLevel);
+                  if (showKospiLine) allTwr.push(h.benchmarkTwrLevels?.kospiTwr ?? metrics.benchmarkComparison.kospiSimHistory?.[idx]?.twrIndexLevel ?? 100);
+                  if (showSp500Line) allTwr.push(h.benchmarkTwrLevels?.sp500Twr ?? metrics.benchmarkComparison.sp500SimHistory?.[idx]?.twrIndexLevel ?? 100);
+                  if (showBlendLine) allTwr.push(h.benchmarkTwrLevels?.blend5050Twr ?? metrics.benchmarkComparison.blendSimHistory?.[idx]?.twrIndexLevel ?? 100);
+                });
+
+                const minTwr = Math.max(10, Math.min(...allTwr) * 0.9);
+                const maxTwr = Math.max(...allTwr) * 1.1;
+                const range = Math.max(1, maxTwr - minTwr);
+
+                const getX = (idx: number) => pad.left + (idx / Math.max(1, history.length - 1)) * pWidth;
+                const getY = (val: number) => pad.top + pHeight - ((val - minTwr) / range) * pHeight;
+
+                const myTwrPath = history.reduce((acc, h, idx) => {
+                  const x = getX(idx);
+                  const y = getY(h.twrIndexLevel);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '');
+
+                const kospiTwrPath = showKospiLine ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkTwrLevels?.kospiTwr ?? metrics.benchmarkComparison.kospiSimHistory?.[idx]?.twrIndexLevel ?? 100;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const sp500TwrPath = showSp500Line ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkTwrLevels?.sp500Twr ?? metrics.benchmarkComparison.sp500SimHistory?.[idx]?.twrIndexLevel ?? 100;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const blendTwrPath = showBlendLine ? history.reduce((acc, h, idx) => {
+                  const v = h.benchmarkTwrLevels?.blend5050Twr ?? metrics.benchmarkComparison.blendSimHistory?.[idx]?.twrIndexLevel ?? 100;
+                  const x = getX(idx);
+                  const y = getY(v);
+                  return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
+                }, '') : '';
+
+                const activeIdx = hoveredChartIndex !== null ? hoveredChartIndex : history.length - 1;
+                const activeRecord = history[activeIdx];
+                const activeKospiTwr = activeRecord?.benchmarkTwrLevels?.kospiTwr ?? metrics.benchmarkComparison.kospiSimHistory?.[activeIdx]?.twrIndexLevel ?? 100;
+                const activeSp500Twr = activeRecord?.benchmarkTwrLevels?.sp500Twr ?? metrics.benchmarkComparison.sp500SimHistory?.[activeIdx]?.twrIndexLevel ?? 100;
+                const activeBlendTwr = activeRecord?.benchmarkTwrLevels?.blend5050Twr ?? metrics.benchmarkComparison.blendSimHistory?.[activeIdx]?.twrIndexLevel ?? 100;
+
+                return (
+                  <div className="relative w-full space-y-2">
+                    <svg
+                      viewBox={`0 0 ${cWidth} ${cHeight}`}
+                      className="w-full h-auto overflow-visible select-none font-mono text-[10px]"
+                    >
+                      <defs>
+                        <linearGradient id="twrGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+                          <stop offset="100%" stopColor="#6366f1" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      <line x1={pad.left} y1={pad.top + pHeight} x2={pad.left + pWidth} y2={pad.top + pHeight} stroke="#cbd5e1" strokeWidth="1" />
+
+                      {history.map((h, idx) => {
+                        const isTick = h.year % 5 === 0 || idx === 0 || idx === history.length - 1;
+                        if (!isTick) return null;
+                        const x = getX(idx);
+                        return (
+                          <g key={h.year}>
+                            <line x1={x} y1={pad.top} x2={x} y2={pad.top + pHeight} stroke="#f1f5f9" strokeWidth="1" />
+                            <text x={x} y={pad.top + pHeight + 16} textAnchor="middle" className="fill-slate-500 text-[10px] font-sans font-bold">
+                              {h.year}년
+                            </text>
+                          </g>
+                        );
+                      })}
+
+                      {/* 100 Base Line */}
+                      {100 >= minTwr && 100 <= maxTwr && (
+                        <line x1={pad.left} y1={getY(100)} x2={pad.left + pWidth} y2={getY(100)} stroke="#e2e8f0" strokeWidth="1" strokeDasharray="2 2" />
+                      )}
+
+                      {/* Benchmark Paths */}
+                      {showKospiLine && kospiTwrPath && (
+                        <path d={kospiTwrPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="4 3" opacity="0.85" />
+                      )}
+                      {showSp500Line && sp500TwrPath && (
+                        <path d={sp500TwrPath} fill="none" stroke="#9333ea" strokeWidth="2" strokeDasharray="4 3" opacity="0.85" />
+                      )}
+                      {showBlendLine && blendTwrPath && (
+                        <path d={blendTwrPath} fill="none" stroke="#059669" strokeWidth="2" strokeDasharray="3 3" opacity="0.85" />
+                      )}
+
+                      {/* My TWR Area & Path */}
+                      <path
+                        d={`${myTwrPath} L ${getX(history.length - 1)},${pad.top + pHeight} L ${getX(0)},${pad.top + pHeight} Z`}
+                        fill="url(#twrGrad)"
                       />
-                      <span className={`text-[11px] font-mono mt-1 ${isFiveYearTick ? 'font-bold text-slate-800' : 'text-slate-400'}`}>
-                        {isFiveYearTick ? `${h.year}` : `'${h.year.toString().slice(2)}`}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                      <path d={myTwrPath} fill="none" stroke="#4f46e5" strokeWidth="2.75" strokeLinecap="round" strokeLinejoin="round" />
+
+                      {/* Hover Column Indicator */}
+                      {hoveredChartIndex !== null && (
+                        <line
+                          x1={getX(hoveredChartIndex)}
+                          y1={pad.top}
+                          x2={getX(hoveredChartIndex)}
+                          y2={pad.top + pHeight}
+                          stroke="#4f46e5"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                        />
+                      )}
+
+                      {/* Interactive Nodes */}
+                      {history.map((h, idx) => {
+                        const x = getX(idx);
+                        const y = getY(h.twrIndexLevel);
+                        const isHovered = hoveredChartIndex === idx;
+
+                        return (
+                          <g
+                            key={h.year}
+                            className="cursor-pointer"
+                            onMouseEnter={() => setHoveredChartIndex(idx)}
+                            onMouseLeave={() => setHoveredChartIndex(null)}
+                          >
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r={isHovered ? 6 : 3.5}
+                              className={`transition-all ${isHovered ? 'fill-indigo-600 stroke-white stroke-2' : 'fill-white stroke-indigo-600 stroke-2'}`}
+                            />
+                            <rect
+                              x={x - (pWidth / history.length) / 2}
+                              y={pad.top}
+                              width={pWidth / history.length}
+                              height={pHeight}
+                              fill="transparent"
+                            />
+                          </g>
+                        );
+                      })}
+                    </svg>
+
+                    {/* Active Point Quick Info Bar */}
+                    {activeRecord && (
+                      <div className="p-3 bg-indigo-50/60 rounded-xl border border-indigo-200 flex items-center justify-between flex-wrap gap-2 text-xs font-mono">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-indigo-700 bg-white px-2 py-0.5 rounded-md border border-indigo-200 font-sans">
+                            {activeRecord.year}년 누적 TWR
+                          </span>
+                          <span>내 복리지수: <strong className="text-indigo-700 font-black">{activeRecord.twrIndexLevel.toFixed(1)}pt</strong> ({formatPercent((activeRecord.twrIndexLevel - 100) / 100)})</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px]">
+                          {showKospiLine && (
+                            <span className="text-slate-600">🇰🇷 코스피: <strong>{activeKospiTwr.toFixed(1)}pt</strong></span>
+                          )}
+                          {showSp500Line && (
+                            <span className="text-purple-700">🇺🇸 S&P 500: <strong>{activeSp500Twr.toFixed(1)}pt</strong></span>
+                          )}
+                          {showBlendLine && (
+                            <span className="text-emerald-700">⚖️ 50:50: <strong>{activeBlendTwr.toFixed(1)}pt</strong></span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 

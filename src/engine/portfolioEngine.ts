@@ -121,12 +121,41 @@ export function advanceSimulationOneYear(
     subperiodReturn = (endTotalAssets - effectiveStartAssets) / effectiveStartAssets;
   }
 
-  const lastTwrIndex = historySoFar.length > 0 ? historySoFar[historySoFar.length - 1].twrIndexLevel : 100.0;
+  const lastRecord = historySoFar.length > 0 ? historySoFar[historySoFar.length - 1] : null;
+  const lastTwrIndex = lastRecord ? lastRecord.twrIndexLevel : 100.0;
   const currentTwrIndex = lastTwrIndex * (1 + subperiodReturn);
+
+  const runningPeakTwr = Math.max(
+    lastRecord?.runningPeakTwrIndex ?? 100.0,
+    currentTwrIndex
+  );
+  const currentDrawdown = runningPeakTwr > 0 ? (currentTwrIndex - runningPeakTwr) / runningPeakTwr : 0;
 
   const kospiRet = getBenchmarkAnnualReturn('kospi', year);
   const sp500Ret = getBenchmarkAnnualReturn('sp500', year);
   const blendRet = getBenchmarkAnnualReturn('blend5050', year);
+
+  const lastKospiTwr = lastRecord?.benchmarkTwrLevels?.kospiTwr ?? 100.0;
+  const lastSp500Twr = lastRecord?.benchmarkTwrLevels?.sp500Twr ?? 100.0;
+  const lastBlendTwr = lastRecord?.benchmarkTwrLevels?.blend5050Twr ?? 100.0;
+
+  const currentKospiTwr = lastKospiTwr * (1 + kospiRet);
+  const currentSp500Twr = lastSp500Twr * (1 + sp500Ret);
+  const currentBlendTwr = lastBlendTwr * (1 + blendRet);
+
+  const feeRate = settings.feeRate || 0.001;
+  const isFirstYear = historySoFar.length === 0;
+  const deposit = isFirstYear ? 0 : annualDepositKRW;
+  const depositAfterFee = deposit * (1 - feeRate);
+
+  const initialBaseVal = (settings.initialCashKRW || 10000000) * (1 - feeRate);
+  const lastKospiVal = lastRecord?.benchmarkLevels?.kospiValue ?? initialBaseVal;
+  const lastSp500Val = lastRecord?.benchmarkLevels?.sp500Value ?? initialBaseVal;
+  const lastBlendVal = lastRecord?.benchmarkLevels?.blend5050Value ?? initialBaseVal;
+
+  const currentKospiVal = (lastKospiVal + (isFirstYear ? 0 : depositAfterFee)) * (1 + kospiRet);
+  const currentSp500Val = (lastSp500Val + (isFirstYear ? 0 : depositAfterFee)) * (1 + sp500Ret);
+  const currentBlendVal = (lastBlendVal + (isFirstYear ? 0 : depositAfterFee)) * (1 + blendRet);
 
   const briefing = getMarketBriefingForYear(year);
   const fxRate = getFxRate(year);
@@ -151,10 +180,22 @@ export function advanceSimulationOneYear(
     endTotalAssetsKRW: endTotalAssets,
     cashKRW,
     twrIndexLevel: currentTwrIndex,
+    runningPeakTwrIndex: runningPeakTwr,
+    currentDrawdown,
     benchmarkReturns: {
       kospi: kospiRet,
       sp500KRW: sp500Ret,
       blend5050: blendRet,
+    },
+    benchmarkLevels: {
+      kospiValue: currentKospiVal,
+      sp500Value: currentSp500Val,
+      blend5050Value: currentBlendVal,
+    },
+    benchmarkTwrLevels: {
+      kospiTwr: currentKospiTwr,
+      sp500Twr: currentSp500Twr,
+      blend5050Twr: currentBlendTwr,
     },
     annualReturn: subperiodReturn,
     fxRate,

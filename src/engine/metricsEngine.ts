@@ -452,9 +452,17 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
     settings.feeRate
   );
 
-  const kospiTwrCAGR = yearsCount > 0 ? Math.pow(kospiSim.twrIndexLevels[kospiSim.twrIndexLevels.length - 1] / 100.0, 1.0 / yearsCount) - 1.0 : 0;
-  const sp500TwrCAGR = yearsCount > 0 ? Math.pow(sp500Sim.twrIndexLevels[sp500Sim.twrIndexLevels.length - 1] / 100.0, 1.0 / yearsCount) - 1.0 : 0;
-  const blendTwrCAGR = yearsCount > 0 ? Math.pow(blendSim.twrIndexLevels[blendSim.twrIndexLevels.length - 1] / 100.0, 1.0 / yearsCount) - 1.0 : 0;
+  const kospiTwrEnd = kospiSim.twrIndexLevels[kospiSim.twrIndexLevels.length - 1];
+  const sp500TwrEnd = sp500Sim.twrIndexLevels[sp500Sim.twrIndexLevels.length - 1];
+  const blendTwrEnd = blendSim.twrIndexLevels[blendSim.twrIndexLevels.length - 1];
+
+  const kospiTwrCAGR = yearsCount > 0 ? Math.pow(kospiTwrEnd / 100.0, 1.0 / yearsCount) - 1.0 : 0;
+  const sp500TwrCAGR = yearsCount > 0 ? Math.pow(sp500TwrEnd / 100.0, 1.0 / yearsCount) - 1.0 : 0;
+  const blendTwrCAGR = yearsCount > 0 ? Math.pow(blendTwrEnd / 100.0, 1.0 / yearsCount) - 1.0 : 0;
+
+  const kospiTotalReturn = (kospiTwrEnd - 100.0) / 100.0;
+  const sp500TotalReturn = (sp500TwrEnd - 100.0) / 100.0;
+  const blendTotalReturn = (blendTwrEnd - 100.0) / 100.0;
 
   const kospiMDD = calculateMDD(kospiSim.twrIndexLevels);
   const sp500MDD = calculateMDD(sp500Sim.twrIndexLevels);
@@ -543,16 +551,25 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
       kospiFinalValue: kospiSim.finalPortfolioValue,
       kospiTwrCAGR,
       kospiMDD,
+      kospiTotalReturn,
+      kospiTwrIndexEnd: kospiTwrEnd,
       sp500FinalValue: sp500Sim.finalPortfolioValue,
       sp500TwrCAGR,
       sp500MDD,
+      sp500TotalReturn,
+      sp500TwrIndexEnd: sp500TwrEnd,
       blendFinalValue: blendSim.finalPortfolioValue,
       blendTwrCAGR,
       blendMDD,
+      blendTotalReturn,
+      blendTwrIndexEnd: blendTwrEnd,
       alphaVsPrimaryCAGR: twrCAGR - (settings.primaryBenchmark === 'kospi' ? kospiTwrCAGR : settings.primaryBenchmark === 'sp500' ? sp500TwrCAGR : blendTwrCAGR),
       valueDiffVsPrimaryKRW: finalPortfolioValue - (settings.primaryBenchmark === 'kospi' ? kospiSim.finalPortfolioValue : settings.primaryBenchmark === 'sp500' ? sp500Sim.finalPortfolioValue : blendSim.finalPortfolioValue),
       excessReturnVsPrimary: twrCAGR - (settings.primaryBenchmark === 'kospi' ? kospiTwrCAGR : settings.primaryBenchmark === 'sp500' ? sp500TwrCAGR : blendTwrCAGR),
       excessValueVsPrimary: finalPortfolioValue - (settings.primaryBenchmark === 'kospi' ? kospiSim.finalPortfolioValue : settings.primaryBenchmark === 'sp500' ? sp500Sim.finalPortfolioValue : blendSim.finalPortfolioValue),
+      kospiSimHistory: kospiSim.history,
+      sp500SimHistory: sp500Sim.history,
+      blendSimHistory: blendSim.history,
     },
     finalAllocation: {
       krWeight,

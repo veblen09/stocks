@@ -4,10 +4,12 @@ import {
   Unlock,
   Eye,
   FileText,
+  TrendingUp,
+  Award,
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import type { YearlyPerformanceRecord } from '../types/stockGame';
-import { getReturnBgColor, getReturnColor, formatKRW } from '../utils/formatMoney';
+import { getReturnBgColor, getReturnColor, formatKRW, formatPercent } from '../utils/formatMoney';
 import { getAvailableNewsForYear, getYearRetrospectiveNews } from '../engine/newsEngine';
 import { useStockGame } from '../store/stockGameStore';
 import { audioManager } from '../utils/audioManager';
@@ -24,7 +26,7 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
   onProceed,
 }) => {
   const { state } = useStockGame();
-  const [activeTab, setActiveTab] = useState<'RETROSPECTIVE' | 'KNOWN_BEFORE' | 'MY_DECISION'>('RETROSPECTIVE');
+  const [activeTab, setActiveTab] = useState<'BENCHMARK' | 'RETROSPECTIVE' | 'KNOWN_BEFORE' | 'MY_DECISION'>('BENCHMARK');
 
   useEffect(() => {
     if (record) {
@@ -40,6 +42,20 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
 
   const currentYear = record.year;
   const priorYear = currentYear - 1;
+
+  // Benchmark returns for this year
+  const kospiRet = record.benchmarkReturns?.kospi ?? 0;
+  const sp500Ret = record.benchmarkReturns?.sp500KRW ?? 0;
+  const blendRet = record.benchmarkReturns?.blend5050 ?? 0;
+
+  const kospiAlpha = record.annualReturn - kospiRet;
+  const sp500Alpha = record.annualReturn - sp500Ret;
+
+  // Cumulative TWR levels
+  const myTwr = record.twrIndexLevel || 100;
+  const kospiTwr = record.benchmarkTwrLevels?.kospiTwr ?? 100;
+  const sp500Twr = record.benchmarkTwrLevels?.sp500Twr ?? 100;
+  const blendTwr = record.benchmarkTwrLevels?.blend5050Twr ?? 100;
 
   // News known before investment (cutoff date: (currentYear - 1)-12-31)
   const knownBeforeNews = getAvailableNewsForYear(currentYear).slice(0, 4);
@@ -70,7 +86,7 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
         variant="default"
       >
         {/* Top Header & Year Result Badge */}
-        <div className="pb-4 border-b border-slate-200 shrink-0 space-y-2">
+        <div className="pb-3.5 border-b border-slate-200 shrink-0 space-y-2">
           <div className="flex items-center justify-between">
             <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 font-mono text-xs font-bold border border-blue-200">
               {currentYear}년 투자 결산 브리핑
@@ -88,7 +104,6 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
               <p className="text-xs text-slate-500">
                 기말 평가자산: <strong className="text-slate-900 font-mono">{formatKRW(record.endTotalAssetsKRW)}</strong>
               </p>
-
             </div>
 
             <div className={`px-3 py-1.5 rounded-xl ${retBg} border border-slate-200 text-right`}>
@@ -98,22 +113,73 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
               <span className="text-[11px] text-slate-500 block font-medium">포트폴리오 수익률</span>
             </div>
           </div>
+
+          {/* Quick Benchmark Comparison Strip */}
+          <div className="grid grid-cols-3 gap-2 pt-1 text-xs font-mono">
+            <div className="p-2 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="flex justify-between items-center text-[10px] font-sans">
+                <span className="text-slate-600 font-bold">🇰🇷 코스피</span>
+                <span className={`font-bold ${kospiAlpha >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {kospiAlpha >= 0 ? `+${(kospiAlpha * 100).toFixed(1)}%p` : `${(kospiAlpha * 100).toFixed(1)}%p`}
+                </span>
+              </div>
+              <span className={`text-xs font-bold block mt-0.5 ${getReturnColor(kospiRet)}`}>
+                {formatPercent(kospiRet)}
+              </span>
+            </div>
+
+            <div className="p-2 bg-purple-50/70 rounded-xl border border-purple-200">
+              <div className="flex justify-between items-center text-[10px] font-sans">
+                <span className="text-purple-900 font-bold">🇺🇸 S&P 500</span>
+                <span className={`font-bold ${sp500Alpha >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {sp500Alpha >= 0 ? `+${(sp500Alpha * 100).toFixed(1)}%p` : `${(sp500Alpha * 100).toFixed(1)}%p`}
+                </span>
+              </div>
+              <span className={`text-xs font-bold block mt-0.5 ${getReturnColor(sp500Ret)}`}>
+                {formatPercent(sp500Ret)}
+              </span>
+            </div>
+
+            <div className="p-2 bg-emerald-50/70 rounded-xl border border-emerald-200">
+              <div className="flex justify-between items-center text-[10px] font-sans">
+                <span className="text-emerald-900 font-bold">⚖️ 50:50 혼합</span>
+                <span className="text-slate-400 font-normal">리밸런싱</span>
+              </div>
+              <span className={`text-xs font-bold block mt-0.5 ${getReturnColor(blendRet)}`}>
+                {formatPercent(blendRet)}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* 3 Analysis Tabs */}
-        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1 my-3 text-xs font-bold shrink-0">
+        {/* 4 Analysis Tabs */}
+        <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1 my-2.5 text-xs font-bold shrink-0">
+          <button
+            type="button"
+            onClick={() => {
+              audioManager.playUiSound('tab');
+              setActiveTab('BENCHMARK');
+            }}
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1 ${
+              activeTab === 'BENCHMARK' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TrendingUp size={13} />
+            <span>지수 비교 분석</span>
+          </button>
+
           <button
             type="button"
             onClick={() => {
               audioManager.playUiSound('tab');
               setActiveTab('RETROSPECTIVE');
             }}
-            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'RETROSPECTIVE' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Unlock size={13} />
-            <span>실제 발생 사건 ({realizedYearNews.length})</span>
+            <span>실제 사건 ({realizedYearNews.length})</span>
           </button>
 
           <button
@@ -122,12 +188,12 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
               audioManager.playUiSound('tab');
               setActiveTab('KNOWN_BEFORE');
             }}
-            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'KNOWN_BEFORE' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Eye size={13} />
-            <span>연초 확인 정보 ({knownBeforeNews.length})</span>
+            <span>연초 정보 ({knownBeforeNews.length})</span>
           </button>
 
           <button
@@ -136,17 +202,92 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
               audioManager.playUiSound('tab');
               setActiveTab('MY_DECISION');
             }}
-            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1.5 rounded-lg transition cursor-pointer flex items-center justify-center gap-1 ${
               activeTab === 'MY_DECISION' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <FileText size={13} />
-            <span>나의 투자 가설 ({playerNotes.length})</span>
+            <span>투자 가설 ({playerNotes.length})</span>
           </button>
         </div>
 
         {/* Scrollable Tab Content */}
-        <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs text-slate-700">
+        <div className="flex-1 overflow-y-auto space-y-3 pr-1 text-xs text-slate-700">
+          {/* TAB 0: BENCHMARK */}
+          {activeTab === 'BENCHMARK' && (
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 leading-relaxed space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <Award size={15} className="text-blue-700" />
+                  <span>{currentYear}년 시장 벤치마크 대비 성과 진단</span>
+                </div>
+                <p className="text-[11px] text-slate-600 font-medium">
+                  {kospiAlpha >= 0 && sp500Alpha >= 0
+                    ? `대단합니다! 올해 한국 코스피(+${(kospiAlpha * 100).toFixed(1)}%p)와 미국 S&P 500(+${(sp500Alpha * 100).toFixed(1)}%p) 양대 지수를 모두 초과 달성(Alpha)했습니다.`
+                    : kospiAlpha >= 0
+                    ? `한국 코스피 지수 대비 +${(kospiAlpha * 100).toFixed(1)}%p 초과 수익을 거두었습니다.`
+                    : sp500Alpha >= 0
+                    ? `미국 S&P 500 지수 대비 +${(sp500Alpha * 100).toFixed(1)}%p 초과 수익을 거두었습니다.`
+                    : `올해는 대표 시장 지수들의 상승세가 강력했습니다. 장기 패시브 투자의 복리 효과를 함께 학습해 보세요.`}
+                </p>
+              </div>
+
+              {/* Detailed Performance Comparison Table */}
+              <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden font-mono text-xs">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-100/80 border-b border-slate-200 text-[11px] text-slate-600 font-sans font-bold">
+                    <tr>
+                      <th className="p-2.5">전략 / 지수</th>
+                      <th className="p-2.5 text-right font-mono">{currentYear}년 수익률</th>
+                      <th className="p-2.5 text-right font-mono">누적 TWR 지수</th>
+                      <th className="p-2.5 text-right font-sans">초과 격차</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 font-semibold">
+                    <tr className="bg-blue-50/70 font-black text-blue-900">
+                      <td className="p-2.5 font-sans">👑 나의 포트폴리오</td>
+                      <td className={`p-2.5 text-right ${getReturnColor(record.annualReturn)}`}>
+                        {formatPercent(record.annualReturn)}
+                      </td>
+                      <td className="p-2.5 text-right text-blue-700">{myTwr.toFixed(1)}</td>
+                      <td className="p-2.5 text-right font-sans text-blue-700">-</td>
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-sans text-slate-800">🇰🇷 코스피 지수 (KOSPI)</td>
+                      <td className={`p-2.5 text-right ${getReturnColor(kospiRet)}`}>
+                        {formatPercent(kospiRet)}
+                      </td>
+                      <td className="p-2.5 text-right text-slate-700">{kospiTwr.toFixed(1)}</td>
+                      <td className={`p-2.5 text-right font-sans ${kospiAlpha >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {kospiAlpha >= 0 ? `+${(kospiAlpha * 100).toFixed(1)}%p` : `${(kospiAlpha * 100).toFixed(1)}%p`}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-sans text-slate-800">🇺🇸 S&P 500 (원화 환산)</td>
+                      <td className={`p-2.5 text-right ${getReturnColor(sp500Ret)}`}>
+                        {formatPercent(sp500Ret)}
+                      </td>
+                      <td className="p-2.5 text-right text-purple-700">{sp500Twr.toFixed(1)}</td>
+                      <td className={`p-2.5 text-right font-sans ${sp500Alpha >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {sp500Alpha >= 0 ? `+${(sp500Alpha * 100).toFixed(1)}%p` : `${(sp500Alpha * 100).toFixed(1)}%p`}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-2.5 font-sans text-slate-800">⚖️ 50:50 한·미 혼합배분</td>
+                      <td className={`p-2.5 text-right ${getReturnColor(blendRet)}`}>
+                        {formatPercent(blendRet)}
+                      </td>
+                      <td className="p-2.5 text-right text-emerald-700">{blendTwr.toFixed(1)}</td>
+                      <td className={`p-2.5 text-right font-sans ${record.annualReturn - blendRet >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {record.annualReturn - blendRet >= 0 ? `+${((record.annualReturn - blendRet) * 100).toFixed(1)}%p` : `${((record.annualReturn - blendRet) * 100).toFixed(1)}%p`}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: RETROSPECTIVE */}
           {activeTab === 'RETROSPECTIVE' && (
             <div className="space-y-3">
@@ -229,7 +370,7 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
         </div>
 
         {/* Bottom CTA Button */}
-        <div className="pt-4 border-t border-slate-200 shrink-0 flex items-center justify-between">
+        <div className="pt-3.5 border-t border-slate-200 shrink-0 flex items-center justify-between">
           <div className="text-xs text-slate-500 font-medium">
             다음 운용 연도: <strong className="text-slate-900">{currentYear + 1}년</strong>
           </div>

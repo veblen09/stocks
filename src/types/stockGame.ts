@@ -52,14 +52,25 @@ export type MonthlyStockPrices = Record<string, Record<string, MonthlyPricePoint
 
 export type FxDataset = Record<string, number>;
 
+export interface BenchmarkDetail {
+  id: BenchmarkId;
+  nameKo: string;
+  nameEn: string;
+  currency: string;
+  description: string;
+  prices?: Record<string, number>;
+  annualReturns: Record<string, number>;
+  annualReturnsUSD?: Record<string, number>;
+}
+
+export type BenchmarksDataset = Record<string, BenchmarkDetail>;
+
 export interface BenchmarkAnnualData {
   kospiReturn: number;
   sp500KRWReturn: number;
   blend5050Return: number;
   sp500USDReturn?: number;
 }
-
-export type BenchmarksDataset = Record<string, BenchmarkAnnualData>;
 
 export interface MarketEvent {
   year: number;
@@ -382,16 +393,25 @@ export interface FinalMetrics {
     kospiFinalValue: number;
     kospiTwrCAGR: number;
     kospiMDD: number;
+    kospiTotalReturn: number;
+    kospiTwrIndexEnd: number;
     sp500FinalValue: number;
     sp500TwrCAGR: number;
     sp500MDD: number;
+    sp500TotalReturn: number;
+    sp500TwrIndexEnd: number;
     blendFinalValue: number;
     blendTwrCAGR: number;
     blendMDD: number;
+    blendTotalReturn: number;
+    blendTwrIndexEnd: number;
     alphaVsPrimaryCAGR?: number;
     valueDiffVsPrimaryKRW?: number;
     excessReturnVsPrimary?: number;
     excessValueVsPrimary?: number;
+    kospiSimHistory?: { year: number; returnRate: number; totalAssetsKRW: number; twrIndexLevel: number }[];
+    sp500SimHistory?: { year: number; returnRate: number; totalAssetsKRW: number; twrIndexLevel: number }[];
+    blendSimHistory?: { year: number; returnRate: number; totalAssetsKRW: number; twrIndexLevel: number }[];
   };
   scoreAndPersona: {
     diversificationScore: number; // 0-100
