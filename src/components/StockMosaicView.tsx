@@ -69,8 +69,23 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
     return Array.from(sSet);
   }, [tradableStocks]);
 
+  // Effective target weights calculation across holdings & drafts
+  const effectiveTargetWeights = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const [cid, h] of Object.entries(holdings)) {
+      const val = h?.currentValueKRW || 0;
+      map[cid] = totalPortfolioValue > 0 ? val / totalPortfolioValue : 0;
+    }
+    for (const [cid, w] of Object.entries(draftTargetWeights)) {
+      map[cid] = w;
+    }
+    return map;
+  }, [holdings, draftTargetWeights, totalPortfolioValue]);
+
   // Target Cash Calculation
-  const totalStockTarget = Object.values(draftTargetWeights).reduce((sum, w) => sum + w, 0);
+  const totalStockTarget = useMemo(() => {
+    return Object.values(effectiveTargetWeights).reduce((sum, w) => sum + w, 0);
+  }, [effectiveTargetWeights]);
   const draftCashTargetWeight = Math.max(0, 1.0 - totalStockTarget);
   const projectedCashKRW = totalPortfolioValue * draftCashTargetWeight;
 
@@ -387,10 +402,12 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               const holding = holdings[stock.canonicalId];
               const holdingVal = holding ? holding.currentValueKRW || 0 : 0;
               const holdingWeight = totalPortfolioValue > 0 ? holdingVal / totalPortfolioValue : 0;
-              const draftWeight = draftTargetWeights[stock.canonicalId] || 0;
+              const hasExplicitDraft = draftTargetWeights[stock.canonicalId] !== undefined;
+              const draftWeight = hasExplicitDraft ? draftTargetWeights[stock.canonicalId] : 0;
+              const effectiveWeight = effectiveTargetWeights[stock.canonicalId] || 0;
               const yearReturn = yearEndReturns ? yearEndReturns[stock.canonicalId] : null;
-              const otherStocksSum = totalStockTarget - draftWeight;
-              const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
+              const otherStocksSum = totalStockTarget - effectiveWeight;
+              const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 100000000) / 100000000);
 
               return (
                 <MosaicTile
@@ -400,6 +417,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   currentYear={currentYear}
                   totalPortfolioValue={totalPortfolioValue}
                   draftTargetWeight={draftWeight}
+                  hasExplicitDraft={hasExplicitDraft}
                   availableHeadroom={availableHeadroom}
                   currentHoldingWeight={holdingWeight}
                   currentHoldingValueKRW={holdingVal}
@@ -436,11 +454,13 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   const holding = holdings[stock.canonicalId];
                   const holdingVal = holding ? holding.currentValueKRW || 0 : 0;
                   const holdingWeight = totalPortfolioValue > 0 ? holdingVal / totalPortfolioValue : 0;
-                  const draftWeight = draftTargetWeights[stock.canonicalId] || 0;
-                  const targetAmount = Math.round(draftWeight * totalPortfolioValue);
-                  const otherStocksSum = totalStockTarget - draftWeight;
-                  const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
-                  const canIncrease = draftWeight < availableHeadroom - 0.000001;
+                  const hasExplicitDraft = draftTargetWeights[stock.canonicalId] !== undefined;
+                  const draftWeight = hasExplicitDraft ? draftTargetWeights[stock.canonicalId] : 0;
+                  const effectiveWeight = effectiveTargetWeights[stock.canonicalId] || 0;
+                  const targetAmount = Math.round(effectiveWeight * totalPortfolioValue);
+                  const otherStocksSum = totalStockTarget - effectiveWeight;
+                  const availableHeadroom = Math.max(0, Math.round((1.0 - otherStocksSum) * 100000000) / 100000000);
+                  const canIncrease = effectiveWeight < availableHeadroom - 0.000001;
                   const sparkline = getCompany1YrSparkline(stock.canonicalId, currentYear - 1);
                   const defaultBuyAmount = totalPortfolioValue >= 2000000 ? 1000000 : Math.round(totalPortfolioValue * 0.1);
                   const defaultBuyWeight = totalPortfolioValue > 0 ? defaultBuyAmount / totalPortfolioValue : 0.1;
@@ -449,7 +469,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                     <tr
                       key={stock.canonicalId}
                       className={`hover:bg-blue-50/50 transition cursor-pointer ${
-                        draftWeight > 0.0001 ? 'bg-blue-50/30 font-medium' : ''
+                        hasExplicitDraft ? 'bg-blue-50/30 font-medium' : ''
                       }`}
                       onClick={() => onSelectStock(stock.canonicalId)}
                     >

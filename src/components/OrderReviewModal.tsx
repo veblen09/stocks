@@ -79,7 +79,8 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
     const currVal = currentHolding ? currentHolding.currentValueKRW || 0 : 0;
     const currWeight = totalPortfolioValue > 0 ? currVal / totalPortfolioValue : 0;
 
-    const tgtWeight = draftTargetWeights[cid] || 0;
+    const hasExplicitDraft = draftTargetWeights[cid] !== undefined;
+    const tgtWeight = hasExplicitDraft ? draftTargetWeights[cid] : currWeight;
     const tgtVal = totalPortfolioValue * tgtWeight;
     const diffVal = tgtVal - currVal;
 
@@ -112,7 +113,7 @@ export const OrderReviewModal: React.FC<OrderReviewModalProps> = ({
     return order[a.action] - order[b.action];
   });
 
-  const totalStockTarget = Object.values(draftTargetWeights).reduce((sum, w) => sum + w, 0);
+  const totalStockTarget = stockChanges.reduce((sum, item) => sum + item.targetWeight, 0);
   const targetCashWeight = Math.max(0, 1.0 - totalStockTarget);
   const isOverAllocated = totalStockTarget > 1.0001;
 

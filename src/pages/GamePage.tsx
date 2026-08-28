@@ -187,16 +187,31 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     return getMacroNewsForYear(currentYear).slice(0, 6);
   }, [currentYear]);
 
+  // Effective target weights calculation across holdings & drafts
+  const effectiveTargetWeights = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const [cid, h] of Object.entries(holdings)) {
+      const val = h?.currentValueKRW || 0;
+      map[cid] = currentAssets > 0 ? val / currentAssets : 0;
+    }
+    for (const [cid, w] of Object.entries(draftTargetWeights)) {
+      map[cid] = w;
+    }
+    return map;
+  }, [holdings, draftTargetWeights, currentAssets]);
+
   // Draft Target Weights Calculation
-  const totalStockTarget = Object.values(draftTargetWeights).reduce((sum, w) => sum + w, 0);
+  const totalStockTarget = useMemo(() => {
+    return Object.values(effectiveTargetWeights).reduce((sum, w) => sum + w, 0);
+  }, [effectiveTargetWeights]);
   const draftCashTargetWeight = Math.max(0, 1.0 - totalStockTarget);
-  const changedStocksCount = Object.values(draftTargetWeights).filter(w => w > 0.0001).length;
+  const changedStocksCount = Object.keys(draftTargetWeights).length;
 
   // Single stock concentration check
   const maxDraftStock = useMemo(() => {
     let maxCid = '';
     let maxW = 0;
-    for (const [cid, w] of Object.entries(draftTargetWeights)) {
+    for (const [cid, w] of Object.entries(effectiveTargetWeights)) {
       if (w > maxW) {
         maxW = w;
         maxCid = cid;
@@ -204,7 +219,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     }
     const s = STOCKS_BY_ID[maxCid];
     return { cid: maxCid, nameKo: s ? s.nameKo : maxCid, weight: maxW };
-  }, [draftTargetWeights]);
+  }, [effectiveTargetWeights]);
 
   // Handle Advance Simulation (with Live Market Replay)
   const handleInitiateAdvance = () => {

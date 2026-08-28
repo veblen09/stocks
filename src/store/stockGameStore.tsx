@@ -17,6 +17,7 @@ import { evaluateAchievements } from '../features/achievements/achievementEngine
 import { createEncyclopediaEntryForListing, syncEncyclopediaWithState } from '../features/encyclopedia/encyclopediaEngine';
 import { buildYearbookEntries } from '../features/yearbook/yearbookEngine';
 import { getTradableStocks } from '../engine/universeEngine';
+import { getStockPriceKRW } from '../engine/returnEngine';
 import { executeCrisisDecision, getCrisisEventById } from '../engine/crisisEngine';
 import { getMonthlyReplayQuality } from '../engine/monthlyReplayEngine';
 import { calculateChapterSummary, isChapterEndYear } from '../features/chapters/chapterEngine';
@@ -323,28 +324,49 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
     case 'SET_DRAFT_TARGET_WEIGHT': {
       const { canonicalId, weight } = action.payload;
       const currentWeights = { ...(state.draftTargetWeights || {}) };
-      if (weight <= 0.000001) {
-        delete currentWeights[canonicalId];
-        return {
-          ...state,
-          draftTargetWeights: currentWeights,
-        };
-      }
+      const priorYear = state.currentYear - 1;
+      const totalPortfolioValue = calculatePortfolioValue(
+        state.cashKRW,
+        state.holdings,
+        priorYear
+      );
 
-      let otherSum = 0;
-      for (const [cid, w] of Object.entries(currentWeights)) {
-        if (cid !== canonicalId) {
+      if (weight <= 0.000001) {
+        if (state.holdings[canonicalId] && (state.holdings[canonicalId]?.shares || 0) > 0) {
+          currentWeights[canonicalId] = 0; // Explicit 0 -> sell
+        } else {
+          delete currentWeights[canonicalId];
+        }
+      } else {
+        let otherSum = 0;
+        // Holdings without explicit draft target keep their current weight in calculation
+        for (const [cid, h] of Object.entries(state.holdings || {})) {
+          if (cid === canonicalId) continue;
+          if (currentWeights[cid] !== undefined) {
+            otherSum += currentWeights[cid];
+          } else if (totalPortfolioValue > 0) {
+            const p = getStockPriceKRW(cid, priorYear) || 0;
+            otherSum += ((h?.shares || 0) * p) / totalPortfolioValue;
+          }
+        }
+        // Non-held stocks with explicit draft
+        for (const [cid, w] of Object.entries(currentWeights)) {
+          if (cid === canonicalId || state.holdings?.[cid]) continue;
           otherSum += w;
         }
-      }
 
-      const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 100000000) / 100000000);
-      const clampedWeight = Math.min(Math.round(weight * 100000000) / 100000000, maxAllowed);
+        const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 100000000) / 100000000);
+        const clampedWeight = Math.min(Math.round(weight * 100000000) / 100000000, maxAllowed);
 
-      if (clampedWeight <= 0.000001) {
-        delete currentWeights[canonicalId];
-      } else {
-        currentWeights[canonicalId] = clampedWeight;
+        if (clampedWeight <= 0.000001) {
+          if (state.holdings[canonicalId] && (state.holdings[canonicalId]?.shares || 0) > 0) {
+            currentWeights[canonicalId] = 0;
+          } else {
+            delete currentWeights[canonicalId];
+          }
+        } else {
+          currentWeights[canonicalId] = clampedWeight;
+        }
       }
 
       return {
@@ -377,10 +399,30 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
     case 'EXECUTE_DRAFT_ALLOCATION': {
       if (state.isGameOver) return state;
       try {
-        const targets = Object.entries(state.draftTargetWeights || {}).map(([canonicalId, weight]) => ({
-          canonicalId,
-          weight,
-        }));
+        const priorYear = state.currentYear - 1;
+        const totalPortfolioValue = calculatePortfolioValue(
+          state.cashKRW,
+          state.holdings,
+          priorYear
+        );
+
+        // Build target list: for holdings not explicitly in draftTargetWeights, preserve their current holding weight
+        const allStockIds = new Set([
+          ...Object.keys(state.holdings || {}),
+          ...Object.keys(state.draftTargetWeights || {}),
+        ]);
+
+        const targets: { canonicalId: string; weight: number }[] = [];
+        for (const cid of allStockIds) {
+          if (state.draftTargetWeights && state.draftTargetWeights[cid] !== undefined) {
+            targets.push({ canonicalId: cid, weight: state.draftTargetWeights[cid] });
+          } else if (state.holdings[cid] && totalPortfolioValue > 0) {
+            const p = getStockPriceKRW(cid, priorYear) || 0;
+            const val = (state.holdings[cid].shares || 0) * p;
+            targets.push({ canonicalId: cid, weight: val / totalPortfolioValue });
+          }
+        }
+
         const res = executeRebalanceToTargetWeights(
           targets,
           state.cashKRW,

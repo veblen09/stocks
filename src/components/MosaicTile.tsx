@@ -17,6 +17,7 @@ interface MosaicTileProps {
   currentYear?: number;
   totalPortfolioValue?: number;
   draftTargetWeight?: number; // 0.00 to 1.00
+  hasExplicitDraft?: boolean;
   availableHeadroom?: number; // Maximum allowed target weight without exceeding 100% total
   currentHoldingWeight?: number; // 0.00 to 1.00
   currentHoldingValueKRW?: number;
@@ -34,6 +35,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   currentYear = 2000,
   totalPortfolioValue = 10000000,
   draftTargetWeight = 0,
+  hasExplicitDraft = false,
   availableHeadroom,
   currentHoldingWeight = 0,
   currentHoldingValueKRW = 0,
@@ -45,11 +47,13 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   onQuickAdjustTarget,
 }) => {
   const isHolding = currentHoldingWeight > 0.0001;
-  const hasTarget = draftTargetWeight > 0.0001;
+  const hasTarget = hasExplicitDraft || draftTargetWeight > 0.0001;
   const isKR = stock.market === 'KR';
 
+  const effectiveWeight = hasExplicitDraft ? draftTargetWeight : currentHoldingWeight;
+
   // Calculate current target amount in KRW
-  const targetAmountKRW = Math.round(draftTargetWeight * totalPortfolioValue);
+  const targetAmountKRW = Math.round(effectiveWeight * totalPortfolioValue);
 
   // Default single buy amount based on portfolio size
   const defaultSingleBuyAmount = totalPortfolioValue >= 2000000 ? 1000000 : Math.round(totalPortfolioValue * 0.1);
@@ -62,7 +66,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
 
   // Maximum allowed for this stock
   const maxCap = availableHeadroom !== undefined ? availableHeadroom : 1.0;
-  const canIncrease = draftTargetWeight < maxCap - 0.0001;
+  const canIncrease = effectiveWeight < maxCap - 0.0001;
 
   // Handle tile click (opens detail panel with tileOpen sound)
   const handleTileClick = () => {
@@ -91,7 +95,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   const handleAmountAdjust = (e: React.MouseEvent, deltaAmount: number) => {
     e.stopPropagation();
     if (totalPortfolioValue <= 0) return;
-    const currentAmount = draftTargetWeight * totalPortfolioValue;
+    const currentAmount = effectiveWeight * totalPortfolioValue;
     const maxAllowedAmount = maxCap * totalPortfolioValue;
     const targetAmount = Math.max(0, Math.min(maxAllowedAmount, currentAmount + deltaAmount));
     const nextWeight = Math.round((targetAmount / totalPortfolioValue) * 100000000) / 100000000;
@@ -110,7 +114,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   // Handle quick direct buy target
   const handleDirectBuy = (e: React.MouseEvent, targetPct: number) => {
     e.stopPropagation();
-    if (!canIncrease && targetPct > draftTargetWeight) return;
+    if (!canIncrease && targetPct > effectiveWeight) return;
     audioManager.playUiSound('allocationUp');
     if (onQuickAdjustTarget) {
       const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 100000000) / 100000000));
@@ -278,7 +282,6 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
 
       {/* 3. Bottom: Mode-specific info & Target Allocation Controls */}
       <div className="mt-3 pt-2.5 border-t border-slate-200/80 space-y-2">
-        {/* Mode 1: Target Allocation Mode or Default */}
         {mode === 'TARGET_ALLOCATION' || mode === 'EXPLORE' ? (
           <div className="space-y-2">
             {!hasTarget ? (
@@ -286,18 +289,20 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium">
                   <span>매수 설정</span>
-                  <span className="font-mono text-slate-400 text-[10px]">0원 (미설정)</span>
+                  <span className="font-mono text-slate-400 text-[10px]">
+                    {isHolding ? `보유 ${formatCompactKRW(currentHoldingValueKRW)} (유지)` : '0원 (미설정)'}
+                  </span>
                 </div>
 
                 <button
                   type="button"
-                  onClick={e => handleDirectBuy(e, Math.min(maxCap, defaultSingleBuyWeight))}
-                  disabled={maxCap <= 0.0001}
+                  onClick={e => handleDirectBuy(e, Math.min(maxCap, currentHoldingWeight + defaultSingleBuyWeight))}
+                  disabled={maxCap <= effectiveWeight + 0.0001}
                   className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap active:scale-98"
-                  title={`${stock.nameKo} +${formatCompactKRW(defaultSingleBuyAmount)} 매수 담기`}
+                  title={`${stock.nameKo} +${formatCompactKRW(defaultSingleBuyAmount)} ${isHolding ? '추가 매수' : '매수 담기'}`}
                 >
                   <ShoppingCart size={13} className="shrink-0 text-white/90" />
-                  <span>+{formatCompactKRW(defaultSingleBuyAmount)} 매수 담기</span>
+                  <span>+{formatCompactKRW(defaultSingleBuyAmount)} {isHolding ? '추가 매수' : '매수 담기'}</span>
                 </button>
               </div>
             ) : (
@@ -306,21 +311,21 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center gap-1">
                     <ShoppingCart size={10} />
-                    <span>매수 담김</span>
+                    <span>{isHolding ? '설정' : '매수 담김'}</span>
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono font-bold text-blue-700 text-sm">
                       {formatCompactKRW(targetAmountKRW)}
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">
-                      ({Math.round(draftTargetWeight * 100)}%)
+                      ({Math.round(effectiveWeight * 100)}%)
                     </span>
                     <button
                       type="button"
                       onClick={e => handleDirectBuy(e, 0)}
                       className="w-4 h-4 rounded-full bg-slate-200/80 hover:bg-rose-100 text-slate-500 hover:text-rose-600 flex items-center justify-center text-[10px] font-bold transition cursor-pointer ml-0.5"
-                      title="매수 취소 (0원)"
-                      aria-label={`${stock.nameKo} 매수 취소`}
+                      title={isHolding ? '설정 취소' : '매수 취소 (0원)'}
+                      aria-label={`${stock.nameKo} 설정 취소`}
                     >
                       ✕
                     </button>
@@ -331,7 +336,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                 <div className="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden">
                   <div
                     className="bg-blue-600 h-full rounded-full transition-all duration-200"
-                    style={{ width: `${Math.min(100, Math.round(draftTargetWeight * 100))}%` }}
+                    style={{ width: `${Math.min(100, Math.round(effectiveWeight * 100))}%` }}
                   />
                 </div>
 
@@ -343,7 +348,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                       <button
                         type="button"
                         onClick={e => handleAmountAdjust(e, -1000000)}
-                        disabled={draftTargetWeight <= 0}
+                        disabled={effectiveWeight <= 0}
                         className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[10.5px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
                         aria-label={`${stock.nameKo} 100만원 감소`}
                       >
@@ -352,7 +357,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                       <button
                         type="button"
                         onClick={e => handleAmountAdjust(e, -100000)}
-                        disabled={draftTargetWeight <= 0}
+                        disabled={effectiveWeight <= 0}
                         className="w-full py-1.5 text-center rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 text-[10.5px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
                         aria-label={`${stock.nameKo} 10만원 감소`}
                       >
@@ -385,7 +390,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                       <button
                         type="button"
                         onClick={e => handleAmountAdjust(e, -10000)}
-                        disabled={draftTargetWeight <= 0}
+                        disabled={effectiveWeight <= 0}
                         className="w-full py-1 text-center rounded-lg bg-slate-50 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed text-slate-600 text-[10px] font-bold font-mono border border-slate-200 transition-colors cursor-pointer"
                         aria-label={`${stock.nameKo} 1만원 미세 감소`}
                       >
@@ -396,7 +401,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                         onClick={e => handleAmountAdjust(e, +10000)}
                         disabled={!canIncrease}
                         title={!canIncrease ? '자산 한도에 도달했습니다' : undefined}
-                        className="w-full py-1 text-center rounded-lg bg-blue-50/60 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-600 text-[10px] font-bold font-mono border border-blue-100 transition-colors cursor-pointer"
+                        className="w-full py-1 text-center rounded-lg bg-blue-50 hover:bg-blue-100 disabled:opacity-30 disabled:cursor-not-allowed text-blue-700 text-[10px] font-bold font-mono border border-blue-200 transition-colors cursor-pointer"
                         aria-label={`${stock.nameKo} 1만원 미세 증가`}
                       >
                         +1만원 (미세)

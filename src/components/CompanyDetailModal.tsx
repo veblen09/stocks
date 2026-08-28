@@ -39,7 +39,7 @@ export type TabType = 'OVERVIEW' | 'NEWS' | 'LISTING' | 'FILINGS' | 'NOTES' | 'P
 export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   canonicalId,
   initialTab = 'OVERVIEW',
-  draftTargetWeight = 0,
+  draftTargetWeight: _draftTargetWeight = 0,
   onUpdateDraftTargetWeight,
   onClose,
 }) => {
@@ -52,7 +52,13 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   const [selectedNewsForAnalysis, setSelectedNewsForAnalysis] = useState<HistoricalNewsItem | null>(null);
   const [noteText, setNoteText] = useState('');
   const [isNoteSaved, setIsNoteSaved] = useState(false);
-  const currentDraftWeight = canonicalId ? (state.draftTargetWeights[canonicalId] ?? draftTargetWeight) : 0;
+  const userHolding = canonicalId ? state.holdings[canonicalId] : undefined;
+  const holdingStockValues = Object.values(state.holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
+  const totalPortfolioValue = state.cashKRW + holdingStockValues;
+  const holdingVal = userHolding ? userHolding.currentValueKRW || 0 : 0;
+  const holdingWeight = totalPortfolioValue > 0 ? holdingVal / totalPortfolioValue : 0;
+  const hasExplicitDraft = Boolean(canonicalId && state.draftTargetWeights && state.draftTargetWeights[canonicalId] !== undefined);
+  const currentDraftWeight = (canonicalId && hasExplicitDraft) ? state.draftTargetWeights[canonicalId] : holdingWeight;
   const [targetSliderVal, setTargetSliderVal] = useState<number>(currentDraftWeight);
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -66,9 +72,13 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   }, [initialTab, canonicalId]);
 
   useEffect(() => {
-    const w = canonicalId ? (state.draftTargetWeights[canonicalId] ?? draftTargetWeight) : 0;
+    const uHolding = canonicalId ? state.holdings[canonicalId] : undefined;
+    const hVal = uHolding ? uHolding.currentValueKRW || 0 : 0;
+    const hWeight = totalPortfolioValue > 0 ? hVal / totalPortfolioValue : 0;
+    const hasDraft = Boolean(canonicalId && state.draftTargetWeights && state.draftTargetWeights[canonicalId] !== undefined);
+    const w = (canonicalId && hasDraft) ? state.draftTargetWeights[canonicalId] : hWeight;
     setTargetSliderVal(w);
-  }, [canonicalId, state.draftTargetWeights, draftTargetWeight]);
+  }, [canonicalId, state.draftTargetWeights, state.holdings, totalPortfolioValue]);
 
   useEffect(() => {
     if (canonicalId && state.investmentNotes && state.investmentNotes[canonicalId]) {
@@ -97,19 +107,22 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   const overview = getCompanyOverviewAtYear(canonicalId, currentYear);
   const baseStock = STOCKS_BY_ID[canonicalId];
   const isWatchlisted = (state.watchlist || []).includes(canonicalId);
-  const userHolding = state.holdings[canonicalId];
   const listingEvent = getListingEventByCompanyId(canonicalId);
   const isNew = isNewlyListedInYear(canonicalId, currentYear);
 
-  // Portfolio value calculations
-  const holdingStockValues = Object.values(state.holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
-  const totalPortfolioValue = state.cashKRW + holdingStockValues;
-
   // Headroom calculation: ensure sum of all stock targets never exceeds 100%
-  const otherStocksSum = Object.entries(state.draftTargetWeights || {})
-    .filter(([cid]) => cid !== canonicalId)
-    .reduce((sum, [_, w]) => sum + w, 0);
-  const maxAllowedWeight = Math.max(0, Math.round((1.0 - otherStocksSum) * 1000000) / 1000000);
+  const otherStocksSum = Object.entries(state.holdings || {}).reduce((sum, [cid, h]) => {
+    if (cid === canonicalId) return sum;
+    const explicit = state.draftTargetWeights?.[cid];
+    if (explicit !== undefined) return sum + explicit;
+    const val = h?.currentValueKRW || 0;
+    return sum + (totalPortfolioValue > 0 ? val / totalPortfolioValue : 0);
+  }, 0) + Object.entries(state.draftTargetWeights || {}).reduce((sum, [cid, w]) => {
+    if (cid === canonicalId || state.holdings?.[cid]) return sum;
+    return sum + w;
+  }, 0);
+
+  const maxAllowedWeight = Math.max(0, Math.round((1.0 - otherStocksSum) * 100000000) / 100000000);
 
   // Amounts in KRW
   const maxAllowedAmountKRW = Math.round(maxAllowedWeight * totalPortfolioValue);
