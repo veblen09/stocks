@@ -338,8 +338,8 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         }
       }
 
-      const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 1000000) / 1000000);
-      const clampedWeight = Math.min(Math.round(weight * 1000000) / 1000000, maxAllowed);
+      const maxAllowed = Math.max(0, Math.round((1.0 - otherSum) * 100000000) / 100000000);
+      const clampedWeight = Math.min(Math.round(weight * 100000000) / 100000000, maxAllowed);
 
       if (clampedWeight <= 0.000001) {
         delete currentWeights[canonicalId];

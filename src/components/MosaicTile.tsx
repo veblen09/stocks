@@ -94,7 +94,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
     const currentAmount = draftTargetWeight * totalPortfolioValue;
     const maxAllowedAmount = maxCap * totalPortfolioValue;
     const targetAmount = Math.max(0, Math.min(maxAllowedAmount, currentAmount + deltaAmount));
-    const nextWeight = Math.round((targetAmount / totalPortfolioValue) * 1000000) / 1000000;
+    const nextWeight = Math.round((targetAmount / totalPortfolioValue) * 100000000) / 100000000;
 
     if (deltaAmount > 0) {
       if (!canIncrease) return;
@@ -113,7 +113,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
     if (!canIncrease && targetPct > draftTargetWeight) return;
     audioManager.playUiSound('allocationUp');
     if (onQuickAdjustTarget) {
-      const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 1000000) / 1000000));
+      const nextVal = Math.max(0, Math.min(maxCap, Math.round(targetPct * 100000000) / 100000000));
       onQuickAdjustTarget(nextVal);
     }
   };

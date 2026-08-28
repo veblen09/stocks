@@ -152,7 +152,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   };
 
   const handleApplyWeight = (val: number, isIncrease?: boolean) => {
-    const clamped = Math.max(0, Math.min(maxAllowedWeight, Math.round(val * 1000000) / 1000000));
+    const clamped = Math.max(0, Math.min(maxAllowedWeight, Math.round(val * 100000000) / 100000000));
     if (isIncrease !== undefined) {
       if (isIncrease) {
         audioManager.playUiSound('allocationUp');
@@ -171,7 +171,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
   const handleApplyAmount = (amount: number, isIncrease?: boolean) => {
     if (totalPortfolioValue <= 0) return;
     const clampedAmount = Math.max(0, Math.min(maxAllowedAmountKRW, amount));
-    const nextWeight = Math.round((clampedAmount / totalPortfolioValue) * 1000000) / 1000000;
+    const nextWeight = Math.round((clampedAmount / totalPortfolioValue) * 100000000) / 100000000;
     handleApplyWeight(nextWeight, isIncrease);
   };
 

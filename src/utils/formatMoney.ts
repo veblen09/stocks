@@ -10,7 +10,11 @@ export function formatKRW(amount: number): string {
   if (rounded === 0) return '0원';
   if (rounded < 0) return `-${formatKRW(Math.abs(rounded))}`;
 
-  const absVal = Math.abs(rounded);
+  let absVal = Math.abs(rounded);
+  const nearest10k = Math.round(absVal / 10000) * 10000;
+  if (nearest10k > 0 && Math.abs(absVal - nearest10k) <= 500) {
+    absVal = nearest10k;
+  }
 
   // For stock prices and smaller amounts (< 1,000,000 KRW), display exact won
   if (absVal < 1000000) {
@@ -45,7 +49,11 @@ export function formatCompactKRW(amount: number): string {
   if (rounded === 0) return '0원';
   if (rounded < 0) return `-${formatCompactKRW(Math.abs(rounded))}`;
 
-  const absVal = Math.abs(rounded);
+  let absVal = Math.abs(rounded);
+  const nearest10k = Math.round(absVal / 10000) * 10000;
+  if (nearest10k > 0 && Math.abs(absVal - nearest10k) <= 500) {
+    absVal = nearest10k;
+  }
 
   // For stock prices and smaller amounts (< 1,000,000 KRW), display exact won
   if (absVal < 1000000) {
