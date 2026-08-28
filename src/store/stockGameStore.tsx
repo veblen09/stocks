@@ -393,6 +393,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           cashKRW: res.updatedCash,
           holdings: res.updatedHoldings,
           tradeLogs: [...state.tradeLogs, ...res.tradeLogs],
+          draftTargetWeights: {},
         };
       } catch (err) {
         console.error('EXECUTE_DRAFT_ALLOCATION failed safely:', err);
@@ -601,6 +602,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           investmentNotes: state.investmentNotes || {},
           tradeRationales: state.tradeRationales || {},
           watchlist: state.watchlist || [],
+          draftTargetWeights: {},
         };
 
         // 2. Evaluate chapter risk missions if chapter completes this year
