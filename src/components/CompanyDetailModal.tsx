@@ -130,7 +130,11 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
     maxAllowedAmountKRW,
     Math.round(targetSliderVal * totalPortfolioValue)
   );
-  const priceKRW = getStockPriceKRW(canonicalId, currentYear - 1) || 1;
+  const priceKRW =
+    getStockPriceKRW(canonicalId, currentYear - 1) ??
+    getStockPriceKRW(canonicalId, currentYear) ??
+    listingEvent?.firstValidPrice ??
+    1;
   const estimatedShares = priceKRW > 0 ? (targetAmountKRW / priceKRW) : 0;
 
   // News available strictly up to cutoffDate

@@ -570,20 +570,20 @@ LISTING_METADATA = {
         "officialUrl": "https://www.sec.gov",
         "relatedNewsIds": ["SEC_IPO_2010_TSLA", "COMP_2010_US_TSLA"]
     },
-    "US_BRK_B": { # Berkshire Hathaway
+    "US_BRK_B": { # Berkshire Hathaway Class B
         "eventType": "IPO",
-        "listingDate": "1980-01-01",
-        "firstTradingDate": "1980-01-01",
-        "companyName": "Berkshire Hathaway Inc.",
-        "ticker": "BRK",
+        "listingDate": "1996-05-08",
+        "firstTradingDate": "1996-05-08",
+        "companyName": "Berkshire Hathaway Class B",
+        "ticker": "BRK.B",
         "exchange": "NYSE",
         "sector": "Financial Conglomerate / Insurance",
         "business": "Property and casualty insurance (GEICO) and value investing",
         "ipoPrice": None,
-        "firstPrice": 290.0,
-        "officialTitle": "Berkshire Hathaway Inc. Historical Listing on NYSE",
+        "firstPrice": 22.24,
+        "officialTitle": "Berkshire Hathaway Inc. Class B Common Stock Initial Listing on NYSE",
         "officialUrl": "https://www.sec.gov",
-        "relatedNewsIds": ["SEC_1980_BRK"]
+        "relatedNewsIds": ["SEC_1996_BRK_B"]
     },
     "US_JNJ": { # Johnson & Johnson
         "eventType": "IPO",

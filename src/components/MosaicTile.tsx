@@ -10,6 +10,7 @@ import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
 import { formatKRW, formatCompactKRW, formatPercent, getReturnColor } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { getCompany1YrSparkline } from '../engine/companyChartEngine';
+import { getStockPriceKRW, getStockPriceLocal } from '../engine/returnEngine';
 
 interface MosaicTileProps {
   stock: TradableStockItem;
@@ -49,6 +50,50 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   const isHolding = currentHoldingWeight > 0.0001;
   const hasTarget = hasExplicitDraft || draftTargetWeight > 0.0001;
   const isKR = stock.market === 'KR';
+
+  const priorYear = currentYear - 1;
+  const rawPriceKRW = useMemo(() => {
+    return (
+      getStockPriceKRW(stock.canonicalId, priorYear) ??
+      getStockPriceKRW(stock.canonicalId, currentYear) ??
+      stock.listingEvent?.firstValidPrice ??
+      stock.listingEvent?.ipoOfferingPrice ??
+      null
+    );
+  }, [stock.canonicalId, priorYear, currentYear, stock.listingEvent]);
+
+  const rawPriceLocal = useMemo(() => {
+    return (
+      getStockPriceLocal(stock.canonicalId, priorYear) ??
+      getStockPriceLocal(stock.canonicalId, currentYear) ??
+      stock.listingEvent?.firstValidPrice ??
+      stock.listingEvent?.ipoOfferingPrice ??
+      null
+    );
+  }, [stock.canonicalId, priorYear, currentYear, stock.listingEvent]);
+
+  const formattedPrice = useMemo(() => {
+    if (isKR) {
+      if (rawPriceKRW !== null && rawPriceKRW > 0) {
+        return `${Math.round(rawPriceKRW).toLocaleString()}원`;
+      }
+      return '-';
+    } else {
+      if (rawPriceLocal !== null && rawPriceLocal > 0) {
+        return rawPriceLocal >= 100
+          ? `$${rawPriceLocal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+          : `$${rawPriceLocal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      return '-';
+    }
+  }, [isKR, rawPriceKRW, rawPriceLocal]);
+
+  const krwConvertedHint = useMemo(() => {
+    if (!isKR && rawPriceKRW !== null && rawPriceKRW > 0) {
+      return `약 ${formatCompactKRW(rawPriceKRW)}`;
+    }
+    return null;
+  }, [isKR, rawPriceKRW]);
 
   const effectiveWeight = hasExplicitDraft ? draftTargetWeight : currentHoldingWeight;
 
@@ -123,7 +168,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
   };
 
   // Accessible descriptive label
-  const ariaLabel = `${stock.nameKo}, ${stock.ticker}, ${isKR ? '한국' : '미국'}, ${stock.sector}, ${
+  const ariaLabel = `${stock.nameKo}, ${stock.ticker}, ${isKR ? '한국' : '미국'}, ${stock.sector}, 1주당 ${formattedPrice}${krwConvertedHint ? ` (${krwConvertedHint})` : ''}, ${
     isHolding ? `현재 보유 ${formatKRW(currentHoldingValueKRW)} (${Math.round(currentHoldingWeight * 100)}%)` : '미보유'
   }, ${hasTarget ? `매수 설정 ${formatCompactKRW(targetAmountKRW)} (${Math.round(draftTargetWeight * 100)}%)` : '매수 가능'}`;
 
@@ -219,16 +264,41 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
             <div className="text-[11px] text-blue-300 font-mono mt-0.5">
               {stock.ticker} · <span className="text-slate-300 font-sans">{stock.sector}</span>
             </div>
+            {formattedPrice !== '-' && (
+              <div className="text-[11px] text-emerald-400 font-mono mt-1 pt-1 border-t border-slate-800 flex items-center gap-1.5">
+                <span className="text-slate-400 font-sans text-[10px]">기준 주가:</span>
+                <span className="font-bold text-white">{formattedPrice}</span>
+                {krwConvertedHint && <span className="text-slate-400 text-[10px]">({krwConvertedHint})</span>}
+              </div>
+            )}
           </div>
         </div>
 
-        <div
-          title={`${stock.ticker} · ${stock.sector}`}
-          className="flex items-center gap-1.5 text-[12px] sm:text-[13px] text-slate-500 font-medium cursor-help"
-        >
-          <span className="font-mono font-semibold text-slate-700">{stock.ticker}</span>
-          <span>·</span>
-          <span className="line-clamp-1" title={stock.sector}>{stock.sector}</span>
+        {/* Ticker, Sector and Stock Price */}
+        <div className="flex items-center justify-between gap-1 text-[11.5px] sm:text-[12px] text-slate-500 font-medium">
+          <div
+            title={`${stock.ticker} · ${stock.sector}`}
+            className="flex items-center gap-1 min-w-0 truncate cursor-help"
+          >
+            <span className="font-mono font-semibold text-slate-700">{stock.ticker}</span>
+            <span>·</span>
+            <span className="truncate" title={stock.sector}>{stock.sector}</span>
+          </div>
+
+          {/* Compact Stock Price Display */}
+          {formattedPrice !== '-' && (
+            <div
+              title={`${currentYear}년 투자 기준 주가: ${formattedPrice}${krwConvertedHint ? ` (${krwConvertedHint})` : ''}`}
+              className="flex items-center gap-1 shrink-0 font-mono font-bold text-slate-900 bg-slate-100/90 px-1.5 py-0.5 rounded text-[11px] sm:text-[11.5px] border border-slate-200/70"
+            >
+              <span>{formattedPrice}</span>
+              {krwConvertedHint && (
+                <span className="text-[9.5px] text-slate-500 font-normal hidden xl:inline">
+                  ({krwConvertedHint})
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 1-Year Mini Sparkline (Naver Style Chart) */}

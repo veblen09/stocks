@@ -15,6 +15,7 @@ import type { StockHolding } from '../types/stockGame';
 import { formatKRW, formatCompactKRW, formatPercent } from '../utils/formatMoney';
 import { audioManager } from '../utils/audioManager';
 import { getCompany1YrSparkline } from '../engine/companyChartEngine';
+import { getStockPriceKRW, getStockPriceLocal } from '../engine/returnEngine';
 
 interface StockMosaicViewProps {
   tradableStocks: TradableStockItem[];
@@ -440,6 +441,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                 <tr>
                   <th className="p-3">종목명 / 티커</th>
                   <th className="p-3">국가 / 업종</th>
+                  <th className="p-3 text-right">기준 주가</th>
                   <th className="p-3 text-center">1년 주가 추이</th>
                   <th className="p-3 text-right">보유 수량 / 금액</th>
                   <th className="p-3 text-right">보유 비중</th>
@@ -465,6 +467,20 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   const defaultBuyAmount = totalPortfolioValue >= 2000000 ? 1000000 : Math.round(totalPortfolioValue * 0.1);
                   const defaultBuyWeight = totalPortfolioValue > 0 ? defaultBuyAmount / totalPortfolioValue : 0.1;
 
+                  const priorYear = currentYear - 1;
+                  const rawP_KRW = getStockPriceKRW(stock.canonicalId, priorYear) ?? getStockPriceKRW(stock.canonicalId, currentYear) ?? stock.listingEvent?.firstValidPrice ?? stock.listingEvent?.ipoOfferingPrice ?? null;
+                  const rawP_Local = getStockPriceLocal(stock.canonicalId, priorYear) ?? getStockPriceLocal(stock.canonicalId, currentYear) ?? stock.listingEvent?.firstValidPrice ?? stock.listingEvent?.ipoOfferingPrice ?? null;
+                  const isKR = stock.market === 'KR';
+
+                  const tablePrice = isKR
+                    ? (rawP_KRW !== null && rawP_KRW > 0 ? `${Math.round(rawP_KRW).toLocaleString()}원` : '-')
+                    : (rawP_Local !== null && rawP_Local > 0
+                        ? (rawP_Local >= 100
+                            ? `$${rawP_Local.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+                            : `$${rawP_Local.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+                        : '-');
+                  const tableKrwHint = !isKR && rawP_KRW !== null && rawP_KRW > 0 ? `약 ${formatCompactKRW(rawP_KRW)}` : null;
+
                   return (
                     <tr
                       key={stock.canonicalId}
@@ -481,6 +497,12 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                         <span className="font-medium text-slate-700">{stock.market === 'KR' ? '한국' : '미국'}</span>
                         <span className="text-slate-400"> · </span>
                         <span className="text-slate-600">{stock.sector}</span>
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="font-mono font-bold text-slate-900 text-xs">{tablePrice}</div>
+                        {tableKrwHint && (
+                          <div className="font-mono text-[10px] text-slate-400">({tableKrwHint})</div>
+                        )}
                       </td>
                       <td className="p-3 text-center">
                         {sparkline && sparkline.points.length > 1 ? (

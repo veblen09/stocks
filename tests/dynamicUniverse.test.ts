@@ -52,8 +52,8 @@ describe('동적 투자 가능 종목군 & 종목 모자이크뷰 (Sections 49~8
   // Test 3: 상장 전 종목이 DOM/카탈로그에 렌더링되지 않는지 (데이터 레벨 원천 차단)
   it('3. 상장 전 종목이 카탈로그 목록에 원천적으로 생성되지 않는지', () => {
     const list1981 = getTradableStocks({ currentYear: 1981 });
-    // In 1981, Amazon (1997), Tesla (2010), Meta (2012), Google (2004), Nvidia (1999) must NOT exist in array
-    const futureIds = ['US_AMZN', 'US_TSLA', 'US_META', 'US_GOOGL', 'US_NVDA', 'KR_000660'];
+    // In 1981, Amazon (1997), Berkshire Class B (1996), Tesla (2010), Meta (2012), Google (2004), Nvidia (1999) must NOT exist in array
+    const futureIds = ['US_AMZN', 'US_BRK_B', 'US_TSLA', 'US_META', 'US_GOOGL', 'US_NVDA', 'KR_000660'];
     futureIds.forEach(id => {
       expect(list1981.some(s => s.canonicalId === id)).toBe(false);
     });

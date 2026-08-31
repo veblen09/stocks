@@ -1302,26 +1302,26 @@
     "currentName": "버크셔 해서웨이 Class B",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1996-05-08",
+    "firstTradingDate": "1996-05-08",
+    "firstValidPriceDate": "1996-05-08",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
-        "name": "Berkshire Hathaway Inc.",
-        "ticker": "BRK"
+        "validFrom": "1996-05-08",
+        "name": "Berkshire Hathaway Class B",
+        "ticker": "BRK.B"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1996-05-08",
         "sector": "Financial Conglomerate / Insurance"
       }
     ],
     "listingEventId": "LISTING_EVENT_US_BRK_B",
     "listingNewsIds": [
-      "SEC_1980_BRK"
+      "SEC_1996_BRK_B"
     ],
     "dataQuality": "HIGH",
     "description": "워런 버핏이 이끄는 보험(GEICO), 에너지, 철도(BNSF) 종합 투자 지주사"
