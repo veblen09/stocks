@@ -5,7 +5,7 @@ import { getChapterByYear } from './chapterDefinitions';
 export function isChapterStartYear(year: number, gameStartYear: number): boolean {
   const chapter = getChapterByYear(year);
   if (!chapter) return false;
-  return year === chapter.startYear || year === gameStartYear + 1;
+  return year === chapter.startYear || year === gameStartYear;
 }
 
 export function isChapterEndYear(year: number, gameEndYear: number): boolean {

@@ -69,8 +69,8 @@ export function simulateBenchmarkSeries(
   let twrIndex = 100.0;
   const history: { year: number; returnRate: number; totalAssetsKRW: number; twrIndexLevel: number }[] = [];
 
-  for (let year = startYear + 1; year <= endYear; year++) {
-    const isFirstYear = year === startYear + 1;
+  for (let year = startYear; year <= endYear; year++) {
+    const isFirstYear = year === startYear;
     const deposit = isFirstYear ? 0 : annualContributionKRW;
     const depositAfterFee = deposit * (1 - feeRate);
 

@@ -32,7 +32,7 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
   const [showRealPurchasingPower, setShowRealPurchasingPowerState] = useState<boolean>(true);
   const [monthlyReplaySpeed, setMonthlyReplaySpeedState] = useState<MonthlyReplaySpeed>('NORMAL');
 
-  const totalYears = endYear - startYear;
+  const totalYears = endYear - startYear + 1;
   const isPeriodValid = totalYears >= 5;
 
   const handleStartGame = () => {
@@ -169,34 +169,34 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
             {/* Period Range */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-extrabold text-slate-700">시작 기준 연도</label>
+                <label className="text-xs font-extrabold text-slate-700">시작 연도</label>
                 <select
                   value={startYear}
                   onChange={e => {
                     const sy = parseInt(e.target.value);
                     setStartYear(sy);
-                    if (endYear - sy < 5) {
-                      setEndYear(Math.min(2025, sy + 5));
+                    if (endYear - sy + 1 < 5) {
+                      setEndYear(Math.min(2025, sy + 4));
                     }
                   }}
                   className="w-full px-3.5 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
                 >
-                  {Array.from({ length: 41 }, (_, i) => 1980 + i).map(y => (
-                    <option key={y} value={y}>{y}년 말</option>
+                  {Array.from({ length: 42 }, (_, i) => 1980 + i).map(y => (
+                    <option key={y} value={y}>{y}년</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-extrabold text-slate-700">종료 기준 연도</label>
+                <label className="text-xs font-extrabold text-slate-700">종료 연도</label>
                 <select
                   value={endYear}
                   onChange={e => setEndYear(parseInt(e.target.value))}
                   className="w-full px-3.5 py-2 bg-white rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 shadow-sm"
                 >
-                  {Array.from({ length: 41 }, (_, i) => 1985 + i).map(y => (
-                    <option key={y} value={y} disabled={y <= startYear}>
-                      {y}년 말 {y - startYear >= 5 ? `(${y - startYear}년)` : '(최소 5년 이상)'}
+                  {Array.from({ length: 42 }, (_, i) => 1984 + i).map(y => (
+                    <option key={y} value={y} disabled={y < startYear + 4}>
+                      {y}년 {y - startYear + 1 >= 5 ? `(${y - startYear + 1}개년)` : '(최소 5년 이상)'}
                     </option>
                   ))}
                 </select>

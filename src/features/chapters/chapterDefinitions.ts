@@ -4,13 +4,13 @@ export const HISTORICAL_CHAPTERS: HistoricalChapter[] = [
   {
     id: 'chapter_1',
     chapterNumber: 1,
-    startYear: 1981,
+    startYear: 1980,
     endYear: 1985,
     titleKo: '고물가와 긴축의 시대',
     eraNameKo: '1980년대 초반: 제2차 오일쇼크 여파와 볼커의 초고금리 긴축',
     
     startContext: {
-      knownAsOf: '1981년 초',
+      knownAsOf: '1980년 초',
       descriptionKo: '제2차 석유파동의 여파로 미국 연준 폴 볼커 의장은 인플레이션 억제를 위해 기준금리를 최고 20%까지 인상하며 강력한 긴축에 돌입했습니다. 한국 경제는 중화학공업 투자조정과 강력한 물가안정화 정책을 겪으며 산업 체질을 개선하고 있습니다.',
       keyObservationVariables: [
         { name: '미국 연준 기준금리', description: '인플레이션 파이터 폴 볼커의 초고금리 긴축 강도' },

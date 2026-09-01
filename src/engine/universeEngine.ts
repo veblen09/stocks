@@ -34,8 +34,8 @@ export function isStockTradableOnDate(canonicalCompanyId: string, asOfDateOrYear
 
   let targetDate = '';
   if (typeof asOfDateOrYear === 'number') {
-    // If year number Y is passed, it represents the investment decision cutoff date: (Y-1)-12-31 or Y-12-31
-    targetDate = `${asOfDateOrYear}-12-31`;
+    // If year number Y is passed, it represents the investment decision cutoff date: (Y-1)-12-31 or 1980-01-01 for 1980
+    targetDate = asOfDateOrYear <= 1980 ? '1980-01-01' : `${asOfDateOrYear - 1}-12-31`;
   } else {
     targetDate = asOfDateOrYear;
   }
@@ -64,6 +64,26 @@ export function getListingEventsForYear(year: number): ListingEvent[] {
   return LISTING_EVENTS.filter(ev => {
     return ev.firstTradingDate.startsWith(yStr) || (ev.listingDate ? ev.listingDate.startsWith(yStr) : false);
   }).sort((a, b) => a.firstTradingDate.localeCompare(b.firstTradingDate));
+}
+
+/**
+ * Returns all stock definitions newly listed during year Y
+ */
+export function getNewlyListedStocksForYear(year: number): HistoricalStockDefinition[] {
+  const yStr = year.toString();
+  return HISTORICAL_STOCKS.filter(stk => {
+    return stk.firstTradingDate && stk.firstTradingDate.startsWith(yStr);
+  });
+}
+
+/**
+ * Returns all stock definitions delisted during year Y
+ */
+export function getDelistedStocksForYear(year: number): HistoricalStockDefinition[] {
+  const yStr = year.toString();
+  return HISTORICAL_STOCKS.filter(stk => {
+    return stk.delistingDate && stk.delistingDate.startsWith(yStr);
+  });
 }
 
 /**
@@ -99,8 +119,8 @@ export function getTradableStocks(options: GetTradableStocksOptions = {}): Trada
     holdings = {},
   } = options;
 
-  // Resolve target date for comparison
-  const targetDate = asOfDate || `${currentYear}-12-31`;
+  // Resolve target date for comparison (decision cutoff: 1980-01-01 for 1980, or (currentYear-1)-12-31)
+  const targetDate = asOfDate || (currentYear <= 1980 ? '1980-01-01' : `${currentYear - 1}-12-31`);
 
   const tradableList: TradableStockItem[] = [];
 

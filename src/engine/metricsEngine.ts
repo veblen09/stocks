@@ -408,8 +408,8 @@ export function calculateFinalMetrics(state: StockGameState): FinalMetrics {
   const annualVolatility = calculateVolatility(returns);
 
   // Best & Worst Years
-  let bestYear = { year: settings.startYear + 1, returnRate: 0 };
-  let worstYear = { year: settings.startYear + 1, returnRate: 0 };
+  let bestYear = { year: settings.startYear, returnRate: 0 };
+  let worstYear = { year: settings.startYear, returnRate: 0 };
   let winYearsCount = 0;
 
   history.forEach(h => {

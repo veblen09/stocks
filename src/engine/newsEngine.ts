@@ -25,6 +25,9 @@ HISTORICAL_NEWS.forEach(n => {
  * Y investment decisions occur at beginning of year Y based on info up to (Y-1)-12-31
  */
 export function getDecisionCutoffDate(year: number): string {
+  if (year <= 1980) {
+    return '1980-01-01';
+  }
   const priorYear = year - 1;
   return `${priorYear}-12-31`;
 }
@@ -307,8 +310,11 @@ export function getDecisionCutoffDisplayInfo(year: number) {
   return {
     currentYear: year,
     cutoffDate,
-    searchPeriod: `1980-01-01 ~ ${cutoffDate}`,
-    topBannerNotice: `현재 표시되는 정보는 ${cYear}년 ${cMonth}월 ${cDay}일까지 당시 투자자가 확인할 수 있었던 자료입니다.`,
+    searchPeriod: year <= 1980 ? '1980-01-01 (1년차 시작)' : `1980-01-01 ~ ${cutoffDate}`,
+    topBannerNotice:
+      year <= 1980
+        ? '1980년 1년차 시작 시점입니다. 당시 시장에 상장되어 있던 우량주를 탐색하고 포트폴리오를 구성하세요.'
+        : `현재 표시되는 정보는 ${cYear}년 ${cMonth}월 ${cDay}일까지 당시 투자자가 확인할 수 있었던 자료입니다.`,
     isLockedFuture: true,
     lockMessage: `${year}년 중 발생 사건은 연말 결산 시 잠금 해제`,
   };

@@ -31,6 +31,8 @@ import { StockMosaicView } from '../components/StockMosaicView';
 import { OrderReviewModal } from '../components/OrderReviewModal';
 import { CrisisDecisionModal } from '../components/CrisisDecisionModal';
 import { RiskDashboardView } from '../components/RiskDashboardView';
+import { NewListingModal } from '../components/NewListingModal';
+import { DelistingAlertModal } from '../components/DelistingAlertModal';
 
 // Live Market Replay System
 import { MarketReplayStage } from '../features/marketReplay/MarketReplayStage';
@@ -54,12 +56,14 @@ import { PortfolioGhostRace } from '../features/gameplay/PortfolioGhostRace';
 import { calculatePortfolioValue } from '../engine/portfolioEngine';
 import { calculatePureInvestmentPnL, calculateRiskLevel } from '../engine/metricsEngine';
 import { getMacroNewsForYear, getDecisionCutoffDisplayInfo } from '../engine/newsEngine';
-import { getTradableStocks } from '../engine/universeEngine';
+import { getTradableStocks, getNewlyListedStocksForYear, getDelistedStocksForYear } from '../engine/universeEngine';
 import { executeCrisisDecision } from '../engine/crisisEngine';
+import { executeRebalanceToTargetWeights } from '../engine/tradeEngine';
 import { STOCKS_BY_ID } from '../engine/returnEngine';
 import type { HistoricalNewsItem } from '../types/stockNews';
 import type { ChapterSummaryData } from '../types/chapter';
 import type { CrisisDecisionAction } from '../types/stockGame';
+import type { HistoricalStockDefinition } from '../types/stockUniverse';
 
 interface GamePageProps {
   onNavigate: (page: string) => void;
@@ -100,7 +104,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     activeCrisisEvent,
   } = state;
 
-  const priorYear = currentYear - 1;
+  const priorYear = currentYear === settings.startYear ? 1979 : currentYear - 1;
   const cutoffInfo = getDecisionCutoffDisplayInfo(currentYear);
 
   // Modals & Active Selections
@@ -116,6 +120,13 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const [showOrderReviewModal, setShowOrderReviewModal] = useState<boolean>(false);
   const [showRealLockConfirmModal, setShowRealLockConfirmModal] = useState<boolean>(false);
   const [showRestartModal, setShowRestartModal] = useState<boolean>(false);
+
+  // Listing & Delisting Notification Modals
+  const [pendingNewListings, setPendingNewListings] = useState<HistoricalStockDefinition[]>([]);
+  const [pendingDelistings, setPendingDelistings] = useState<HistoricalStockDefinition[]>([]);
+  const [delistingHoldingsSnapshot, setDelistingHoldingsSnapshot] = useState<Record<string, any>>({});
+  const [showNewListingModal, setShowNewListingModal] = useState<boolean>(false);
+  const [showDelistingModal, setShowDelistingModal] = useState<boolean>(false);
 
   // Live Market Replay Stage State
   const [showReplayStage, setShowReplayStage] = useState<boolean>(false);
@@ -156,7 +167,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   // Calculate current portfolio values
   const currentAssets = calculatePortfolioValue(cashKRW, holdings, priorYear);
   const initialCashKRW = settings.initialCashKRW || 10000000;
-  const isFirstSimulationYear = currentYear === settings.startYear + 1;
+  const isFirstSimulationYear = currentYear === settings.startYear;
   const totalInvestedPrincipal = initialCashKRW + (isFirstSimulationYear ? 0 : history.length * (settings.annualContributionKRW || 0));
 
   const purePnL = calculatePureInvestmentPnL(
@@ -238,18 +249,32 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     setShowRealLockConfirmModal(false);
     audioManager.playSound('click');
 
+    let cashBefore = cashKRW;
+    let holdingsBefore = holdings;
+
     // First commit draft allocation
     if (changedStocksCount > 0) {
+      const targets = Object.entries(effectiveTargetWeights).map(([cid, weight]) => ({
+        canonicalId: cid,
+        weight,
+      }));
+      const res = executeRebalanceToTargetWeights(
+        targets,
+        cashKRW,
+        holdings,
+        currentYear,
+        settings
+      );
+      cashBefore = res.updatedCash;
+      holdingsBefore = res.updatedHoldings;
       dispatch({ type: 'EXECUTE_DRAFT_ALLOCATION' });
     }
 
-    const cashBefore = cashKRW;
-
-    // Generate 12-Month Live Market Replay Data
+    // Generate 12-Month Live Market Replay Data with the executed holdings
     const replayData = generateYearReplayData(
       currentYear,
       cashBefore,
-      holdings,
+      holdingsBefore,
       currentAssets,
       totalInvestedPrincipal,
       runningPeak,
@@ -258,6 +283,14 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     );
 
     setActiveYearReplayData(replayData);
+
+    // Capture newly listed & delisted stocks during this completed year
+    const finishedYear = currentYear;
+    const newlyListed = getNewlyListedStocksForYear(finishedYear);
+    const delisted = getDelistedStocksForYear(finishedYear);
+    setPendingNewListings(newlyListed);
+    setPendingDelistings(delisted);
+    setDelistingHoldingsSnapshot(holdingsBefore);
 
     if (monthlyReplaySpeed === 'INSTANT') {
       // Step immediately only if user explicitly selected instant mode
@@ -784,6 +817,13 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           }}
           onFinishReplay={() => {
             setShowReplayStage(false);
+            const finishedYear = currentYear;
+            const newlyListed = getNewlyListedStocksForYear(finishedYear);
+            const delisted = getDelistedStocksForYear(finishedYear);
+            setPendingNewListings(newlyListed);
+            setPendingDelistings(delisted);
+            setDelistingHoldingsSnapshot(holdings);
+
             stepOneYear();
             setShowYearEndModal(true);
 
@@ -814,7 +854,44 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         <YearEndBriefingModal
           record={state.history[state.history.length - 1] || null}
           isGameOver={state.isGameOver}
-          onProceed={() => setShowYearEndModal(false)}
+          onProceed={() => {
+            setShowYearEndModal(false);
+            if (pendingDelistings.length > 0) {
+              setShowDelistingModal(true);
+            } else if (pendingNewListings.length > 0) {
+              setShowNewListingModal(true);
+            }
+          }}
+        />
+      )}
+
+      {/* Delisting Alert Modal */}
+      {showDelistingModal && (
+        <DelistingAlertModal
+          delistedStocks={pendingDelistings}
+          holdingsBefore={delistingHoldingsSnapshot}
+          year={currentYear - 1}
+          isOpen={showDelistingModal}
+          onClose={() => {
+            setShowDelistingModal(false);
+            if (pendingNewListings.length > 0) {
+              setShowNewListingModal(true);
+            }
+          }}
+        />
+      )}
+
+      {/* New Listing Modal */}
+      {showNewListingModal && (
+        <NewListingModal
+          listedStocks={pendingNewListings}
+          targetYear={currentYear}
+          isOpen={showNewListingModal}
+          onClose={() => setShowNewListingModal(false)}
+          onSelectStock={cid => {
+            setSelectedCanonicalIdForDetail(cid);
+            setInitialDetailTab('OVERVIEW');
+          }}
         />
       )}
 

@@ -156,7 +156,7 @@ export function executeAutoInvestSingleYear(
   }
 
   const year = state.currentYear;
-  const isFirstSimYear = year === settings.startYear + 1;
+  const isFirstSimYear = year === settings.startYear;
   const deposit = isFirstSimYear ? 0 : settings.annualContributionKRW;
   let cash = state.cashKRW + deposit;
   let holdings = { ...state.holdings };
@@ -355,7 +355,7 @@ export function summarizeAutoInvestResults(
   const maxDrawdownMDD = calculateMDD(twrLevels);
   const recoveryMetrics = calculateRecoveryMetrics(endState.history, settings.startYear);
 
-  let worstYear = { year: settings.startYear + 1, returnRate: 0 };
+  let worstYear = { year: settings.startYear, returnRate: 0 };
   endState.history.forEach(h => {
     if (h.annualReturn < worstYear.returnRate || h === endState.history[0]) {
       worstYear = { year: h.year, returnRate: h.annualReturn };

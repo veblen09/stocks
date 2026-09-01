@@ -17,7 +17,7 @@ import { runAutoInvestSimulation, type AutoInvestStepState } from '../engine/aut
 import { evaluateAchievements } from '../features/achievements/achievementEngine';
 import { createEncyclopediaEntryForListing, syncEncyclopediaWithState } from '../features/encyclopedia/encyclopediaEngine';
 import { buildYearbookEntries } from '../features/yearbook/yearbookEngine';
-import { getTradableStocks } from '../engine/universeEngine';
+import { getTradableStocks, getDelistedStocksForYear } from '../engine/universeEngine';
 import { getStockPriceKRW, isStockListed } from '../engine/returnEngine';
 import { executeCrisisDecision, getCrisisEventById } from '../engine/crisisEngine';
 import { getMonthlyReplayQuality } from '../engine/monthlyReplayEngine';
@@ -51,7 +51,7 @@ const INITIAL_STATE: StockGameState = {
   isGameStarted: false,
   isGameOver: false,
   settings: DEFAULT_SETTINGS,
-  currentYear: 1981,
+  currentYear: 1980,
   cashKRW: 10000000,
   holdings: {},
   history: [],
@@ -211,7 +211,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         monthlyReplaySpeed: settings.monthlyReplaySpeed || 'NORMAL',
         showRealPurchasingPower: settings.showRealPurchasingPower ?? true,
         universeMode: settings.universeMode || 'CLASSIC_50',
-        currentYear: startYear + 1,
+        currentYear: startYear,
         cashKRW: initialCash,
         holdings: {},
         history: [],
@@ -400,7 +400,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
     case 'EXECUTE_DRAFT_ALLOCATION': {
       if (state.isGameOver) return state;
       try {
-        const priorYear = state.currentYear - 1;
+        const priorYear = state.currentYear === state.settings.startYear ? 1979 : state.currentYear - 1;
         const totalPortfolioValue = calculatePortfolioValue(
           state.cashKRW,
           state.holdings,
@@ -615,10 +615,10 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
       if (state.isGameOver) return state;
       try {
         const year = state.currentYear;
-        const isFirstSimYear = year === state.settings.startYear + 1;
+        const isFirstSimYear = year === state.settings.startYear;
         const deposit = isFirstSimYear ? 0 : state.settings.annualContributionKRW;
 
-        const priorYear = year - 1;
+        const priorYear = year === state.settings.startYear ? 1979 : year - 1;
         const startAssets = calculatePortfolioValue(state.cashKRW, state.holdings, priorYear);
 
         const stepRes = advanceSimulationOneYear(
@@ -632,12 +632,43 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           state.settings
         );
 
+        // Check for delisted stocks during this completed year
+        const finalHoldings = { ...stepRes.updatedHoldings };
+        let delistedCashRecovered = 0;
+        const delistLogs: TradeLogItem[] = [];
+
+        const delistedDefs = getDelistedStocksForYear(year);
+        delistedDefs.forEach(dStk => {
+          const cid = dStk.canonicalCompanyId;
+          const h = finalHoldings[cid];
+          if (h && h.shares > 0) {
+            const pKRW = getStockPriceKRW(cid, year) || 0;
+            const recovered = Math.round(h.shares * pKRW);
+            delistedCashRecovered += recovered;
+            delete finalHoldings[cid];
+
+            delistLogs.push({
+              id: `DELIST_${year}_${cid}_${Date.now()}`,
+              year,
+              action: 'SELL',
+              canonicalId: cid,
+              nameKo: dStk.currentName,
+              shares: h.shares,
+              priceKRW: pKRW,
+              amountKRW: recovered,
+              feeKRW: 0,
+              timestamp: Date.now(),
+              thesis: `[상장폐지 공시] ${dStk.currentName} 상장폐지로 인한 보유 잔고 청산 완료`,
+            });
+          }
+        });
+
         // When entering nextYear, deposit new year's contribution directly into cashKRW!
         // No automatic stock purchases - player must choose what to buy with this cash.
         const nextYearDeposit = !stepRes.isGameOver && state.settings.annualContributionKRW > 0
           ? state.settings.annualContributionKRW
           : 0;
-        const nextCashKRW = stepRes.updatedCash + nextYearDeposit;
+        const nextCashKRW = stepRes.updatedCash + nextYearDeposit + delistedCashRecovered;
 
         // Attach perceived risk, crisis record, and monthly data quality to the performance record
         const record = stepRes.performanceRecord;
@@ -666,8 +697,9 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           ...state,
           currentYear: stepRes.nextYear,
           cashKRW: nextCashKRW,
-          holdings: stepRes.updatedHoldings,
+          holdings: finalHoldings,
           history: [...state.history, record],
+          tradeLogs: [...state.tradeLogs, ...delistLogs],
           isGameOver: stepRes.isGameOver,
           companyEncyclopedia: updatedEncyclopedia,
           investmentNotes: state.investmentNotes || {},
@@ -856,7 +888,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         playMode: settings.playMode || 'REAL',
         monthlyReplaySpeed: settings.monthlyReplaySpeed || 'NORMAL',
         showRealPurchasingPower: settings.showRealPurchasingPower ?? true,
-        currentYear: startYear + 1,
+        currentYear: startYear,
         cashKRW: initialCash,
         holdings: {},
         history: [],
