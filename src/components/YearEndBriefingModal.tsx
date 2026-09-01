@@ -103,6 +103,11 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
               </h3>
               <p className="text-xs text-slate-500">
                 기말 평가자산: <strong className="text-slate-900 font-mono">{formatKRW(record.endTotalAssetsKRW)}</strong>
+                {record.annualDepositKRW > 0 && (
+                  <span className="text-emerald-700 font-bold font-mono ml-2">
+                    (연초 납입: +{formatKRW(record.annualDepositKRW)})
+                  </span>
+                )}
               </p>
             </div>
 

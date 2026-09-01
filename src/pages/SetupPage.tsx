@@ -230,11 +230,11 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
             {/* Annual Contribution */}
             <div className="space-y-1">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-extrabold text-slate-700">매년 연초 추가 납입금</label>
+                <label className="text-xs font-extrabold text-slate-700">매년 연초 추가 납입금 (적립식 투자)</label>
                 <span className="text-xs font-mono font-extrabold text-blue-700">+{formatKRW(annualContribution)}</span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
-                {[0, 1000000, 3000000, 5000000].map(amt => (
+              <div className="grid grid-cols-5 gap-1.5">
+                {[0, 1000000, 3000000, 6000000, 10000000].map(amt => (
                   <button
                     key={amt}
                     type="button"

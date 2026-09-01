@@ -8,6 +8,7 @@ import type {
   MonthlyReplaySpeed,
   PerceivedRisk,
   CrisisDecisionAction,
+  TradeLogItem,
 } from '../types/stockGame';
 import type { TradeRationale } from '../types/stockNews';
 import { executeBuy, executeSell, executeRebalanceToTargetWeights } from '../engine/tradeEngine';
@@ -17,7 +18,7 @@ import { evaluateAchievements } from '../features/achievements/achievementEngine
 import { createEncyclopediaEntryForListing, syncEncyclopediaWithState } from '../features/encyclopedia/encyclopediaEngine';
 import { buildYearbookEntries } from '../features/yearbook/yearbookEngine';
 import { getTradableStocks } from '../engine/universeEngine';
-import { getStockPriceKRW } from '../engine/returnEngine';
+import { getStockPriceKRW, isStockListed } from '../engine/returnEngine';
 import { executeCrisisDecision, getCrisisEventById } from '../engine/crisisEngine';
 import { getMonthlyReplayQuality } from '../engine/monthlyReplayEngine';
 import { calculateChapterSummary, isChapterEndYear } from '../features/chapters/chapterEngine';
@@ -406,35 +407,57 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           priorYear
         );
 
-        // Build target list: for holdings not explicitly in draftTargetWeights, preserve their current holding weight
-        const allStockIds = new Set([
-          ...Object.keys(state.holdings || {}),
-          ...Object.keys(state.draftTargetWeights || {}),
-        ]);
+        if (totalPortfolioValue <= 0) return state;
 
-        const targets: { canonicalId: string; weight: number }[] = [];
-        for (const cid of allStockIds) {
-          if (state.draftTargetWeights && state.draftTargetWeights[cid] !== undefined) {
-            targets.push({ canonicalId: cid, weight: state.draftTargetWeights[cid] });
-          } else if (state.holdings[cid] && totalPortfolioValue > 0) {
-            const p = getStockPriceKRW(cid, priorYear) || 0;
-            const val = (state.holdings[cid].shares || 0) * p;
-            targets.push({ canonicalId: cid, weight: val / totalPortfolioValue });
+        let currentCash = state.cashKRW;
+        let currentHoldings = { ...state.holdings };
+        const tradeLogs: TradeLogItem[] = [];
+
+        // 1. Sells first for explicitly drafted stocks where target value < current value
+        for (const [cid, targetWeight] of Object.entries(state.draftTargetWeights || {})) {
+          const pKRW = getStockPriceKRW(cid, priorYear) || 1;
+          const currentShares = currentHoldings[cid]?.shares || 0;
+          const currentVal = currentShares * pKRW;
+          const targetVal = totalPortfolioValue * targetWeight;
+
+          if (currentVal > targetVal + 100) {
+            const valToSell = currentVal - targetVal;
+            const sharesToSell = valToSell / pKRW;
+            const res = executeSell(cid, sharesToSell, currentCash, currentHoldings, state.currentYear, state.settings);
+            currentCash = res.updatedCash;
+            currentHoldings = res.updatedHoldings;
+            tradeLogs.push(...res.tradeLogs);
           }
         }
 
-        const res = executeRebalanceToTargetWeights(
-          targets,
-          state.cashKRW,
-          state.holdings,
-          state.currentYear,
-          state.settings
-        );
+        // 2. Buys next for explicitly drafted stocks where target value > current value
+        for (const [cid, targetWeight] of Object.entries(state.draftTargetWeights || {})) {
+          if (!isStockListed(cid, state.currentYear)) continue;
+
+          const pKRW = getStockPriceKRW(cid, priorYear) || 1;
+          const currentShares = currentHoldings[cid]?.shares || 0;
+          const currentVal = currentShares * pKRW;
+          const targetVal = totalPortfolioValue * targetWeight;
+
+          if (targetVal > currentVal + 100) {
+            const neededVal = targetVal - currentVal;
+            const maxAffordable = (currentCash * 0.999999) / (1 + (state.settings.feeRate || 0.001));
+            const valToBuy = Math.min(neededVal, maxAffordable);
+
+            if (valToBuy > 100) {
+              const res = executeBuy(cid, valToBuy, currentCash, currentHoldings, state.currentYear, state.settings);
+              currentCash = res.updatedCash;
+              currentHoldings = res.updatedHoldings;
+              tradeLogs.push(...res.tradeLogs);
+            }
+          }
+        }
+
         return {
           ...state,
-          cashKRW: res.updatedCash,
-          holdings: res.updatedHoldings,
-          tradeLogs: [...state.tradeLogs, ...res.tradeLogs],
+          cashKRW: currentCash,
+          holdings: currentHoldings,
+          tradeLogs: [...state.tradeLogs, ...tradeLogs],
           draftTargetWeights: {},
         };
       } catch (err) {
@@ -594,14 +617,13 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         const year = state.currentYear;
         const isFirstSimYear = year === state.settings.startYear + 1;
         const deposit = isFirstSimYear ? 0 : state.settings.annualContributionKRW;
-        const updatedCashBeforeTrade = state.cashKRW + deposit;
 
         const priorYear = year - 1;
         const startAssets = calculatePortfolioValue(state.cashKRW, state.holdings, priorYear);
 
         const stepRes = advanceSimulationOneYear(
           year,
-          updatedCashBeforeTrade,
+          state.cashKRW,
           state.holdings,
           startAssets,
           deposit,
@@ -609,6 +631,13 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
           state.history,
           state.settings
         );
+
+        // When entering nextYear, deposit new year's contribution directly into cashKRW!
+        // No automatic stock purchases - player must choose what to buy with this cash.
+        const nextYearDeposit = !stepRes.isGameOver && state.settings.annualContributionKRW > 0
+          ? state.settings.annualContributionKRW
+          : 0;
+        const nextCashKRW = stepRes.updatedCash + nextYearDeposit;
 
         // Attach perceived risk, crisis record, and monthly data quality to the performance record
         const record = stepRes.performanceRecord;
@@ -636,7 +665,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         const intermediateState: StockGameState = {
           ...state,
           currentYear: stepRes.nextYear,
-          cashKRW: stepRes.updatedCash,
+          cashKRW: nextCashKRW,
           holdings: stepRes.updatedHoldings,
           history: [...state.history, record],
           isGameOver: stepRes.isGameOver,

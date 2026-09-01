@@ -244,8 +244,8 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
         </div>
       </div>
 
-      {/* 2. Center: Company Name & Identifiers (High Contrast) */}
-      <div className="space-y-1 my-1 relative">
+      {/* 2. Center: Company Name & Identifiers */}
+      <div className="space-y-1.5 my-1 relative">
         <div className="group/name relative inline-block max-w-full hover:z-50 focus-within:z-50">
           <h3
             className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-snug tracking-tight group-hover:text-blue-600 transition-colors line-clamp-1 cursor-pointer"
@@ -274,45 +274,62 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
           </div>
         </div>
 
-        {/* Ticker, Sector and Stock Price */}
-        <div className="flex items-center justify-between gap-1 text-[11.5px] sm:text-[12px] text-slate-500 font-medium">
-          <div
-            title={`${stock.ticker} · ${stock.sector}`}
-            className="flex items-center gap-1 min-w-0 truncate cursor-help"
-          >
-            <span className="font-mono font-semibold text-slate-700">{stock.ticker}</span>
-            <span>·</span>
-            <span className="truncate" title={stock.sector}>{stock.sector}</span>
-          </div>
-
-          {/* Compact Stock Price Display */}
-          {formattedPrice !== '-' && (
-            <div
-              title={`${currentYear}년 투자 기준 주가: ${formattedPrice}${krwConvertedHint ? ` (${krwConvertedHint})` : ''}`}
-              className="flex items-center gap-1 shrink-0 font-mono font-bold text-slate-900 bg-slate-100/90 px-1.5 py-0.5 rounded text-[11px] sm:text-[11.5px] border border-slate-200/70"
-            >
-              <span>{formattedPrice}</span>
-              {krwConvertedHint && (
-                <span className="text-[9.5px] text-slate-500 font-normal hidden xl:inline">
-                  ({krwConvertedHint})
-                </span>
-              )}
-            </div>
-          )}
+        {/* Ticker and Sector */}
+        <div
+          title={`${stock.ticker} · ${stock.sector}`}
+          className="flex items-center gap-1 text-[11px] sm:text-[11.5px] text-slate-500 font-medium truncate cursor-help"
+        >
+          <span className="font-mono font-semibold text-slate-600">{stock.ticker}</span>
+          <span className="text-slate-300">·</span>
+          <span className="truncate" title={stock.sector}>{stock.sector}</span>
         </div>
 
-        {/* 1-Year Mini Sparkline (Naver Style Chart) */}
+        {/* Highlighted Stock Price & Trend Box (Eye-Catching Price Display) */}
         <div
           onClick={e => {
             e.stopPropagation();
             handleTileClick();
           }}
-          className="mt-1.5 mb-1 p-1.5 rounded-xl bg-slate-50/90 hover:bg-blue-50/60 border border-slate-200/60 hover:border-blue-200 transition-all flex items-center justify-between gap-2 cursor-pointer group/spark"
-          title="클릭 시 과거 주가 차트 상세 보기"
+          className="mt-1 p-2 rounded-xl bg-slate-50/95 hover:bg-blue-50/60 border border-slate-200/80 hover:border-blue-300 transition-all cursor-pointer group/price-card space-y-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"
+          title="클릭 시 과거 주가 차트 및 기업 상세 보기"
         >
-          <div className="flex-1 min-w-0 h-6 flex items-center">
+          {/* Main Stock Price & 1-Year Return Row */}
+          <div className="flex items-center justify-between gap-1.5 min-w-0">
+            <div className="flex items-baseline gap-1 min-w-0 flex-wrap">
+              <span className="font-mono font-black text-[15px] sm:text-[16.5px] text-slate-950 tracking-tight leading-none whitespace-nowrap group-hover/price-card:text-blue-700 transition-colors">
+                {formattedPrice}
+              </span>
+              {krwConvertedHint && (
+                <span
+                  title={`원화 환산가: ${krwConvertedHint}`}
+                  className="text-[9.5px] sm:text-[10px] font-semibold text-slate-500 font-mono shrink-0 bg-slate-200/80 px-1 py-0.5 rounded leading-none whitespace-nowrap"
+                >
+                  {krwConvertedHint}
+                </span>
+              )}
+            </div>
+
+            {/* 1-Year Return Badge */}
+            {sparkline ? (
+              <span
+                className={`text-[10px] sm:text-[11px] font-bold font-mono px-1.5 py-0.5 rounded-md shrink-0 whitespace-nowrap flex items-center gap-0.5 ${
+                  sparkline.isPositive
+                    ? 'text-red-700 bg-red-50 border border-red-200/80'
+                    : 'text-blue-700 bg-blue-50 border border-blue-200/80'
+                }`}
+              >
+                <span>{sparkline.isPositive ? '▲' : '▼'}</span>
+                <span>{formatPercent(Math.abs(sparkline.return1Yr))}</span>
+              </span>
+            ) : (
+              <span className="text-[10px] text-slate-400 font-mono shrink-0 whitespace-nowrap">-</span>
+            )}
+          </div>
+
+          {/* 1-Year Mini Sparkline (Full Width inside card) */}
+          <div className="h-6 w-full flex items-center">
             {sparkline && sparkline.points.length > 1 ? (
-              <svg viewBox="0 0 100 30" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id={`grad-${stock.canonicalId}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.25" />
@@ -324,27 +341,13 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
                   d={sparkline.svgPath}
                   fill="none"
                   stroke={sparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                  strokeWidth="1.8"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             ) : (
               <div className="w-full text-[9px] text-slate-400 font-mono text-center">차트 분석 중</div>
-            )}
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-[9px] text-slate-400 block font-medium">최근 1년</span>
-            {sparkline ? (
-              <span
-                className={`text-[11px] font-bold font-mono ${
-                  sparkline.isPositive ? 'text-red-600' : 'text-blue-600'
-                }`}
-              >
-                {sparkline.isPositive ? '▲' : '▼'} {formatPercent(Math.abs(sparkline.return1Yr))}
-              </span>
-            ) : (
-              <span className="text-[10px] text-slate-400 font-mono">-</span>
             )}
           </div>
         </div>
@@ -379,7 +382,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
               /* Active Target Allocation Controls when target > 0 KRW */
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-[12px]">
-                  <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center gap-1">
+                  <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold text-[10px] flex items-center gap-1 shrink-0 whitespace-nowrap">
                     <ShoppingCart size={10} />
                     <span>{isHolding ? '설정' : '매수 담김'}</span>
                   </span>

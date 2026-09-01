@@ -499,9 +499,9 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                         <span className="text-slate-600">{stock.sector}</span>
                       </td>
                       <td className="p-3 text-right">
-                        <div className="font-mono font-bold text-slate-900 text-xs">{tablePrice}</div>
+                        <div className="font-mono font-black text-slate-950 text-[13.5px]">{tablePrice}</div>
                         {tableKrwHint && (
-                          <div className="font-mono text-[10px] text-slate-400">({tableKrwHint})</div>
+                          <div className="font-mono text-[10.5px] font-semibold text-slate-500">({tableKrwHint})</div>
                         )}
                       </td>
                       <td className="p-3 text-center">

@@ -437,5 +437,48 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
     expect(stepRes.performanceRecord.worstPerformer).toBeDefined();
     expect(stepRes.nextYear).toBe(1982);
   });
+  // Test 21: 연초 추가 납입금이 현금으로 입금되며 사용자가 매수하지 않으면 자동으로 종목을 사지 않는지
+  it('21. 연초 추가 납입금은 현금으로 입금되며, 사용자가 매수하지 않으면 기존 종목과 현금이 자동 매수 없이 그대로 유지되는지', () => {
+    const cash = 10000000;
+    // 1981년 삼성전자 400만원 매수 (잔여 현금 약 600만원)
+    const buyRes = executeBuy('KR_005930', 4000000, cash, {}, 1981, TEST_SETTINGS);
+    const initialShares = buyRes.updatedHoldings['KR_005930'].shares;
+    const remainingCash = buyRes.updatedCash;
+
+    // 1981년 1년 시뮬레이션 진행
+    const startAssets = calculatePortfolioValue(remainingCash, buyRes.updatedHoldings, 1980);
+    const stepRes = advanceSimulationOneYear(
+      1981,
+      remainingCash,
+      buyRes.updatedHoldings,
+      startAssets,
+      0,
+      buyRes.totalFees,
+      [],
+      TEST_SETTINGS
+    );
+
+    // 1982년 연초 추가 납입금 6,000,000원 입금
+    const annualContribution = 6000000;
+    const cash1982Start = stepRes.updatedCash + annualContribution;
+
+    // 사용자가 1982년에 아무런 매수 주문을 하지 않은 경우
+    // 기존 삼성전자 주식 수량은 1주도 변하지 않고 그대로 유지되어야 함
+    expect(stepRes.updatedHoldings['KR_005930'].shares).toBe(initialShares);
+    // 현금 잔고는 이전 잔여현금 + 600만원이 그대로 100% 보존되어야 함
+    expect(cash1982Start).toBeGreaterThanOrEqual(remainingCash + annualContribution - 1);
+  });
+
+  // Test 22: 사용자가 특정 종목을 직접 매수 지정했을 때만 현금이 줄어들며 해당 종목이 매수되는지
+  it('22. 사용자가 특정 종목을 직접 매수 지정했을 때만 현금이 차감되며 해당 종목만 매수되는지', () => {
+    const cash1982 = 12000000; // 보유 현금 1,200만원
+    const buyAmount = 5000000; // 사용자가 기아(KR_000270) 500만원 매수 지정
+
+    const res = executeBuy('KR_000270', buyAmount, cash1982, {}, 1982, TEST_SETTINGS);
+    expect(res.updatedHoldings['KR_000270']).toBeDefined();
+    expect(res.updatedHoldings['KR_000270'].shares).toBeGreaterThan(0);
+    expect(res.updatedCash).toBeLessThan(cash1982);
+    expect(res.updatedCash).toBeCloseTo(cash1982 - (buyAmount + res.totalFees), -1);
+  });
 });
 

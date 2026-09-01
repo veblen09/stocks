@@ -243,8 +243,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
       dispatch({ type: 'EXECUTE_DRAFT_ALLOCATION' });
     }
 
-    const deposit = currentYear === settings.startYear + 1 ? 0 : settings.annualContributionKRW;
-    const cashBefore = cashKRW + deposit;
+    const cashBefore = cashKRW;
 
     // Generate 12-Month Live Market Replay Data
     const replayData = generateYearReplayData(
@@ -260,8 +259,8 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
 
     setActiveYearReplayData(replayData);
 
-    if (monthlyReplaySpeed === 'INSTANT' || replayData.quality === 'ANNUAL_ONLY') {
-      // Step immediately
+    if (monthlyReplaySpeed === 'INSTANT') {
+      // Step immediately only if user explicitly selected instant mode
       stepOneYear();
       setShowYearEndModal(true);
 
@@ -270,7 +269,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         setChapterSummaryData(summary);
       }
     } else {
-      // Open Live Market Replay Stage
+      // Open Live Market Replay Stage (Thrilling 12-Month Live Market Simulation)
       setShowReplayStage(true);
     }
   };
@@ -402,6 +401,28 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Annual Contribution Notice Banner for subsequent years */}
+      {!isFirstSimulationYear && settings.annualContributionKRW > 0 && (
+        <div className="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-emerald-950 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shrink-0">
+              💰 연초 추가 투자금
+            </span>
+            <div className="text-xs">
+              <span className="font-extrabold text-emerald-900">
+                {currentYear}년 연초 적립금 +{formatKRW(settings.annualContributionKRW)} 입금 완료!
+              </span>
+              <span className="text-emerald-700 font-medium ml-1.5 hidden sm:inline">
+                가용 현금 잔고에 자동으로 충전되었습니다.
+              </span>
+            </div>
+          </div>
+          <span className="text-[11px] font-mono font-bold text-emerald-800 shrink-0 bg-white/90 px-2.5 py-1 rounded-lg border border-emerald-200">
+            누적 {history.length}회차 적립
+          </span>
+        </div>
+      )}
+
       {/* TOP KPI BAR: Separating Total Assets from Pure PnL */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Total Assets */}
@@ -439,7 +460,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             </span>
           </div>
           <span className="text-[10px] text-slate-400 font-mono">
-            초기 {formatKRW(initialCashKRW)} + 매년 적립
+            초기 {formatKRW(initialCashKRW)} + 적립 {history.length}회({formatKRW(isFirstSimulationYear ? 0 : history.length * settings.annualContributionKRW)})
           </span>
         </div>
 
