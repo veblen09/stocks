@@ -68,7 +68,7 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
                 </span>
               ) : kospiDiff > 0 ? (
                 <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-md">
-                  코스피 초과
+                  코스피 200 초과
                 </span>
               ) : null}
             </div>
@@ -137,7 +137,7 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-slate-600 font-sans font-bold">
-                  🇰🇷 코스피 지수
+                  🇰🇷 코스피 200 지수
                 </span>
                 <span className={`text-[10px] font-sans font-extrabold flex items-center ${
                   kospiDiff >= 0 ? 'text-emerald-600' : 'text-rose-600'
@@ -219,7 +219,7 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
                 {/* KOSPI Bar */}
                 <div className="space-y-0.5">
                   <div className="flex justify-between text-[11px]">
-                    <span className="text-slate-700">🇰🇷 코스피 지수 (KOSPI)</span>
+                    <span className="text-slate-700">🇰🇷 코스피 200 지수 (KOSPI 200)</span>
                     <span className="font-mono text-slate-700">{latest.kospiTwr.toFixed(1)}</span>
                   </div>
                   <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">

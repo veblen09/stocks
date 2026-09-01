@@ -14,12 +14,12 @@ def validate():
     with open('src/data/normalized/stocks.json', 'r', encoding='utf-8') as f:
         stocks = json.load(f)
     print(f"Checking stocks.json: Found {len(stocks)} stocks.")
-    assert len(stocks) == 50, f"Expected 50 stocks, got {len(stocks)}"
+    assert len(stocks) == 60, f"Expected 60 stocks, got {len(stocks)}"
     kr_stocks = [s for s in stocks if s['market'] == 'KR']
     us_stocks = [s for s in stocks if s['market'] == 'US']
-    assert len(kr_stocks) == 25, f"Expected 25 KR stocks, got {len(kr_stocks)}"
-    assert len(us_stocks) == 25, f"Expected 25 US stocks, got {len(us_stocks)}"
-    print("  -> Exactly 25 Korean stocks and 25 US stocks verified.")
+    assert len(kr_stocks) == 30, f"Expected 30 KR stocks, got {len(kr_stocks)}"
+    assert len(us_stocks) == 30, f"Expected 30 US stocks, got {len(us_stocks)}"
+    print("  -> Exactly 30 Korean stocks and 30 US stocks verified.")
 
     # 2. Load fx_usdkrw.json
     with open('src/data/normalized/fx_usdkrw.json', 'r', encoding='utf-8') as f:
@@ -37,15 +37,15 @@ def validate():
     for b_id in ['kospi', 'sp500', 'blend5050']:
         assert b_id in benchmarks, f"Missing benchmark {b_id}"
         rets = benchmarks[b_id]['annualReturns']
-        for y in range(1981, 2026):
+        for y in range(1980, 2026):
             val = rets.get(str(y), rets.get(y))
             assert val is not None and not math.isnan(val), f"Benchmark {b_id} missing return for {y}"
-    print("  -> All 3 Benchmarks (KOSPI, S&P 500 KRW, 50:50) verified for all 45 annual periods.")
+    print("  -> All 3 Benchmarks (KOSPI 200, S&P 500 KRW, 50:50) verified for all 46 annual periods.")
 
     # 4. Load annual_prices.json
     with open('src/data/normalized/annual_prices.json', 'r', encoding='utf-8') as f:
         annual_prices = json.load(f)
-    assert len(annual_prices) == 50, f"Expected 50 stocks in annual_prices, got {len(annual_prices)}"
+    assert len(annual_prices) == 60, f"Expected 60 stocks in annual_prices, got {len(annual_prices)}"
     
     for stock in stocks:
         cid = stock['canonicalId']

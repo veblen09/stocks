@@ -9,7 +9,7 @@
   "koreanStocksCount": 30,
   "usStocksCount": 30,
   "benchmarks": [
-    "KOSPI (한국 코스피)",
+    "KOSPI 200 (한국 코스피 200)",
     "S&P 500 (미국 대형주 원화환산)",
     "50:50 Blend (한국/미국 배분)"
   ],
@@ -17,7 +17,7 @@
     "usStocks": "Yahoo Finance Adjusted Prices / SEC Historical 10-K Filings / CRSP (배당 재투자 및 주식분할 완벽 반영)",
     "koreanStocks": "한국거래소(KRX) 공식 시세 정보 / 한국은행 ECOS / Yahoo Finance (주식분할 반영 수정주가)",
     "exchangeRate": "한국은행 경제통계시스템(ECOS) 및 미 연방준비은행 FRED USD/KRW 매매기준율",
-    "benchmarks": "한국거래소 코스피 지수 / S&P Dow Jones Indices S&P 500 지수"
+    "benchmarks": "한국거래소 코스피 200 지수 (1990~2025 KRX 공식 / 1980~1989 연계) / S&P Dow Jones Indices S&P 500 지수"
   },
   "qualityGuidelines": {
     "preIpoHandling": "상장 이전 기간은 선택이 원천 차단되며, 결측치를 0%나 임의 가격으로 보간하지 않음",

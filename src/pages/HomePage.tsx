@@ -392,7 +392,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                   <li>한국 주식: 한국거래소(KRX) 공식 시세 DB / Yahoo Finance 수정주가</li>
                   <li>미국 주식: Yahoo Finance Adjusted Prices / SEC 10-K Historical / CRSP</li>
                   <li>USD/KRW 환율: 한국은행 경제통계시스템(ECOS) 및 미 연준 FRED</li>
-                  <li>벤치마크 지수: 한국거래소 코스피 지수 / S&P Dow Jones Indices S&P 500</li>
+                  <li>벤치마크 지수: 한국거래소 코스피 200 지수 / S&P Dow Jones Indices S&P 500</li>
                 </ul>
               </div>
               <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-1 text-amber-900">

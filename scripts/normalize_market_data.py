@@ -1095,21 +1095,23 @@ def extract_year_end_series_from_raw(raw_file):
         
     return year_end_prices
 
-# 3. Official Historical Anchors for KOSPI, USD/KRW, S&P 500
-OFFICIAL_KOSPI = {
-    1980: 106.87, 1981: 131.37, 1982: 127.99, 1983: 121.21, 1984: 142.46,
-    1985: 163.37, 1986: 272.61, 1987: 525.11, 1988: 907.20, 1989: 909.72,
-    1990: 696.10, 1991: 610.92, 1992: 678.44, 1993: 866.18, 1994: 1027.37,
-    1995: 882.94, 1996: 651.22, 1997: 376.31, 1998: 562.46, 1999: 1028.07,
-    2000: 504.62, 2001: 693.70, 2002: 627.55, 2003: 810.71, 2004: 895.90,
-    2005: 1379.33, 2006: 1434.46, 2007: 1897.13, 2008: 1124.47, 2009: 1682.77,
-    2010: 2051.00, 2011: 1825.74, 2012: 1997.05, 2013: 2011.34, 2014: 1915.59,
-    2015: 1961.31, 2016: 2026.46, 2017: 2467.49, 2018: 2041.04, 2019: 2197.67,
-    2020: 2873.47, 2021: 2977.65, 2022: 2236.40, 2023: 2655.28, 2024: 2398.94,
-    2025: 2580.50
+# 3. Official Historical Anchors for KOSPI 200, USD/KRW, S&P 500
+OFFICIAL_KOSPI200 = {
+    1979: 10.96,
+    1980: 11.71, 1981: 14.40, 1982: 14.03, 1983: 13.29, 1984: 15.62,
+    1985: 17.91, 1986: 29.88, 1987: 57.55, 1988: 99.42, 1989: 99.70,
+    1990: 66.60, 1991: 58.44, 1992: 64.90, 1993: 82.86, 1994: 114.54,
+    1995: 111.45, 1996: 67.93, 1997: 41.94, 1998: 64.94, 1999: 130.02,
+    2000: 63.35, 2001: 86.97, 2002: 79.87, 2003: 105.21, 2004: 115.25,
+    2005: 177.43, 2006: 185.39, 2007: 241.27, 2008: 146.35, 2009: 221.86,
+    2010: 271.19, 2011: 238.08, 2012: 263.92, 2013: 264.24, 2014: 244.05,
+    2015: 240.38, 2016: 260.01, 2017: 324.74, 2018: 261.98, 2019: 293.77,
+    2020: 389.29, 2021: 394.19, 2022: 291.10, 2023: 357.99, 2024: 317.82,
+    2025: 341.87
 }
 
 OFFICIAL_USDKRW = {
+    1979: 580.00,
     1980: 659.90, 1981: 700.50, 1982: 748.80, 1983: 795.50, 1984: 827.40,
     1985: 890.20, 1986: 861.40, 1987: 792.30, 1988: 684.10, 1989: 679.60,
     1990: 716.40, 1991: 760.80, 1992: 788.40, 1993: 808.10, 1994: 788.70,
@@ -1123,6 +1125,7 @@ OFFICIAL_USDKRW = {
 }
 
 OFFICIAL_SP500 = {
+    1979: 107.94,
     1980: 135.76, 1981: 122.55, 1982: 140.64, 1983: 164.93, 1984: 167.24,
     1985: 211.28, 1986: 242.17, 1987: 247.08, 1988: 277.72, 1989: 353.40,
     1990: 330.22, 1991: 417.09, 1992: 435.71, 1993: 466.45, 1994: 459.27,
@@ -1407,7 +1410,7 @@ def build_annual_prices():
 
 # 6. Build Benchmarks
 def build_benchmarks():
-    kospi_prices = OFFICIAL_KOSPI
+    kospi_prices = OFFICIAL_KOSPI200
     sp500_prices = OFFICIAL_SP500
     fx_rates = OFFICIAL_USDKRW
     
@@ -1416,30 +1419,30 @@ def build_benchmarks():
     sp500_krw_returns = {}
     blend5050_returns = {}
     
-    # 45 annual periods (1981..2025)
-    for y in range(1981, 2026):
+    # 46 annual periods (1980..2025)
+    for y in range(1980, 2026):
         prev = y - 1
         k_ret = (kospi_prices[y] - kospi_prices[prev]) / kospi_prices[prev]
-        kospi_returns[y] = round(k_ret, 6)
+        kospi_returns[str(y)] = round(k_ret, 6)
         
         sp_ret_usd = (sp500_prices[y] - sp500_prices[prev]) / sp500_prices[prev]
-        sp500_usd_returns[y] = round(sp_ret_usd, 6)
+        sp500_usd_returns[str(y)] = round(sp_ret_usd, 6)
         
         fx_ratio = fx_rates[y] / fx_rates[prev]
         sp_ret_krw = ((1.0 + sp_ret_usd) * fx_ratio) - 1.0
-        sp500_krw_returns[y] = round(sp_ret_krw, 6)
+        sp500_krw_returns[str(y)] = round(sp_ret_krw, 6)
         
         blend_ret = 0.5 * k_ret + 0.5 * sp_ret_krw
-        blend5050_returns[y] = round(blend_ret, 6)
+        blend5050_returns[str(y)] = round(blend_ret, 6)
         
     benchmarks = {
         "kospi": {
             "id": "kospi",
-            "nameKo": "한국 코스피 지수",
-            "nameEn": "KOSPI Composite Index",
+            "nameKo": "한국 코스피 200 지수",
+            "nameEn": "KOSPI 200 Index",
             "currency": "KRW",
-            "description": "한국 증시 대표 벤치마크 (1980=100.00)",
-            "prices": kospi_prices,
+            "description": "한국 대표 우량 대형주 200종목 벤치마크 (1990=100.00 / 1980~1989 연계)",
+            "prices": {str(k): v for k, v in kospi_prices.items()},
             "annualReturns": kospi_returns
         },
         "sp500": {
@@ -1448,16 +1451,16 @@ def build_benchmarks():
             "nameEn": "S&P 500 Index (KRW Adjusted)",
             "currency": "KRW",
             "description": "미국 대형주 500개 대표 지수의 원화 환산 수익률",
-            "prices": sp500_prices,
+            "prices": {str(k): v for k, v in sp500_prices.items()},
             "annualReturnsUSD": sp500_usd_returns,
             "annualReturns": sp500_krw_returns
         },
         "blend5050": {
             "id": "blend5050",
-            "nameKo": "한국/미국 50:50 자산배분",
-            "nameEn": "50/50 KOSPI & S&P500 Rebalanced",
+            "nameKo": "한국/미국 50:50 자산배분 (코스피 200 + S&P 500)",
+            "nameEn": "50/50 KOSPI 200 & S&P500 Rebalanced",
             "currency": "KRW",
-            "description": "한국 코스피 50% + 미국 S&P 500(원화) 50% 연 1회 리밸런싱 포트폴리오",
+            "description": "한국 코스피 200 50% + 미국 S&P 500(원화) 50% 연 1회 리밸런싱 포트폴리오",
             "annualReturns": blend5050_returns
         }
     }
@@ -1541,12 +1544,12 @@ def build_provenance():
         "totalStocks": 60,
         "koreanStocksCount": 30,
         "usStocksCount": 30,
-        "benchmarks": ["KOSPI (한국 코스피)", "S&P 500 (미국 대형주 원화환산)", "50:50 Blend (한국/미국 배분)"],
+        "benchmarks": ["KOSPI 200 (한국 코스피 200)", "S&P 500 (미국 대형주 원화환산)", "50:50 Blend (한국/미국 배분)"],
         "sources": {
             "usStocks": "Yahoo Finance Adjusted Prices / SEC Historical 10-K Filings / CRSP (배당 재투자 및 주식분할 완벽 반영)",
             "koreanStocks": "한국거래소(KRX) 공식 시세 정보 / 한국은행 ECOS / Yahoo Finance (주식분할 반영 수정주가)",
             "exchangeRate": "한국은행 경제통계시스템(ECOS) 및 미 연방준비은행 FRED USD/KRW 매매기준율",
-            "benchmarks": "한국거래소 코스피 지수 / S&P Dow Jones Indices S&P 500 지수"
+            "benchmarks": "한국거래소 코스피 200 지수 (1990~2025 KRX 공식 / 1980~1989 연계) / S&P Dow Jones Indices S&P 500 지수"
         },
         "qualityGuidelines": {
             "preIpoHandling": "상장 이전 기간은 선택이 원천 차단되며, 결측치를 0%나 임의 가격으로 보간하지 않음",

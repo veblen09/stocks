@@ -360,7 +360,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
               <tr>
                 <td className="py-2.5 font-sans flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block"></span>
-                  <span>🇰🇷 코스피 100 지수 (KOSPI)</span>
+                  <span>🇰🇷 코스피 200 지수 (KOSPI 200)</span>
                 </td>
                 <td className="py-2.5 text-right">{formatKRW(metrics.benchmarkComparison.kospiFinalValue)}</td>
                 <td className={`py-2.5 text-right ${getReturnColor(metrics.benchmarkComparison.kospiTotalReturn)}`}>
@@ -414,12 +414,12 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
           {/* 1. KOSPI takeaway */}
           <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1.5 text-xs">
             <span className="font-extrabold text-slate-800 flex items-center gap-1 text-[11px]">
-              🇰🇷 한국 코스피 단순투자 대비 분석
+              🇰🇷 한국 코스피 200 단순투자 대비 분석
             </span>
             <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
               {metrics.twrCAGR >= metrics.benchmarkComparison.kospiTwrCAGR
-                ? `축하합니다! 코스피 단순 보유 대비 연평균 +${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}의 초과 수익(Alpha)을 달성했습니다. 우수 기업 선별 및 위기 대응이 성과를 견인했습니다.`
-                : `코스피 단순 지수 대비 연평균 ${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)} 격차를 보였습니다. 특정 종목 집중 및 잦은 매매 비용이 수익률을 갉아먹지 않았는지 점검해 보세요.`}
+                ? `축하합니다! 코스피 200 단순 보유 대비 연평균 +${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)}의 초과 수익(Alpha)을 달성했습니다. 우수 기업 선별 및 위기 대응이 성과를 견인했습니다.`
+                : `코스피 200 단순 지수 대비 연평균 ${formatPercent(metrics.twrCAGR - metrics.benchmarkComparison.kospiTwrCAGR)} 격차를 보였습니다. 특정 종목 집중 및 잦은 매매 비용이 수익률을 갉아먹지 않았는지 점검해 보세요.`}
             </p>
           </div>
 
@@ -500,7 +500,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
                       showKospiLine ? 'bg-slate-100 border-slate-300 text-slate-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
                     }`}
                   >
-                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 지수
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 200 지수
                   </button>
                   <button
                     type="button"
@@ -730,7 +730,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({ onNavigate }) => {
                       showKospiLine ? 'bg-slate-100 border-slate-300 text-slate-800 font-bold' : 'bg-white border-slate-200 text-slate-400 opacity-60'
                     }`}
                   >
-                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 지수
+                    <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span> 코스피 200 지수
                   </button>
                   <button
                     type="button"

@@ -59,7 +59,7 @@ export interface Sparkline1YrData {
 }
 
 export type NaverCandleType = 'DAY' | 'WEEK' | 'MONTH' | 'LINE';
-export type NaverPeriodType = '1D' | '1M' | '1Y' | '3Y' | '10Y' | 'ALL';
+export type NaverPeriodType = '1D' | '1M' | '3M' | '1Y' | '3Y' | '10Y' | 'ALL';
 
 export interface NaverCandleItem {
   date: string; // e.g. "2007-03-15" or "09:30"
@@ -95,6 +95,9 @@ export interface NaverChartData {
   prevClose: number;
   changeAmount: number;
   changePercent: number;
+  periodStartPrice: number;
+  periodChangeAmount: number;
+  periodChangePercent: number;
   highPrice: number;
   lowPrice: number;
   high52w: number;
@@ -224,7 +227,7 @@ export function getCompanyNaverChartData(
 
   // 1. Determine start year based on period
   let startYear = Math.max(1980, stock.firstValidYear);
-  if (period === '1D' || period === '1M' || period === '1Y') {
+  if (period === '1D' || period === '1M' || period === '3M' || period === '1Y') {
     startYear = upToYear;
   } else if (period === '3Y') {
     startYear = Math.max(stock.firstValidYear, upToYear - 2);
@@ -330,12 +333,13 @@ export function getCompanyNaverChartData(
         volume: vol,
       });
     });
-  } else if (candleType === 'DAY' || period === '1M') {
+  } else if (candleType === 'DAY' || period === '1M' || period === '3M') {
     // Daily candle simulation for the selected period
     // Filter months in range
-    const targetMonths = rawMonthlyList.filter(m => m.year >= startYear);
+    let targetMonths = rawMonthlyList.filter(m => m.year >= startYear);
+    if (period === '1M') targetMonths = targetMonths.slice(-1);
+    if (period === '3M') targetMonths = targetMonths.slice(-3);
     targetMonths.forEach((mItem, mIdx) => {
-      if (period === '1M' && mIdx < targetMonths.length - 1) return; // Only latest month for 1M
 
       const prevMonthPrice = mIdx > 0 ? targetMonths[mIdx - 1].price : mItem.price;
       const monthClose = mItem.price;
@@ -479,6 +483,10 @@ export function getCompanyNaverChartData(
   const changeAmount = currentPrice - prevClose;
   const changePercent = prevClose > 0 ? changeAmount / prevClose : 0;
 
+  const periodStartPrice = firstCandle ? firstCandle.open : currentPrice;
+  const periodChangeAmount = currentPrice - periodStartPrice;
+  const periodChangePercent = periodStartPrice > 0 ? periodChangeAmount / periodStartPrice : 0;
+
   const allHighs = finalCandles.map(c => c.high);
   const allLows = finalCandles.map(c => c.low);
   const allVols = finalCandles.map(c => c.volume);
@@ -510,6 +518,9 @@ export function getCompanyNaverChartData(
     prevClose,
     changeAmount,
     changePercent,
+    periodStartPrice,
+    periodChangeAmount,
+    periodChangePercent,
     highPrice,
     lowPrice,
     high52w,

@@ -264,7 +264,7 @@ export const SetupPage: React.FC<SetupPageProps> = ({ onNavigate }) => {
               <label className="text-xs font-extrabold text-slate-700">주요 성과 비교 벤치마크</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: 'kospi' as const, label: '🇰🇷 코스피' },
+                  { id: 'kospi' as const, label: '🇰🇷 코스피 200' },
                   { id: 'sp500' as const, label: '🇺🇸 S&P 500' },
                   { id: 'blend5050' as const, label: '⚖️ 50:50 혼합' },
                 ].map(b => (

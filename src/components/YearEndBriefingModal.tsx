@@ -228,9 +228,9 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
                 </div>
                 <p className="text-[11px] text-slate-600 font-medium">
                   {kospiAlpha >= 0 && sp500Alpha >= 0
-                    ? `대단합니다! 올해 한국 코스피(+${(kospiAlpha * 100).toFixed(1)}%p)와 미국 S&P 500(+${(sp500Alpha * 100).toFixed(1)}%p) 양대 지수를 모두 초과 달성(Alpha)했습니다.`
+                    ? `대단합니다! 올해 한국 코스피 200(+${(kospiAlpha * 100).toFixed(1)}%p)과 미국 S&P 500(+${(sp500Alpha * 100).toFixed(1)}%p) 양대 지수를 모두 초과 달성(Alpha)했습니다.`
                     : kospiAlpha >= 0
-                    ? `한국 코스피 지수 대비 +${(kospiAlpha * 100).toFixed(1)}%p 초과 수익을 거두었습니다.`
+                    ? `한국 코스피 200 지수 대비 +${(kospiAlpha * 100).toFixed(1)}%p 초과 수익을 거두었습니다.`
                     : sp500Alpha >= 0
                     ? `미국 S&P 500 지수 대비 +${(sp500Alpha * 100).toFixed(1)}%p 초과 수익을 거두었습니다.`
                     : `올해는 대표 시장 지수들의 상승세가 강력했습니다. 장기 패시브 투자의 복리 효과를 함께 학습해 보세요.`}
@@ -258,7 +258,7 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
                       <td className="p-2.5 text-right font-sans text-blue-700">-</td>
                     </tr>
                     <tr>
-                      <td className="p-2.5 font-sans text-slate-800">🇰🇷 코스피 지수 (KOSPI)</td>
+                      <td className="p-2.5 font-sans text-slate-800">🇰🇷 코스피 200 지수 (KOSPI 200)</td>
                       <td className={`p-2.5 text-right ${getReturnColor(kospiRet)}`}>
                         {formatPercent(kospiRet)}
                       </td>

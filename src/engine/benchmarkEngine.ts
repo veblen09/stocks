@@ -5,11 +5,11 @@ export const BENCHMARKS: BenchmarksDataset = rawBenchmarks as unknown as Benchma
 
 export const BENCHMARK_METADATA: Record<BenchmarkId, { nameKo: string; nameEn: string; badge: string; color: string; description: string }> = {
   kospi: {
-    nameKo: '한국 코스피 지수 (KOSPI)',
-    nameEn: 'KOSPI Composite Index',
-    badge: '🇰🇷 코스피',
+    nameKo: '한국 코스피 200 지수 (KOSPI 200)',
+    nameEn: 'KOSPI 200 Index',
+    badge: '🇰🇷 코스피 200',
     color: '#64748b',
-    description: '대한민국 유가증권시장 대표 대형주 100~200 종목 단순 보유(Buy & Hold) 수익률',
+    description: '대한민국 유가증권시장 시가총액 상위 200대 우량 대형주 단순 보유(Buy & Hold) 수익률',
   },
   sp500: {
     nameKo: '미국 S&P 500 (원화 환산)',
@@ -19,11 +19,11 @@ export const BENCHMARK_METADATA: Record<BenchmarkId, { nameKo: string; nameEn: s
     description: '미국 대표 500대 우량 대형주 지수에 원화로 환산 투자한 수익률 (달러 환율 변동 포함)',
   },
   blend5050: {
-    nameKo: '한·미 50:50 자산배분 (연 1회 리밸런싱)',
-    nameEn: '50/50 KOSPI & S&P500 Rebalanced',
+    nameKo: '한·미 50:50 자산배분 (코스피 200 + S&P 500)',
+    nameEn: '50/50 KOSPI 200 & S&P500 Rebalanced',
     badge: '⚖️ 50:50 혼합',
     color: '#059669',
-    description: '한국 코스피 50% + 미국 S&P 500 50%를 연 1회 리밸런싱하며 분산 투자한 복리 성과',
+    description: '한국 코스피 200 50% + 미국 S&P 500 50%를 연 1회 리밸런싱하며 분산 투자한 복리 성과',
   },
 };
 
