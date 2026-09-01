@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, ShieldAlert, Building2, ChevronRight, ChevronLeft, ArrowRight, DollarSign } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 import type { HistoricalStockDefinition } from '../types/stockUniverse';
 import type { StockHolding } from '../types/stockGame';
 import { audioManager } from '../utils/audioManager';
-import { formatKRW } from '../utils/formatMoney';
 
 interface DelistingAlertModalProps {
   delistedStocks: HistoricalStockDefinition[];
@@ -25,7 +24,7 @@ export const DelistingAlertModal: React.FC<DelistingAlertModalProps> = ({
   useEffect(() => {
     if (isOpen && delistedStocks.length > 0) {
       setCurrentIndex(0);
-      audioManager.playUiSound('warning');
+      audioManager.playUiSound('warningLevel');
     }
   }, [isOpen, delistedStocks.length]);
 

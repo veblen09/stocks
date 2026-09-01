@@ -115,9 +115,9 @@ const mockInitialState: StockGameState = {
 };
 
 describe('Historical Chapters Engine', () => {
-  it('should define exactly 9 historical chapters covering 1981-2025', () => {
+  it('should define exactly 9 historical chapters covering 1980-2025', () => {
     expect(HISTORICAL_CHAPTERS.length).toBe(9);
-    expect(HISTORICAL_CHAPTERS[0].startYear).toBe(1981);
+    expect(HISTORICAL_CHAPTERS[0].startYear).toBe(1980);
     expect(HISTORICAL_CHAPTERS[8].endYear).toBe(2025);
   });
 
@@ -132,7 +132,7 @@ describe('Historical Chapters Engine', () => {
   });
 
   it('should detect chapter start and end years accurately', () => {
-    expect(isChapterStartYear(1981, 1980)).toBe(true);
+    expect(isChapterStartYear(1980, 1980)).toBe(true);
     expect(isChapterStartYear(1986, 1980)).toBe(true);
     expect(isChapterStartYear(1987, 1980)).toBe(false);
 

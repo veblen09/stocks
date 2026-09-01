@@ -136,7 +136,7 @@ export function getTradableStocks(options: GetTradableStocksOptions = {}): Trada
 
     const baseStock = STOCKS_BY_ID[cid];
     const listingEv = LISTING_EVENTS_BY_COMPANY[cid];
-    const isNew = isNewlyListedInYear(cid, currentYear);
+    const isNew = isNewlyListedInYear(cid, currentYear <= 1980 ? currentYear : currentYear - 1);
 
     // Resolve name and sector as of targetDate
     let nameKo = baseStock ? baseStock.nameKo : hStock.currentName;

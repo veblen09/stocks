@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Calendar, TrendingUp, Building2, ChevronRight, ChevronLeft, ArrowRight, BookOpen, Check } from 'lucide-react';
+import { Sparkles, Building2, ChevronRight, ChevronLeft, ArrowRight, BookOpen, Check } from 'lucide-react';
 import type { HistoricalStockDefinition, ListingEvent } from '../types/stockUniverse';
 import { getListingEventByCompanyId } from '../engine/universeEngine';
 import { audioManager } from '../utils/audioManager';
@@ -25,7 +25,7 @@ export const NewListingModal: React.FC<NewListingModalProps> = ({
   useEffect(() => {
     if (isOpen && listedStocks.length > 0) {
       setCurrentIndex(0);
-      audioManager.playUiSound('achievement');
+      audioManager.playUiSound('success');
     }
   }, [isOpen, listedStocks.length]);
 

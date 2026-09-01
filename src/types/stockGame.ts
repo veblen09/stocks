@@ -287,7 +287,7 @@ export interface StockGameState {
   isGameStarted: boolean;
   isGameOver: boolean;
   settings: GameSettings;
-  currentYear: number; // Current simulation year (starts at startYear + 1)
+  currentYear: number; // Current simulation year (starts at startYear)
   cashKRW: number;
   holdings: Record<string, StockHolding>; // canonicalId -> StockHolding
   history: YearlyPerformanceRecord[];

@@ -47,7 +47,7 @@ const DEFAULT_SETTINGS: GameSettings = {
 
 const INITIAL_STATE: StockGameState = {
   version: '2.1.0',
-  schemaVersion: 4,
+  schemaVersion: 5,
   isGameStarted: false,
   isGameOver: false,
   settings: DEFAULT_SETTINGS,
@@ -648,14 +648,15 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
             delete finalHoldings[cid];
 
             delistLogs.push({
-              id: `DELIST_${year}_${cid}_${Date.now()}`,
               year,
               action: 'SELL',
               canonicalId: cid,
-              nameKo: dStk.currentName,
+              stockNameKo: dStk.currentName,
               shares: h.shares,
+              priceLocal: pKRW,
+              fxRate: 1,
               priceKRW: pKRW,
-              amountKRW: recovered,
+              totalAmountKRW: recovered,
               feeKRW: 0,
               timestamp: Date.now(),
               thesis: `[상장폐지 공시] ${dStk.currentName} 상장폐지로 인한 보유 잔고 청산 완료`,
@@ -1043,7 +1044,12 @@ export const StockGameProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const saved = localStorage.getItem(STORAGE_KEY_V2);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.schemaVersion === 4) {
+        if (parsed.schemaVersion === 5 || parsed.schemaVersion === 4) {
+          // If history is empty and startYear is 1980, ensure currentYear is 1980
+          if ((!parsed.history || parsed.history.length === 0) && parsed.settings?.startYear === 1980 && parsed.currentYear === 1981) {
+            parsed.currentYear = 1980;
+          }
+          parsed.schemaVersion = 5;
           return parsed;
         }
       }

@@ -115,8 +115,8 @@ describe('동적 투자 가능 종목군 & 종목 모자이크뷰 (Sections 49~8
 
   // Test 10: 신규 상장 종목이 모자이크에 즉시 추가되는지
   it('10. 신규 상장 종목이 모자이크에 즉시 추가되는지', () => {
-    const tradable2004 = getTradableStocks({ currentYear: 2004 });
-    const goog = tradable2004.find(s => s.canonicalId === 'US_GOOGL');
+    const tradable2005 = getTradableStocks({ currentYear: 2005 });
+    const goog = tradable2005.find(s => s.canonicalId === 'US_GOOGL');
     expect(goog).toBeDefined();
     expect(goog?.isNewlyListed).toBe(true);
   });

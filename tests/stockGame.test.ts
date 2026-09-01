@@ -25,19 +25,19 @@ const TEST_SETTINGS: GameSettings = {
 describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단위 테스트', () => {
 
   // Test 1
-  it('1. 1980년 말부터 2025년 말까지 정확히 45개의 연간 구간이 생성되는지', () => {
-    const totalYears = TEST_SETTINGS.endYear - TEST_SETTINGS.startYear;
-    expect(totalYears).toBe(45);
+  it('1. 1980년부터 2025년까지 정확히 46개의 연간 구간이 생성되는지', () => {
+    const totalYears = TEST_SETTINGS.endYear - TEST_SETTINGS.startYear + 1;
+    expect(totalYears).toBe(46);
 
-    let year = TEST_SETTINGS.startYear + 1;
+    let year = TEST_SETTINGS.startYear;
     const yearList: number[] = [];
     while (year <= TEST_SETTINGS.endYear) {
       yearList.push(year);
       year++;
     }
-    expect(yearList.length).toBe(45);
-    expect(yearList[0]).toBe(1981);
-    expect(yearList[44]).toBe(2025);
+    expect(yearList.length).toBe(46);
+    expect(yearList[0]).toBe(1980);
+    expect(yearList[45]).toBe(2025);
   });
 
   // Test 2
@@ -235,9 +235,9 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
   // Test 11
   it('11. 벤치마크에 동일 현금흐름이 정확히 적용되는지', () => {
     const bmSim = simulateBenchmarkSeries('kospi', 1980, 2025, 10000000, 3000000, 0.001);
-    expect(bmSim.history.length).toBe(45);
-    expect(bmSim.history[0].year).toBe(1981);
-    expect(bmSim.history[44].year).toBe(2025);
+    expect(bmSim.history.length).toBe(46);
+    expect(bmSim.history[0].year).toBe(1980);
+    expect(bmSim.history[45].year).toBe(2025);
     expect(bmSim.totalValueKRW).toBeGreaterThan(0);
   });
 
