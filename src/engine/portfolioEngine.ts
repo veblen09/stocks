@@ -115,7 +115,7 @@ export function advanceSimulationOneYear(
     h.currentWeight = endTotalAssets > 0 ? h.currentValueKRW / endTotalAssets : 0;
   }
 
-  const effectiveStartAssets = startAssetsKRW + annualDepositKRW;
+  const effectiveStartAssets = startAssetsKRW;
   let subperiodReturn = 0;
   if (effectiveStartAssets > 0) {
     subperiodReturn = (endTotalAssets - effectiveStartAssets) / effectiveStartAssets;
@@ -145,10 +145,10 @@ export function advanceSimulationOneYear(
 
   const feeRate = settings.feeRate || 0.001;
   const isFirstYear = historySoFar.length === 0;
-  const deposit = isFirstYear ? 0 : annualDepositKRW;
+  const deposit = annualDepositKRW;
   const depositAfterFee = deposit * (1 - feeRate);
 
-  const initialBaseVal = (settings.initialCashKRW || 10000000) * (1 - feeRate);
+  const initialBaseVal = ((settings.initialCashKRW || 10000000) + (settings.annualContributionKRW || 0)) * (1 - feeRate);
   const lastKospiVal = lastRecord?.benchmarkLevels?.kospiValue ?? initialBaseVal;
   const lastSp500Val = lastRecord?.benchmarkLevels?.sp500Value ?? initialBaseVal;
   const lastBlendVal = lastRecord?.benchmarkLevels?.blend5050Value ?? initialBaseVal;

@@ -65,7 +65,7 @@ export function simulateBenchmarkSeries(
   totalValueKRW: number;
   finalTwrIndex: number;
 } {
-  let portfolioValue = initialCapitalKRW * (1 - feeRate);
+  let portfolioValue = (initialCapitalKRW + annualContributionKRW) * (1 - feeRate);
   let twrIndex = 100.0;
   const history: { year: number; returnRate: number; totalAssetsKRW: number; twrIndexLevel: number }[] = [];
 

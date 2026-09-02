@@ -153,7 +153,7 @@ export function generateYearReplayData(
   cumulativePrincipalKRW: number,
   runningPeakAssetsKRW: number,
   settings: GameSettings,
-  historyYearsCount: number
+  _historyYearsCount: number
 ): YearReplayData {
   const quality = getMonthlyReplayQuality(year, holdings);
   const crisisEvent = getCrisisEventForYear(year);
@@ -290,7 +290,7 @@ export function generateYearReplayData(
     year,
     quality,
     startTotalAssetsKRW: startAssetsKRW,
-    annualContributionKRW: historyYearsCount === 0 ? 0 : settings.annualContributionKRW,
+    annualContributionKRW: settings.annualContributionKRW || 0,
     cashBeforeReplayKRW: startCashKRW,
     holdings,
     points,

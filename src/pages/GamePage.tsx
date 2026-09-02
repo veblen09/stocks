@@ -167,13 +167,13 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   // Calculate current portfolio values
   const currentAssets = calculatePortfolioValue(cashKRW, holdings, priorYear);
   const initialCashKRW = settings.initialCashKRW || 10000000;
-  const isFirstSimulationYear = currentYear === settings.startYear;
-  const totalInvestedPrincipal = initialCashKRW + (isFirstSimulationYear ? 0 : history.length * (settings.annualContributionKRW || 0));
+  const totalDepositCount = history.length + 1;
+  const totalInvestedPrincipal = initialCashKRW + totalDepositCount * (settings.annualContributionKRW || 0);
 
   const purePnL = calculatePureInvestmentPnL(
     currentAssets,
     initialCashKRW,
-    isFirstSimulationYear ? 0 : history.length * (settings.annualContributionKRW || 0)
+    totalDepositCount * (settings.annualContributionKRW || 0)
   );
 
   // Peak and Drawdown
@@ -434,8 +434,8 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Annual Contribution Notice Banner for subsequent years */}
-      {!isFirstSimulationYear && settings.annualContributionKRW > 0 && (
+      {/* Annual Contribution Notice Banner */}
+      {settings.annualContributionKRW > 0 && (
         <div className="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-emerald-950 shadow-xs animate-in fade-in">
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shrink-0">
@@ -451,7 +451,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             </div>
           </div>
           <span className="text-[11px] font-mono font-bold text-emerald-800 shrink-0 bg-white/90 px-2.5 py-1 rounded-lg border border-emerald-200">
-            누적 {history.length}회차 적립
+            누적 {history.length + 1}회차 적립
           </span>
         </div>
       )}
@@ -493,7 +493,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             </span>
           </div>
           <span className="text-[10px] text-slate-400 font-mono">
-            초기 {formatKRW(initialCashKRW)} + 적립 {history.length}회({formatKRW(isFirstSimulationYear ? 0 : history.length * settings.annualContributionKRW)})
+            초기 {formatKRW(initialCashKRW)} + 적립 {history.length + 1}회({formatKRW((history.length + 1) * settings.annualContributionKRW)})
           </span>
         </div>
 

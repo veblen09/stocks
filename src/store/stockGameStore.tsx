@@ -52,7 +52,7 @@ const INITIAL_STATE: StockGameState = {
   isGameOver: false,
   settings: DEFAULT_SETTINGS,
   currentYear: 1980,
-  cashKRW: 10000000,
+  cashKRW: DEFAULT_SETTINGS.initialCashKRW + DEFAULT_SETTINGS.annualContributionKRW,
   holdings: {},
   history: [],
   tradeLogs: [],
@@ -212,7 +212,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         showRealPurchasingPower: settings.showRealPurchasingPower ?? true,
         universeMode: settings.universeMode || 'CLASSIC_50',
         currentYear: startYear,
-        cashKRW: initialCash,
+        cashKRW: initialCash + (settings.annualContributionKRW || 0),
         holdings: {},
         history: [],
         tradeLogs: [],
@@ -615,8 +615,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
       if (state.isGameOver) return state;
       try {
         const year = state.currentYear;
-        const isFirstSimYear = year === state.settings.startYear;
-        const deposit = isFirstSimYear ? 0 : state.settings.annualContributionKRW;
+        const deposit = state.settings.annualContributionKRW || 0;
 
         const priorYear = year === state.settings.startYear ? 1979 : year - 1;
         const startAssets = calculatePortfolioValue(state.cashKRW, state.holdings, priorYear);
@@ -890,7 +889,7 @@ function gameReducer(state: StockGameState, action: Action): StockGameState {
         monthlyReplaySpeed: settings.monthlyReplaySpeed || 'NORMAL',
         showRealPurchasingPower: settings.showRealPurchasingPower ?? true,
         currentYear: startYear,
-        cashKRW: initialCash,
+        cashKRW: initialCash + (settings.annualContributionKRW || 0),
         holdings: {},
         history: [],
         tradeLogs: [],

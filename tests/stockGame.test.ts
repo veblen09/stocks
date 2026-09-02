@@ -132,7 +132,7 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
       1982,
       currentCashWithDeposit,
       {},
-      startAssets,
+      currentCashWithDeposit,
       deposit,
       0,
       [],
@@ -140,7 +140,7 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
     );
 
     expect(res.performanceRecord.annualDepositKRW).toBe(3000000);
-    expect(res.performanceRecord.startTotalAssetsKRW).toBe(10000000);
+    expect(res.performanceRecord.startTotalAssetsKRW).toBe(13000000);
     // Cash earned 0% return
     expect(res.performanceRecord.endTotalAssetsKRW).toBe(13000000);
     expect(res.performanceRecord.annualReturn).toBe(0.0);
@@ -479,6 +479,64 @@ describe('머니트랙 45년 한·미 주식투자 실험실 - 18대 핵심 단�
     expect(res.updatedHoldings['KR_000270'].shares).toBeGreaterThan(0);
     expect(res.updatedCash).toBeLessThan(cash1982);
     expect(res.updatedCash).toBeCloseTo(cash1982 - (buyAmount + res.totalFees), -1);
+  });
+
+  // Test 23: 1980년 시작 시 1,300만원(기본 1000만 + 1년차 300만)으로 주식 매수 및 1년 시뮬레이션 진행
+  it('23. 1980년 1,300만원 현금으로 시작하여 삼성전자 매수 시 정상 체결 및 1980년 연간 자산 변동이 정상 반영되는지', () => {
+    const initialCashWithContribution = 13000000;
+    const buyAmount = 10000000;
+
+    // 1980년에 삼성전자 1,000만원 매수
+    const buyRes = executeBuy('KR_005930', buyAmount, initialCashWithContribution, {}, 1980, TEST_SETTINGS);
+    expect(buyRes.updatedHoldings['KR_005930']).toBeDefined();
+    expect(buyRes.updatedHoldings['KR_005930'].shares).toBeGreaterThan(0);
+    expect(buyRes.updatedCash).toBeCloseTo(3000000 - buyRes.totalFees, -1);
+
+    // 1980년 1년 시뮬레이션 진행
+    const startAssets = calculatePortfolioValue(buyRes.updatedCash, buyRes.updatedHoldings, 1979);
+    const stepRes = advanceSimulationOneYear(
+      1980,
+      buyRes.updatedCash,
+      buyRes.updatedHoldings,
+      startAssets,
+      3000000,
+      buyRes.totalFees,
+      [],
+      TEST_SETTINGS
+    );
+
+    // 삼성전자 1980년 주가 상승에 따라 1980년 말 총 자산 변동 확인
+    expect(stepRes.performanceRecord.startTotalAssetsKRW).toBeCloseTo(13000000 - buyRes.totalFees, -1);
+    expect(stepRes.performanceRecord.endTotalAssetsKRW).toBeGreaterThan(13000000 - buyRes.totalFees);
+    expect(stepRes.performanceRecord.annualReturn).toBeGreaterThan(0.05); // 삼성전자 1980년 상승 반영
+  });
+
+  // Test 24: 1981년 진입 시 새로운 300만원 추가 적립 및 누적 1,600만원 확인
+  it('24. 1980년 완료 후 1981년 진입 시 300만원 추가 입금으로 누적 납입원금 1,600만원이 되는지', () => {
+    const initialCash = 10000000;
+    const annualContribution = 3000000;
+    const year1Cash = initialCash + annualContribution; // 1,300만원
+
+    // 1980년 시뮬레이션
+    const stepRes = advanceSimulationOneYear(
+      1980,
+      year1Cash,
+      {},
+      year1Cash,
+      annualContribution,
+      0,
+      [],
+      TEST_SETTINGS
+    );
+
+    // 1981년 연초 새로운 300만원 입금
+    const nextYearDeposit = annualContribution;
+    const cash1981 = stepRes.updatedCash + nextYearDeposit;
+    expect(cash1981).toBe(16000000);
+
+    // 누적 납입원금 계산 (history length 1 + 1회 = 2회 적립 -> 1000만 + 300만*2 = 1600만)
+    const totalInvested1981 = initialCash + (1 + 1) * annualContribution;
+    expect(totalInvested1981).toBe(16000000);
   });
 });
 
