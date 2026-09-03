@@ -44,7 +44,7 @@ describe('Live Market Replay Engine Tests', () => {
     expect(quality2008).toBe('VERIFIED_MONTHLY');
   });
 
-  it('2. Month 1 data slice should strictly contain Month 1 and zero future month leaks', () => {
+  it('2. Month 1 data slice should strictly contain Month 0 (1/1) and Month 1 with zero future month leaks', () => {
     const holdings: Record<string, StockHolding> = {
       'KR_005930': {
         canonicalId: 'KR_005930',
@@ -69,18 +69,25 @@ describe('Live Market Replay Engine Tests', () => {
       0
     );
 
-    expect(replayData.points.length).toBe(12);
+    // Total 13 points (month 0 to month 12)
+    expect(replayData.points.length).toBe(13);
 
-    // Visible slice at Month 1 (index 0)
-    const month1Slice = replayData.points.slice(0, 1);
-    expect(month1Slice.length).toBe(1);
-    expect(month1Slice[0].month).toBe(1);
-    expect(month1Slice[0].date).toBe('2008-01-28');
+    // Month 0 (index 0): Jan 1st start baseline
+    expect(replayData.points[0].month).toBe(0);
+    expect(replayData.points[0].date).toBe('2008-01-01');
+    expect(replayData.points[0].portfolioValueKRW).toBe(5000000);
+    expect(replayData.points[0].primaryBenchmarkValueKRW).toBe(5000000);
 
-    // Visible slice at Month 6 (index 5)
-    const month6Slice = replayData.points.slice(0, 6);
-    expect(month6Slice.length).toBe(6);
-    expect(month6Slice[5].month).toBe(6);
+    // Visible slice at Month 1 (index 0 and index 1: 2 points)
+    const month1Slice = replayData.points.slice(0, 2);
+    expect(month1Slice.length).toBe(2);
+    expect(month1Slice[1].month).toBe(1);
+    expect(month1Slice[1].date).toBe('2008-01-28');
+
+    // Visible slice at Month 6 (index 0 to 6: 7 points)
+    const month6Slice = replayData.points.slice(0, 7);
+    expect(month6Slice.length).toBe(7);
+    expect(month6Slice[6].month).toBe(6);
     expect(month6Slice.every(p => p.month <= 6)).toBe(true);
   });
 
@@ -201,13 +208,13 @@ describe('Live Market Replay Engine Tests', () => {
       DEFAULT_SETTINGS
     );
 
-    // Months 1 to 9 should remain identical
-    for (let m = 1; m <= 9; m++) {
-      expect(recalculated.points[m - 1].portfolioValueKRW).toBe(originalData.points[m - 1].portfolioValueKRW);
+    // Month 0 and Months 1 to 9 should remain identical
+    for (let m = 0; m <= 9; m++) {
+      expect(recalculated.points[m].portfolioValueKRW).toBe(originalData.points[m].portfolioValueKRW);
     }
 
     // Month 10 should reflect new cash and fewer shares
-    expect(recalculated.points[9].cashKRW).toBe(updatedCash);
+    expect(recalculated.points[10].cashKRW).toBe(updatedCash);
   });
 
   it('7. Historical news should only be available in or after its availableFrom month', () => {
@@ -252,7 +259,7 @@ describe('Live Market Replay Engine Tests', () => {
         yr - 1980
       );
 
-      expect(data.points.length).toBe(12);
+      expect(data.points.length).toBe(13);
       data.points.forEach(p => {
         expect(Number.isFinite(p.portfolioValueKRW)).toBe(true);
         expect(Number.isFinite(p.ytdReturn)).toBe(true);
@@ -288,7 +295,7 @@ describe('Live Market Replay Engine Tests', () => {
       1
     );
 
-    const month12 = data2008.points[11];
+    const month12 = data2008.points[12];
     expect(month12.monthsUnderwater).toBeGreaterThanOrEqual(1);
     expect(data2008.maxMonthsUnderwater).toBeGreaterThanOrEqual(1);
   });
@@ -318,7 +325,7 @@ describe('Live Market Replay Engine Tests', () => {
       7
     );
 
-    const month10 = data1987.points[9];
+    const month10 = data1987.points[10];
     expect(month10.month).toBe(10);
     expect(month10.isCrisisMonth).toBe(true);
     expect(month10.crisisEventId).toBe('crisis_1987_black_monday');
@@ -332,9 +339,9 @@ describe('Live Market Replay Engine Tests', () => {
       DEFAULT_SETTINGS
     );
 
-    expect(recalculated.points.length).toBe(12);
-    expect(recalculated.points[10].month).toBe(11);
-    expect(recalculated.points[11].month).toBe(12);
-    expect(recalculated.points[11].portfolioValueKRW).toBeGreaterThan(0);
+    expect(recalculated.points.length).toBe(13);
+    expect(recalculated.points[11].month).toBe(11);
+    expect(recalculated.points[12].month).toBe(12);
+    expect(recalculated.points[12].portfolioValueKRW).toBeGreaterThan(0);
   });
 });

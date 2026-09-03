@@ -701,7 +701,16 @@ export function getCompanyMonthlyReplaySeries(
     priceKRW: number;
     monthlyReturn: number;
     ytdReturn: number;
-  }[] = [];
+  }[] = [
+    {
+      month: 0,
+      monthLabel: '1/1',
+      priceLocal: pStartLocal,
+      priceKRW: pStartKRW,
+      monthlyReturn: 0,
+      ytdReturn: 0,
+    },
+  ];
 
   let prevPriceLocal = pStartLocal;
   let prevPriceKRW = pStartKRW;

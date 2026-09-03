@@ -55,8 +55,8 @@ export const IndividualStockReplayChart: React.FC<IndividualStockReplayChartProp
   const yRange = yMax - yMin || 1;
 
   const getX = (m: number) => {
-    // 12 months total on X axis
-    return padLeft + ((m - 1) / 11) * chartW;
+    // 13 points total (0: 1/1, 1..12: 1~12월)
+    return padLeft + (m / 12) * chartW;
   };
 
   const getY = (val: number) => {
@@ -108,7 +108,9 @@ export const IndividualStockReplayChart: React.FC<IndividualStockReplayChartProp
 
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 block font-sans">누적 YTD ({currentMonth}월)</span>
+            <span className="text-[10px] text-slate-400 block font-sans">
+              누적 YTD ({currentMonth === 0 ? '1/1' : `${currentMonth}월`})
+            </span>
             <span
               className={`font-bold text-sm ${
                 latestPoint.ytdReturn >= 0 ? 'text-emerald-400' : 'text-rose-400'
@@ -120,14 +122,15 @@ export const IndividualStockReplayChart: React.FC<IndividualStockReplayChartProp
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] text-slate-400 block font-sans">{currentMonth}월 당월</span>
+            <span className="text-[10px] text-slate-400 block font-sans">
+              {currentMonth === 0 ? '1/1 기준' : `${currentMonth}월 당월`}
+            </span>
             <span
               className={`font-bold text-sm ${
                 latestPoint.monthlyReturn >= 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}
             >
-              {latestPoint.monthlyReturn >= 0 ? '+' : ''}
-              {formatPercent(latestPoint.monthlyReturn)}
+              {currentMonth === 0 ? '기준가' : `${latestPoint.monthlyReturn >= 0 ? '+' : ''}${formatPercent(latestPoint.monthlyReturn)}`}
             </span>
           </div>
 
@@ -249,10 +252,11 @@ export const IndividualStockReplayChart: React.FC<IndividualStockReplayChartProp
             );
           })}
 
-          {/* X Axis month nodes 1..12 */}
-          {Array.from({ length: 12 }, (_, i) => i + 1).map(m => {
+          {/* X Axis month nodes 0 (1/1) .. 12 */}
+          {Array.from({ length: 13 }, (_, i) => i).map(m => {
             const x = getX(m);
             const isRevealed = m <= currentMonth;
+            const label = m === 0 ? '1/1' : `${m}월`;
 
             return (
               <g key={m}>
@@ -265,7 +269,7 @@ export const IndividualStockReplayChart: React.FC<IndividualStockReplayChartProp
                   fontFamily="monospace"
                   fontWeight={m === currentMonth ? 'bold' : 'normal'}
                 >
-                  {m}월
+                  {label}
                 </text>
               </g>
             );

@@ -162,7 +162,7 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
               {/* Current Assets */}
               <div className="p-3.5 bg-slate-900 text-white rounded-2xl shadow-md flex flex-col justify-between">
                 <span className="text-[11px] font-bold text-slate-300 font-sans">
-                  현재 총 평가자산 ({currentPoint.month}월)
+                  현재 총 평가자산 ({currentPoint.month === 0 ? '1/1' : `${currentPoint.month}월`})
                 </span>
                 <div className="my-1">
                   <AnimatedPortfolioValue
@@ -211,7 +211,7 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
                   />
                 </div>
                 <span className={`text-[10px] font-bold font-sans ${getReturnColor(currentPoint.monthlyReturn)}`}>
-                  {currentPoint.month}월 당월: {formatPercent(currentPoint.monthlyReturn)}
+                  {currentPoint.month === 0 ? '1/1 연초 시작' : `${currentPoint.month}월 당월: ${formatPercent(currentPoint.monthlyReturn)}`}
                 </span>
               </div>
 
@@ -296,7 +296,7 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
               year={yearData.year}
               currentMonth={currentPoint.month}
               totalMonths={12}
-              onSelectMonth={m => setCurrentMonthIndex(m - 1)}
+              onSelectMonth={m => setCurrentMonthIndex(m)}
             />
 
             {/* Risk & Drawdown Gauge */}

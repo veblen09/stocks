@@ -78,17 +78,18 @@ describe('Individual Company Price Charts Engine Tests', () => {
   });
 
   describe('2. Real-Time Replay Series (Replay Phase)', () => {
-    it('should generate real-time points for Month 1 up to currentMonth', () => {
+    it('should generate real-time points for Month 0 (1/1) up to currentMonth', () => {
       const year = 2008;
       const currentMonth = 6;
       const replay = getCompanyMonthlyReplaySeries('KR_005930', year, currentMonth);
 
       expect(replay).not.toBeNull();
-      expect(replay?.points.length).toBe(currentMonth);
+      // Total currentMonth + 1 points (month 0 to month 6)
+      expect(replay?.points.length).toBe(currentMonth + 1);
 
-      // Verify points match 1..6
+      // Verify points match 0..6
       replay?.points.forEach((p, idx) => {
-        expect(p.month).toBe(idx + 1);
+        expect(p.month).toBe(idx);
         expect(p.priceKRW).toBeGreaterThan(0);
         expect(Number.isFinite(p.monthlyReturn)).toBe(true);
         expect(Number.isFinite(p.ytdReturn)).toBe(true);
@@ -97,7 +98,8 @@ describe('Individual Company Price Charts Engine Tests', () => {
 
     it('should never leak future months beyond currentMonth', () => {
       const replay = getCompanyMonthlyReplaySeries('US_MSFT', 2020, 4);
-      expect(replay?.points.length).toBe(4);
+      // Month 0, 1, 2, 3, 4 = 5 points
+      expect(replay?.points.length).toBe(5);
       expect(replay?.points.some(p => p.month > 4)).toBe(false);
     });
   });

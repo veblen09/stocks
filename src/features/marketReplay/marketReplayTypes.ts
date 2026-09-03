@@ -29,9 +29,9 @@ export interface ReplaySettings {
 
 export interface MonthlyPortfolioPoint {
   year: number;
-  month: number; // 1 ~ 12
+  month: number; // 0 (1/1 연초 시작) ~ 12
   date: string; // YYYY-MM-DD
-  monthLabelKo: string; // e.g. "1월"
+  monthLabelKo: string; // e.g. "1/1" or "1월"
 
   // Wealth & Principal
   portfolioValueKRW: number;

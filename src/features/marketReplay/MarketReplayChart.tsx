@@ -56,7 +56,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   const valRange = Math.max(1, maxVal - minVal);
 
   const getX = (monthIdx: number) => {
-    return padding.left + (monthIdx / 11) * plotWidth;
+    return padding.left + (monthIdx / 12) * plotWidth;
   };
 
   const getY = (val: number) => {
@@ -158,11 +158,12 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           strokeWidth="1"
         />
 
-        {/* Months X-Axis Grid & Labels (1~12월) */}
-        {Array.from({ length: 12 }).map((_, idx) => {
+        {/* Months X-Axis Grid & Labels (1/1 시작 ~ 12월, 총 13개) */}
+        {Array.from({ length: 13 }).map((_, idx) => {
           const x = getX(idx);
           const isRevealed = idx < visiblePoints.length;
           const isCurrent = idx === visiblePoints.length - 1;
+          const label = idx === 0 ? '1/1' : `${idx}월`;
 
           return (
             <g key={idx}>
@@ -179,15 +180,15 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
                 x={x}
                 y={bottomY + 18}
                 textAnchor="middle"
-                className={`transition-colors font-sans text-[11px] ${
+                className={`transition-colors font-sans ${idx === 0 ? 'text-[10px]' : 'text-[11px]'} ${
                   isCurrent
                     ? 'fill-blue-600 font-extrabold text-xs'
                     : isRevealed
-                    ? 'fill-slate-700 font-bold'
+                    ? idx === 0 ? 'fill-blue-600 font-bold' : 'fill-slate-700 font-bold'
                     : 'fill-slate-300'
                 }`}
               >
-                {idx + 1}월
+                {label}
               </text>
             </g>
           );
@@ -354,14 +355,18 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
         >
           <div className="flex items-center justify-between gap-3 text-[11px] pb-1.5 border-b border-slate-700">
             <span className="font-extrabold text-blue-300">
-              {visiblePoints[hoveredPointIndex].year}년 {visiblePoints[hoveredPointIndex].month}월
+              {visiblePoints[hoveredPointIndex].month === 0
+                ? `${visiblePoints[hoveredPointIndex].year}년 1월 1일 (시작)`
+                : `${visiblePoints[hoveredPointIndex].year}년 ${visiblePoints[hoveredPointIndex].month}월`}
             </span>
             <span
               className={`font-bold ${
                 visiblePoints[hoveredPointIndex].monthlyReturn >= 0 ? 'text-emerald-400' : 'text-rose-400'
               }`}
             >
-              당월: {formatPercent(visiblePoints[hoveredPointIndex].monthlyReturn)}
+              {visiblePoints[hoveredPointIndex].month === 0
+                ? '출발선 (기준)'
+                : `당월: ${formatPercent(visiblePoints[hoveredPointIndex].monthlyReturn)}`}
             </span>
           </div>
           <div className="pt-1.5 space-y-1 text-[10px]">

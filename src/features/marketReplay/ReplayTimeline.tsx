@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ReplayTimelineProps {
   year: number;
-  currentMonth: number; // 1 to 12
+  currentMonth: number; // 0 (1/1) to 12
   totalMonths?: number;
   onSelectMonth?: (m: number) => void;
   className?: string;
@@ -24,7 +24,7 @@ export const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-slate-900 font-black text-sm tracking-tight">{year}년</span>
           <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-mono">
-            {currentMonth}월 / {totalMonths}월
+            {currentMonth === 0 ? '1/1 (연초 시작)' : `${currentMonth}월 / ${totalMonths}월`}
           </span>
         </div>
         <div className="flex items-center gap-1 font-mono text-[11px] text-slate-500">
@@ -41,13 +41,14 @@ export const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
           style={{ width: `calc(${(currentMonth / totalMonths) * 100}% - 3px)` }}
         />
 
-        {/* Month Buttons Grid */}
-        <div className="relative grid grid-cols-12 gap-1 text-center text-xs font-mono">
-          {Array.from({ length: totalMonths }).map((_, idx) => {
-            const m = idx + 1;
+        {/* Month Buttons Grid (0: 1/1 start + 1..12) */}
+        <div className="relative grid grid-cols-[repeat(13,minmax(0,1fr))] gap-0.5 sm:gap-1 text-center text-xs font-mono">
+          {Array.from({ length: 13 }).map((_, idx) => {
+            const m = idx;
             const isCompleted = m < currentMonth;
             const isCurrent = m === currentMonth;
             const isFuture = m > currentMonth;
+            const label = m === 0 ? '1/1' : `${m}월`;
 
             return (
               <button
@@ -55,7 +56,7 @@ export const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
                 type="button"
                 disabled={isFuture}
                 onClick={() => isCompleted && onSelectMonth && onSelectMonth(m)}
-                className={`py-1.5 rounded-lg font-bold transition-all text-[11px] flex flex-col items-center justify-center ${
+                className={`py-1.5 rounded-lg font-bold transition-all text-[10px] sm:text-[11px] flex flex-col items-center justify-center ${
                   isCurrent
                     ? 'bg-white text-blue-700 shadow-md font-black ring-2 ring-blue-500 z-10 scale-105'
                     : isCompleted
@@ -63,8 +64,8 @@ export const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
                     : 'text-slate-400 opacity-60 cursor-not-allowed'
                 }`}
               >
-                <span>{m}월</span>
-                <span className="text-[9px] mt-0.5">
+                <span>{label}</span>
+                <span className="text-[8px] sm:text-[9px] mt-0.5">
                   {isCurrent ? '◉' : isCompleted ? '●' : '○'}
                 </span>
               </button>

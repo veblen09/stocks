@@ -161,13 +161,67 @@ export function generateYearReplayData(
   // Month 0 (start of year reference)
   let prevMonthValue = startAssetsKRW;
   let runningPeak = Math.max(runningPeakAssetsKRW, startAssetsKRW);
-  let monthsUnderwaterCount = 0;
-
   const points: MonthlyPortfolioPoint[] = [];
   let bestMonth = { month: 1, returnRate: -999 };
   let worstMonth = { month: 1, returnRate: 999 };
   let maxIntraYearDrawdown = 0;
   let maxUnderwater = 0;
+  let monthsUnderwaterCount = 0;
+
+  // Month 0 (1월 1일 연초 시작 baseline 앵커)
+  let totalStockValStart = 0;
+  let krStockValStart = 0;
+  let usStockValStart = 0;
+
+  for (const cid in holdings) {
+    const h = holdings[cid];
+    if (h.shares <= 0) continue;
+    const pKRW = getStockPriceKRW(cid, year - 1) || 1;
+    const stockVal = h.shares * pKRW;
+    totalStockValStart += stockVal;
+    if (cid.startsWith('KR_')) {
+      krStockValStart += stockVal;
+    } else {
+      usStockValStart += stockVal;
+    }
+  }
+
+  const initialInvested = cumulativePrincipalKRW;
+  const initialPnLKRW = startAssetsKRW - initialInvested;
+  const initialPnLPercent = initialInvested > 0 ? initialPnLKRW / initialInvested : 0;
+  const initialDrawdown = runningPeak > 0 ? (startAssetsKRW - runningPeak) / runningPeak : 0;
+  const initialLossFromPeak = Math.max(0, runningPeak - startAssetsKRW);
+
+  // Index 0: 1월 1일 출발선 (내 자산과 벤치마크가 정확히 동일한 100% 시작점)
+  points.push({
+    year,
+    month: 0,
+    date: `${year}-01-01`,
+    monthLabelKo: '1/1',
+    portfolioValueKRW: startAssetsKRW,
+    cashKRW: startCashKRW,
+    holdingsValueKRW: totalStockValStart,
+    cumulativeContributionsKRW: initialInvested,
+    investmentPnLKRW: initialPnLKRW,
+    investmentPnLPercent: initialPnLPercent,
+    monthlyReturn: 0,
+    ytdReturn: 0,
+    runningPeakKRW: runningPeak,
+    drawdown: initialDrawdown,
+    lossFromPeakKRW: initialLossFromPeak,
+    monthsUnderwater: 0,
+    isNewHigh: false,
+    krWeight: startAssetsKRW > 0 ? krStockValStart / startAssetsKRW : 0,
+    usWeight: startAssetsKRW > 0 ? usStockValStart / startAssetsKRW : 0,
+    cashWeight: startAssetsKRW > 0 ? startCashKRW / startAssetsKRW : 1,
+    primaryBenchmarkValueKRW: startAssetsKRW,
+    primaryBenchmarkYtdReturn: 0,
+    kospiYtdReturn: 0,
+    sp500YtdReturn: 0,
+    riskLevel: calculateRiskLevel(initialDrawdown),
+    newlyAvailableNews: [],
+    isCrisisMonth: false,
+  });
 
   for (let m = 1; m <= 12; m++) {
     const mStr = m.toString().padStart(2, '0');
@@ -312,12 +366,12 @@ export function recalculateRemainingMonths(
   settings: GameSettings
 ): YearReplayData {
   const points = [...existingData.points];
-  let runningPeak = existingData.points[crisisMonth - 1]?.runningPeakKRW || existingData.startTotalAssetsKRW;
-  let prevMonthVal = existingData.points[crisisMonth - 1]?.portfolioValueKRW || existingData.startTotalAssetsKRW;
-  let monthsUnderwaterCount = existingData.points[crisisMonth - 1]?.monthsUnderwater || 0;
+  let runningPeak = existingData.points[crisisMonth]?.runningPeakKRW || existingData.startTotalAssetsKRW;
+  let prevMonthVal = existingData.points[crisisMonth]?.portfolioValueKRW || existingData.startTotalAssetsKRW;
+  let monthsUnderwaterCount = existingData.points[crisisMonth]?.monthsUnderwater || 0;
 
   for (let m = crisisMonth + 1; m <= 12; m++) {
-    const idx = m - 1;
+    const idx = m; // With month 0 included, index equals month number
 
     let totalStockVal = 0;
     let krStockVal = 0;
