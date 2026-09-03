@@ -5,7 +5,6 @@ import {
   Building2,
   Newspaper,
   FileText,
-  LineChart,
   Edit3,
   ExternalLink,
   Sparkles,
@@ -308,21 +307,7 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({
         {/* 2. Split 2-Column Body (Left: Stock Price Chart & Market Overview / Right: Details Tabs & Eye-Catching Buy Studio) */}
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
           {/* LEFT COLUMN: Dedicated Stock Chart Studio (Always Visible) */}
-          <div className="w-full lg:w-[50%] xl:w-[52%] flex flex-col bg-slate-50/60 overflow-y-auto p-4 sm:p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-blue-100 text-blue-700 font-bold">
-                  <LineChart size={16} />
-                </span>
-                <h3 className="font-black text-slate-900 text-base tracking-tight">
-                  {overview.nameKo} 주가 차트 & 시세 분석
-                </h3>
-              </div>
-              <span className="text-xs text-slate-500 font-mono">
-                {currentYear - 1}년 12월 31일 종가 기준
-              </span>
-            </div>
-
+          <div className="w-full lg:w-[50%] xl:w-[52%] flex flex-col bg-slate-50/60 overflow-y-auto p-4 sm:p-5 space-y-3.5">
             {/* Always Rendered Interactive Naver-Style Price Chart */}
             <CompanyPriceChart
               canonicalId={canonicalId}

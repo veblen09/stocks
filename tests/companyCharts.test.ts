@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   getCompanyHistoricalPriceSeries,
   getCompanyMonthlyReplaySeries,
+  getCompanyNaverChartData,
+  getCompany1YrSparkline,
 } from '../src/engine/companyChartEngine';
 import { STOCKS_BY_ID } from '../src/engine/returnEngine';
 
@@ -104,7 +106,52 @@ describe('Individual Company Price Charts Engine Tests', () => {
     });
   });
 
-  describe('3. Robustness Across All 50 Universe Stocks', () => {
+  describe('3. Naver Finance High-Resolution Series & Non-Linearity', () => {
+    it('should generate high-resolution non-straight price curve for INTC in 1982 (1-Year Mountain & Day)', () => {
+      const chart1Y = getCompanyNaverChartData('US_INTC', 1982, 'LINE', '1Y');
+      expect(chart1Y).not.toBeNull();
+      expect(chart1Y?.candles.length).toBeGreaterThanOrEqual(100); // High-res daily simulation
+      
+      // Verify price curve is not a single straight line
+      const closes = chart1Y!.candles.map(c => c.close);
+      const firstClose = closes[0];
+      const lastClose = closes[closes.length - 1];
+      expect(firstClose).toBeGreaterThan(0);
+      expect(lastClose).toBeGreaterThan(0);
+
+      // Check standard deviation of price changes or intermediate variance
+      let intermediateFluctuations = 0;
+      for (let i = 1; i < closes.length - 1; i++) {
+        const expectedLinear = firstClose + (lastClose - firstClose) * (i / (closes.length - 1));
+        const diff = Math.abs(closes[i] - expectedLinear);
+        if (diff > 0.5) intermediateFluctuations++;
+      }
+      expect(intermediateFluctuations).toBeGreaterThan(10); // Confirms realistic market wave, not straight line!
+
+      // Verify volume
+      expect(chart1Y?.totalVolume).toBeGreaterThan(0);
+      chart1Y?.candles.forEach(c => {
+        expect(c.volume).toBeGreaterThan(0);
+        expect(c.high).toBeGreaterThanOrEqual(c.low);
+      });
+    });
+
+    it('should calculate accurate moving averages (MA5, MA20, MA60, MA120) for candlestick mode', () => {
+      const candleData = getCompanyNaverChartData('KR_005930', 2020, 'DAY', '1Y');
+      expect(candleData).not.toBeNull();
+      expect(candleData?.candles.length).toBeGreaterThan(60);
+
+      const lateCandle = candleData!.candles[candleData!.candles.length - 1];
+      expect(lateCandle.ma5).not.toBeNull();
+      expect(lateCandle.ma20).not.toBeNull();
+      expect(lateCandle.ma60).not.toBeNull();
+      expect(Number.isFinite(lateCandle.ma5!)).toBe(true);
+      expect(Number.isFinite(lateCandle.ma20!)).toBe(true);
+      expect(Number.isFinite(lateCandle.ma60!)).toBe(true);
+    });
+  });
+
+  describe('4. Robustness Across All 50 Universe Stocks', () => {
     it('should produce strictly valid historical price series for all active stocks', () => {
       const allStockIds = Object.keys(STOCKS_BY_ID);
       expect(allStockIds.length).toBeGreaterThanOrEqual(50);
