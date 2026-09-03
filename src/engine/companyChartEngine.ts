@@ -145,9 +145,39 @@ export interface MonthPriceItem {
 }
 
 /**
+ * Helper to detect if a monthly price sequence is synthetic linear interpolation or flat dummy constants
+ */
+function isSyntheticLinearOrFlat(prices: number[]): boolean {
+  if (prices.length < 3) return true;
+
+  const maxP = Math.max(...prices);
+  const minP = Math.min(...prices);
+  const span = maxP - minP;
+
+  // Case 1: Flat dummy constants across the year
+  if (span < 0.001 * Math.max(1, maxP)) return true;
+
+  // Case 2: Pure linear interpolation (P[m] = P0 + m * delta)
+  const diffs: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    diffs.push(prices[i] - prices[i - 1]);
+  }
+
+  const meanDiff = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+  const diffVar = diffs.reduce((a, b) => a + Math.pow(b - meanDiff, 2), 0) / diffs.length;
+  const relDiffStd = Math.sqrt(diffVar) / Math.max(1e-6, span);
+
+  // If standard deviation of month-over-month step is near zero (< 0.015), it is a synthetic straight line
+  if (relDiffStd < 0.02) return true;
+
+  return false;
+}
+
+/**
  * Returns 12 realistic monthly prices for a given year.
- * If raw monthly data is available, uses it.
- * Otherwise, generates a smooth, realistic macroeconomic trajectory connecting startPrice to endPrice.
+ * If authentic raw monthly data is available (with real market variance), uses it.
+ * If raw data is missing, flat, or synthetic linear filler, generates a natural, realistic
+ * autoregressive price wave anchored to startPrice (year-end of y-1) and endPrice (year-end of y).
  */
 export function getYearMonthlyPrices(
   canonicalId: string,
@@ -184,14 +214,12 @@ export function getYearMonthlyPrices(
     }
   }
 
-  // Check if raw data exists AND has real variance (not flat dummy constants)
   const validItems = rawMonths.filter((m): m is MonthPriceItem => m !== null && m.price > 0);
   const validPrices = validItems.map(m => m.price);
-  const rawMax = validPrices.length > 0 ? Math.max(...validPrices) : 0;
-  const rawMin = validPrices.length > 0 ? Math.min(...validPrices) : 0;
-  const hasRealVariance = validCount >= 10 && (rawMax - rawMin) > 0.002 * Math.max(1, rawMax);
+  const isSynthetic = isSyntheticLinearOrFlat(validPrices);
 
-  if (hasRealVariance) {
+  // If complete, non-synthetic real market data exists, use it
+  if (validCount >= 10 && !isSynthetic) {
     const filled: MonthPriceItem[] = [];
     let lastP = (useLocal ? getStockPriceLocal(canonicalId, year - 1) : getStockPriceKRW(canonicalId, year - 1)) || 100;
     for (let m = 1; m <= 12; m++) {
@@ -242,11 +270,11 @@ export function getYearMonthlyPrices(
 
     const remainingMonths = 13 - m;
     const requiredDrift = (Math.log(Math.max(1, endP)) - Math.log(Math.max(1, curRunningPrice))) / remainingMonths;
-    const monthlyVol = 0.048; // Realistic monthly volatility
+    const monthlyVol = 0.052; // Realistic monthly macro volatility ~5.2%
     const shock = pseudoRandNorm(seedBase + m * 37) * monthlyVol;
 
-    // Autoregressive momentum: trend continuity
-    const stepReturn = 0.3 * lastReturn + 0.7 * shock + requiredDrift;
+    // Autoregressive momentum: smooth multi-month waves with trend continuity
+    const stepReturn = 0.32 * lastReturn + 0.68 * shock + requiredDrift;
     lastReturn = stepReturn;
 
     curRunningPrice = Math.max(1, curRunningPrice * Math.exp(stepReturn));
@@ -283,8 +311,6 @@ export function getCompany1YrSparkline(
     getStockPriceKRW(canonicalId, upToYear) ||
     monthlyList[monthlyList.length - 1].price;
 
-  // Build high-resolution 24 bi-weekly points for silky-smooth sparkline
-  const sampledPoints: { x: number; y: number; price: number; month: number }[] = [];
   const rawPrices = [startP, ...monthlyList.map(pt => pt.price)];
 
   const width = 100;
@@ -297,6 +323,7 @@ export function getCompany1YrSparkline(
   const maxP = Math.max(...rawPrices);
   const pRange = maxP - minP || 1;
 
+  const sampledPoints: { x: number; y: number; price: number; month: number }[] = [];
   rawPrices.forEach((p, idx) => {
     const x = (idx / (rawPrices.length - 1)) * width;
     const y = padTop + usableH - ((p - minP) / pRange) * usableH;
@@ -442,7 +469,7 @@ export function getCompanyNaverChartData(
         const daySeed = hashSeed(canonicalId, mItem.year * 100 + mItem.month, d);
         const remainingDays = tradingDaysPerMonth - d + 1;
         const drift = (Math.log(Math.max(1, monthClose)) - Math.log(Math.max(1, currentDayPrice))) / remainingDays;
-        const dailyShock = pseudoRandNorm(daySeed) * 0.011; // ~1.1% daily volatility
+        const dailyShock = pseudoRandNorm(daySeed) * 0.011;
 
         dailyMomentum = 0.35 * dailyMomentum + 0.65 * dailyShock + drift;
         const open = currentDayPrice;
@@ -467,7 +494,6 @@ export function getCompanyNaverChartData(
     });
   } else if (period === '1Y' || (candleType === 'DAY' && period !== '3Y' && period !== '10Y' && period !== 'ALL')) {
     // 1-Year High Resolution: 12 months x 20 trading days = 240 rich daily candles
-    // Uses realistic autoregressive random walk with momentum & smooth multi-day waves
     const targetMonths = allMonthlyList.filter(m => m.year === upToYear);
     const priorYearEnd =
       allMonthlyList.find(m => m.year === upToYear - 1 && m.month === 12)?.price ||
