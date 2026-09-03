@@ -821,7 +821,7 @@
       "COMP_1989_KR_001600"
     ],
     "dataQuality": "HIGH",
-    "description": "당진제철소 과잉 차입투자로 1997년 1월 부도 발생, IMF 외환위기의 도화선이 된 상장폐지 기업"
+    "description": "당진 신제철소 건설과 코렉스(COREX) 차세대 공법 도입을 통해 급성장하는 대형 철강 및 철근 제조사"
   },
   {
     "canonicalCompanyId": "KR_000010",
@@ -852,7 +852,7 @@
       "COMP_1980_KR_000010"
     ],
     "dataQuality": "HIGH",
-    "description": "1980년대 5대 시중은행 대장주였으나 한보·기아 부실채권 직격탄으로 감자 및 매각된 금융사"
+    "description": "1980~90년대 대한민국 5대 시중은행(조상제한서)의 선두주자이자 국가 주요 기간산업과 대기업 대출을 주도하는 대표 시중은행"
   },
   {
     "canonicalCompanyId": "KR_001300",
@@ -883,7 +883,7 @@
       "COMP_1980_KR_001300"
     ],
     "dataQuality": "HIGH",
-    "description": "'세계경영'의 상징이었으나 1999년 대우 워크아웃 및 부채 500% 초과로 해체된 대마불사 종말 기업"
+    "description": "동유럽, 중앙아시아, 중동 등 전 세계 신흥 시장을 개척하며 무역, 건설, 자동차 수출을 주도하는 '세계경영'의 종합상사 기함"
   },
   {
     "canonicalCompanyId": "KR_025930",
@@ -914,7 +914,7 @@
       "COMP_1999_KR_025930"
     ],
     "dataQuality": "HIGH",
-    "description": "SKY 휴대폰 신화로 국내 2위 제조사로 성장했으나 스마트폰 대전환기 자금난으로 사라진 IT 벤처"
+    "description": "프리미엄 브랜드 SKY와 감각적인 디자인 혁신으로 국내 휴대폰 시장 2위에 오른 대표 토종 IT 벤처 기업"
   },
   {
     "canonicalCompanyId": "KR_003550",
@@ -1735,7 +1735,7 @@
       "COMP_1994_US_LEH"
     ],
     "dataQuality": "HIGH",
-    "description": "158년 역사의 미국 4대 투자은행이었으나 서브프라임 모기지 사태로 2008년 파산한 글로벌 금융위기 진원지"
+    "description": "채권 발행, M&A 자문, 주택저당증권(MBS) 및 파생상품 트레이딩을 선도하는 150여 년 전통의 월스트리트 대표 투자은행(IB)"
   },
   {
     "canonicalCompanyId": "US_ENE",
@@ -1766,7 +1766,7 @@
       "COMP_1985_US_ENE"
     ],
     "dataQuality": "HIGH",
-    "description": "혁신적 에너지 기업으로 추앙받았으나 특수목적법인(SPE)을 통한 사상 최대 분식회계로 파산한 기업"
+    "description": "천연가스 및 전력 거래 파생상품과 인터넷 기반 EnronOnline 플랫폼을 개척한 혁신 에너지·금융 트레이딩 기업"
   },
   {
     "canonicalCompanyId": "US_BB",
@@ -1797,7 +1797,7 @@
       "COMP_1999_US_BB"
     ],
     "dataQuality": "HIGH",
-    "description": "쿼티 스마트폰으로 세계 시장 50%를 점유했으나 터치스크린·앱 생태계 전환에 실패하여 급락한 기업"
+    "description": "무선 모바일 이메일 솔루션과 쿼티(QWERTY) 키패드, 독자 보안 네트워크로 글로벌 비즈니스 모바일 시장을 선도하는 스마트 기기 기업"
   },
   {
     "canonicalCompanyId": "US_BBI",
@@ -1828,7 +1828,7 @@
       "COMP_1999_US_BBI"
     ],
     "dataQuality": "HIGH",
-    "description": "9천개 비디오 대여점을 거느렸으나 넷플릭스 인수를 거절하고 디지털 스트리밍 전환에 밀려 파산한 기업"
+    "description": "미국 전역 및 해외 9,000여 개 직영 유통망을 통해 비디오·DVD 대여 및 홈 엔터테인먼트 시장을 지배하는 리테일 체인 기업"
   },
   {
     "canonicalCompanyId": "US_NOK",
@@ -1859,6 +1859,6 @@
       "COMP_1994_US_NOK"
     ],
     "dataQuality": "HIGH",
-    "description": "10여 년간 글로벌 휴대폰 1위였으나 스마트폰 대전환기 실기로 사업부를 매각하고 통신장비사로 재편된 거인"
+    "description": "세계 이동통신 휴대폰 시장 점유율 1위를 질주하는 핀란드 발 글로벌 모바일 기기 및 통신 네트워크 장비 거인"
   }
 ]

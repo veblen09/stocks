@@ -350,8 +350,9 @@ export function generateYearReplayData(
     points,
     bestMonth,
     worstMonth,
-    maxIntraYearDrawdown,
+    maxIntraYearDrawdown: maxIntraYearDrawdown,
     maxMonthsUnderwater: maxUnderwater,
+    primaryBenchmark: settings.primaryBenchmark || 'kospi',
   };
 }
 

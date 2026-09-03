@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { MonthlyPortfolioPoint, MotionPreference } from './marketReplayTypes';
 import { formatKRW, formatPercent } from '../../utils/formatMoney';
 
@@ -12,14 +12,36 @@ interface MarketReplayChartProps {
   motionPreference?: MotionPreference;
 }
 
+/**
+ * Concise KRW formatter for Y-axis scale ticks
+ */
+function formatYAxisKRW(amount: number): string {
+  if (amount <= 0) return '0원';
+  if (amount >= 1000000000000) {
+    const jo = amount / 1000000000000;
+    return `${jo % 1 === 0 ? jo : jo.toFixed(1)}조`;
+  }
+  if (amount >= 100000000) {
+    const eok = amount / 100000000;
+    return `${eok % 1 === 0 ? eok : eok.toFixed(1)}억`;
+  }
+  if (amount >= 10000) {
+    const man = amount / 10000;
+    return `${Math.round(man)}만`;
+  }
+  return `${Math.round(amount)}원`;
+}
+
 export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   points,
   currentMonthIndex,
   startTotalAssetsKRW,
   showBenchmark,
+  benchmarkName = '코스피 200',
   motionPreference = 'NORMAL',
 }) => {
   const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
+  const benchmarkLabel = benchmarkName || '코스피 200';
 
   // STRICT ZERO LOOKAHEAD LEAK: slice strictly from 0 to currentMonthIndex + 1
   const visiblePoints = points.slice(0, Math.min(points.length, currentMonthIndex + 1));
@@ -34,9 +56,9 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   }
 
   // Dimensions & ViewBox
-  const width = 680;
+  const width = 700;
   const height = 240;
-  const padding = { top: 32, right: 96, bottom: 32, left: 55 };
+  const padding = { top: 32, right: 110, bottom: 32, left: 58 };
 
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
@@ -68,6 +90,16 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
     const norm = (val - minVal) / valRange;
     return padding.top + plotHeight - norm * plotHeight;
   };
+
+  // Y-axis tick marks
+  const yTicks = useMemo(() => {
+    const count = 4; // 5 ticks total
+    const ticks: number[] = [];
+    for (let i = 0; i <= count; i++) {
+      ticks.push(minVal + (valRange * i) / count);
+    }
+    return ticks;
+  }, [minVal, valRange]);
 
   // Helper for smooth cubic spline paths
   const getSplinePath = (pts: { x: number; y: number }[]) => {
@@ -117,23 +149,41 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   const portfolioY = getY(currentPoint.portfolioValueKRW);
   const benchmarkY = showBenchmark ? getY(currentPoint.primaryBenchmarkValueKRW) : 0;
 
-  // Collision-free label positioning for right side
+  // Collision-free 2-line label positioning for right side
   let labelPortfolioY = portfolioY;
   let labelBenchmarkY = benchmarkY;
   let labelPeakY = currentPeakY;
 
-  if (showBenchmark && Math.abs(labelPortfolioY - labelBenchmarkY) < 14) {
-    if (labelPortfolioY < labelBenchmarkY) {
-      labelPortfolioY -= 7;
-      labelBenchmarkY += 7;
-    } else {
-      labelPortfolioY += 7;
-      labelBenchmarkY -= 7;
+  const minLabelSpacing = 22;
+  const labelItems: { id: string; y: number }[] = [
+    { id: 'portfolio', y: labelPortfolioY },
+    ...(showBenchmark ? [{ id: 'benchmark', y: labelBenchmarkY }] : []),
+    ...(isUnderwater ? [{ id: 'peak', y: labelPeakY }] : []),
+  ];
+
+  labelItems.sort((a, b) => a.y - b.y);
+
+  for (let i = 1; i < labelItems.length; i++) {
+    if (labelItems[i].y - labelItems[i - 1].y < minLabelSpacing) {
+      labelItems[i].y = labelItems[i - 1].y + minLabelSpacing;
     }
   }
 
-  if (isUnderwater && Math.abs(labelPortfolioY - labelPeakY) < 14) {
-    labelPeakY = Math.min(labelPortfolioY - 14, labelPeakY);
+  const maxAllowedY = bottomY - 6;
+  if (labelItems.length > 0 && labelItems[labelItems.length - 1].y > maxAllowedY) {
+    const overflow = labelItems[labelItems.length - 1].y - maxAllowedY;
+    for (let i = labelItems.length - 1; i >= 0; i--) {
+      labelItems[i].y -= overflow;
+      if (i > 0 && labelItems[i].y - labelItems[i - 1].y < minLabelSpacing) {
+        labelItems[i - 1].y = labelItems[i].y - minLabelSpacing;
+      }
+    }
+  }
+
+  for (const item of labelItems) {
+    if (item.id === 'portfolio') labelPortfolioY = item.y;
+    if (item.id === 'benchmark') labelBenchmarkY = item.y;
+    if (item.id === 'peak') labelPeakY = item.y;
   }
 
   return (
@@ -151,15 +201,15 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           {showBenchmark && (
             <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-bold shadow-2xs">
               <span className="w-3.5 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span>
-              <span>시장 벤치마크 지수</span>
+              <span>시장 벤치마크 ({benchmarkLabel})</span>
             </div>
           )}
 
-          {/* 3. All-time Peak (Only shown if currently in drawdown) */}
+          {/* 3. High-Water Mark Peak Reference Line (Only shown if currently in drawdown) */}
           {isUnderwater && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
-              <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span>
-              <span>역대 최고점 (회복선)</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
+              <span className="w-3.5 h-0.5 border-t-2 border-dashed border-emerald-500 inline-block"></span>
+              <span>최고점 회복 기준선 ({formatKRW(currentPoint.runningPeakKRW)})</span>
             </div>
           )}
         </div>
@@ -187,7 +237,34 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           </filter>
         </defs>
 
-        {/* Chart Background Grid */}
+        {/* Y-Axis Horizontal Grid Lines & Scale Tick Labels */}
+        {yTicks.map((tickVal, idx) => {
+          const y = getY(tickVal);
+          if (y < padding.top - 2 || y > bottomY + 2) return null;
+          return (
+            <g key={`ytick-${idx}`}>
+              <line
+                x1={padding.left}
+                y1={y}
+                x2={padding.left + plotWidth}
+                y2={y}
+                stroke="#f1f5f9"
+                strokeWidth="1"
+                strokeDasharray="3 3"
+              />
+              <text
+                x={padding.left - 8}
+                y={y + 3.5}
+                textAnchor="end"
+                className="fill-slate-400 font-sans text-[9px] font-semibold select-none"
+              >
+                {formatYAxisKRW(tickVal)}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Chart Background Bottom Baseline */}
         <line
           x1={padding.left}
           y1={bottomY}
@@ -211,7 +288,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
                 y1={padding.top}
                 x2={x}
                 y2={bottomY}
-                stroke={isCurrent ? '#93c5fd' : '#f1f5f9'}
+                stroke={isCurrent ? '#93c5fd' : '#f8fafc'}
                 strokeWidth={isCurrent ? '1.5' : '1'}
                 strokeDasharray={isCurrent ? '3 3' : undefined}
               />
@@ -233,7 +310,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           );
         })}
 
-        {/* Peak Asset Dotted Line (역대 최고점 회복 기준선: 오직 낙폭 상태일 때만 표시) */}
+        {/* Peak Asset Reference Guideline (회복 목표 수평 기준선: 오직 낙폭 상태일 때만 표시) */}
         {isUnderwater && currentPeakY >= padding.top && currentPeakY <= bottomY && (
           <g>
             <line
@@ -243,16 +320,26 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               y2={currentPeakY}
               stroke="#10b981"
               strokeWidth="1.2"
-              strokeDasharray="2 2"
-              opacity="0.7"
+              strokeDasharray="3 3"
+              opacity="0.8"
             />
-            <text
-              x={padding.left + plotWidth + 6}
-              y={labelPeakY + 3}
-              className="fill-emerald-600 font-sans text-[9px] font-bold"
-            >
-              역대 최고점
-            </text>
+            {/* Right side label with exact amount */}
+            <g transform={`translate(${padding.left + plotWidth + 6}, ${labelPeakY})`}>
+              <text
+                x={0}
+                y={-1}
+                className="fill-emerald-700 font-sans text-[9px] font-black"
+              >
+                최고점 회복선
+              </text>
+              <text
+                x={0}
+                y={10}
+                className="fill-emerald-600 font-sans text-[8.5px] font-bold"
+              >
+                {formatKRW(currentPoint.runningPeakKRW)}
+              </text>
+            </g>
           </g>
         )}
 
@@ -285,13 +372,22 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               strokeDasharray="4 3"
               opacity="0.85"
             />
-            <text
-              x={lastX + 6}
-              y={labelBenchmarkY + 3}
-              className="fill-slate-600 font-sans text-[9px] font-extrabold"
-            >
-              시장 벤치마크
-            </text>
+            <g transform={`translate(${lastX + 6}, ${labelBenchmarkY})`}>
+              <text
+                x={0}
+                y={-1}
+                className="fill-slate-600 font-sans text-[9px] font-extrabold"
+              >
+                벤치마크 ({benchmarkLabel})
+              </text>
+              <text
+                x={0}
+                y={10}
+                className="fill-slate-500 font-sans text-[8.5px] font-bold"
+              >
+                {formatKRW(currentPoint.primaryBenchmarkValueKRW)}
+              </text>
+            </g>
           </g>
         )}
 
@@ -306,14 +402,23 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           filter="url(#glow)"
         />
 
-        {/* Direct Label on My Portfolio End */}
-        <text
-          x={lastX + 6}
-          y={labelPortfolioY + 3}
-          className="fill-blue-700 font-sans text-[9px] font-black"
-        >
-          내 포트폴리오
-        </text>
+        {/* Direct Label & Value on My Portfolio End */}
+        <g transform={`translate(${lastX + 6}, ${labelPortfolioY})`}>
+          <text
+            x={0}
+            y={-1}
+            className="fill-blue-700 font-sans text-[9px] font-black"
+          >
+            내 포트폴리오
+          </text>
+          <text
+            x={0}
+            y={10}
+            className="fill-blue-600 font-sans text-[9.5px] font-black"
+          >
+            {formatKRW(currentPoint.portfolioValueKRW)}
+          </text>
+        </g>
 
         {/* Visible Monthly Node Points */}
         {visiblePoints.map((p, idx) => {
@@ -396,7 +501,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
             {showBenchmark && (
               <div className="flex justify-between gap-4">
                 <span className="text-slate-400 font-sans font-medium flex items-center gap-1">
-                  <span className="w-2 h-0.5 bg-slate-400 inline-block"></span> 시장 벤치마크:
+                  <span className="w-2 h-0.5 bg-slate-400 inline-block"></span> 벤치마크 ({benchmarkLabel}):
                 </span>
                 <span className="font-bold text-slate-300">
                   {formatKRW(visiblePoints[hoveredPointIndex].primaryBenchmarkValueKRW)}
@@ -425,3 +530,4 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
     </div>
   );
 };
+

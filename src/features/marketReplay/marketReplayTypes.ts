@@ -81,4 +81,5 @@ export interface YearReplayData {
   worstMonth: { month: number; returnRate: number };
   maxIntraYearDrawdown: number;
   maxMonthsUnderwater: number;
+  primaryBenchmark?: 'kospi' | 'sp500' | 'blend5050';
 }

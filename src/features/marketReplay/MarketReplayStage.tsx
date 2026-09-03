@@ -286,6 +286,13 @@ export const MarketReplayStage: React.FC<MarketReplayStageProps> = ({
                   startTotalAssetsKRW={yearData.startTotalAssetsKRW}
                   cumulativePrincipalKRW={currentPoint.cumulativeContributionsKRW}
                   showBenchmark={settings.showBenchmark}
+                  benchmarkName={
+                    yearData.primaryBenchmark === 'sp500'
+                      ? 'S&P 500'
+                      : yearData.primaryBenchmark === 'blend5050'
+                      ? '50:50 혼합'
+                      : '코스피 200'
+                  }
                   motionPreference={settings.motionPreference}
                 />
               )}

@@ -251,5 +251,115 @@
     "relationship": "SAME_ENTITY",
     "contemporaryBusinessKo": "Google Search, YouTube, Google Cloud, Waymo, DeepMind AI",
     "continuityNotes": "글로벌 인공지능 및 디지털 광고 지주사."
+  },
+  {
+    "canonicalCompanyId": "US_ENE",
+    "validFrom": "1985-07-16",
+    "validTo": "9999-12-31",
+    "historicalName": "Enron Corp.",
+    "ticker": "ENE",
+    "market": "US",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "천연가스 및 전력 거래 파생상품과 인터넷 기반 EnronOnline 플랫폼을 개척한 혁신 에너지·금융 트레이딩 기업",
+    "continuityNotes": "1985년 휴스턴 내추럴 가스와 인터노스 합병으로 출범, 미국 최대 에너지 트레이딩 기업으로 급성장."
+  },
+  {
+    "canonicalCompanyId": "US_LEH",
+    "validFrom": "1994-05-27",
+    "validTo": "9999-12-31",
+    "historicalName": "Lehman Brothers Holdings Inc.",
+    "ticker": "LEH",
+    "market": "US",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "채권 발행, M&A 자문, 주택저당증권(MBS) 및 파생상품 트레이딩을 선도하는 150여 년 전통의 월스트리트 대표 투자은행(IB)",
+    "continuityNotes": "1850년 설립된 유서 깊은 미국 4대 글로벌 투자은행."
+  },
+  {
+    "canonicalCompanyId": "US_BB",
+    "validFrom": "1999-02-04",
+    "validTo": "2013-01-29",
+    "historicalName": "Research In Motion Limited (RIM)",
+    "ticker": "RIMM",
+    "market": "US",
+    "relationship": "RENAMED",
+    "contemporaryBusinessKo": "무선 모바일 이메일 솔루션과 쿼티(QWERTY) 키패드, 독자 보안 네트워크로 글로벌 비즈니스 모바일 시장을 선도하는 스마트 기기 기업",
+    "continuityNotes": "1999년 나스닥 상장, 2013년 사명을 BlackBerry로 변경."
+  },
+  {
+    "canonicalCompanyId": "US_BB",
+    "validFrom": "2013-01-30",
+    "validTo": "9999-12-31",
+    "historicalName": "BlackBerry Limited",
+    "ticker": "BB",
+    "market": "US",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "엔터프라이즈 모바일 보안 소프트웨어 및 임베디드 차량용 OS(QNX) 솔루션 기업",
+    "continuityNotes": "스마트폰 제조에서 엔터프라이즈 보안 및 전장 소프트웨어 기업으로 전환."
+  },
+  {
+    "canonicalCompanyId": "US_BBI",
+    "validFrom": "1999-08-11",
+    "validTo": "9999-12-31",
+    "historicalName": "Blockbuster Inc.",
+    "ticker": "BBI",
+    "market": "US",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "미국 전역 및 해외 9,000여 개 직영 유통망을 통해 비디오·DVD 대여 및 홈 엔터테인먼트 시장을 지배하는 리테일 체인 기업",
+    "continuityNotes": "1999년 뉴욕증권거래소 상장, 전 세계 최대 규모의 비디오 대여점 프랜차이즈."
+  },
+  {
+    "canonicalCompanyId": "US_NOK",
+    "validFrom": "1994-07-01",
+    "validTo": "9999-12-31",
+    "historicalName": "Nokia Corporation",
+    "ticker": "NOK",
+    "market": "US",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "세계 이동통신 휴대폰 시장 점유율 1위를 질주하는 핀란드 발 글로벌 모바일 기기 및 통신 네트워크 장비 거인",
+    "continuityNotes": "1994년 뉴욕증권거래소 상장, 글로벌 GSM 이동통신 표준화 및 모바일 기기 시장 선도."
+  },
+  {
+    "canonicalCompanyId": "KR_001600",
+    "validFrom": "1989-11-20",
+    "validTo": "9999-12-31",
+    "historicalName": "한보철강공업(주)",
+    "ticker": "001600",
+    "market": "KR",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "당진 신제철소 건설과 코렉스(COREX) 차세대 공법 도입을 통해 급성장하는 대형 철강 및 철근 제조사",
+    "continuityNotes": "1989년 11월 한국거래소 상장, 대규모 제철 설비 확충을 추진한 대표 철강사."
+  },
+  {
+    "canonicalCompanyId": "KR_000010",
+    "validFrom": "1956-03-03",
+    "validTo": "9999-12-31",
+    "historicalName": "제일은행(주)",
+    "ticker": "000010",
+    "market": "KR",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "1980~90년대 대한민국 5대 시중은행(조상제한서)의 선두주자이자 국가 주요 기간산업과 대기업 대출을 주도하는 대표 시중은행",
+    "continuityNotes": "1956년 3월 한국거래소 상장, 1980~90년대 국내 5대 시중은행 대장주."
+  },
+  {
+    "canonicalCompanyId": "KR_001300",
+    "validFrom": "1975-10-07",
+    "validTo": "9999-12-31",
+    "historicalName": "(주)대우",
+    "ticker": "001300",
+    "market": "KR",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "동유럽, 중앙아시아, 중동 등 전 세계 신흥 시장을 개척하며 무역, 건설, 자동차 수출을 주도하는 '세계경영'의 종합상사 기함",
+    "continuityNotes": "1975년 한국거래소 상장, 대우그룹의 핵심 지주사 역할을 수행한 종합무역상사."
+  },
+  {
+    "canonicalCompanyId": "KR_025930",
+    "validFrom": "1999-12-07",
+    "validTo": "9999-12-31",
+    "historicalName": "팬택(주)",
+    "ticker": "025930",
+    "market": "KR",
+    "relationship": "SAME_ENTITY",
+    "contemporaryBusinessKo": "프리미엄 브랜드 SKY와 감각적인 디자인 혁신으로 국내 휴대폰 시장 2위에 오른 대표 토종 IT 벤처 기업",
+    "continuityNotes": "1999년 12월 코스닥 상장, 무선호출기(삐삐)에서 프리미엄 모바일 단말기 제조사로 도약."
   }
 ]
