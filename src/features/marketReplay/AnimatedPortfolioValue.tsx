@@ -75,8 +75,7 @@ export const AnimatedPortfolioValue: React.FC<AnimatedPortfolioValueProps> = ({
       const prefix = showSign && rounded > 0 ? '+' : '';
       return `${prefix}${formatKRW(rounded)}`;
     } else if (formatType === 'PERCENT') {
-      const prefix = showSign && displayValue > 0.0001 ? '+' : '';
-      return `${prefix}${formatPercent(displayValue)}`;
+      return formatPercent(displayValue);
     }
     return Math.round(displayValue).toLocaleString();
   };

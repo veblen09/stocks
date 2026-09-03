@@ -16,7 +16,6 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   points,
   currentMonthIndex,
   startTotalAssetsKRW,
-  cumulativePrincipalKRW,
   showBenchmark,
   motionPreference = 'NORMAL',
 }) => {
@@ -37,22 +36,25 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   // Dimensions & ViewBox
   const width = 680;
   const height = 240;
-  const padding = { top: 32, right: 90, bottom: 32, left: 55 };
+  const padding = { top: 32, right: 96, bottom: 32, left: 55 };
 
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
 
-  // Calculate dynamic Min and Max for visible values
+  // Calculate dynamic Min and Max focusing on the active intra-year movements
   const allVisibleValues = visiblePoints.flatMap(p => [
     p.portfolioValueKRW,
     p.runningPeakKRW,
-    p.cumulativeContributionsKRW,
     showBenchmark ? p.primaryBenchmarkValueKRW : p.portfolioValueKRW,
   ]);
-  allVisibleValues.push(startTotalAssetsKRW, cumulativePrincipalKRW);
+  allVisibleValues.push(startTotalAssetsKRW);
 
-  const minVal = Math.min(...allVisibleValues) * 0.96;
-  const maxVal = Math.max(...allVisibleValues) * 1.04;
+  const rawMin = Math.min(...allVisibleValues);
+  const rawMax = Math.max(...allVisibleValues);
+  const buffer = Math.max((rawMax - rawMin) * 0.12, rawMax * 0.02);
+
+  const minVal = Math.max(0, rawMin - buffer);
+  const maxVal = rawMax + buffer;
   const valRange = Math.max(1, maxVal - minVal);
 
   const getX = (monthIdx: number) => {
@@ -64,32 +66,72 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
     return padding.top + plotHeight - norm * plotHeight;
   };
 
-  // Build Portfolio Path
-  const portfolioPathD = visiblePoints.reduce((acc, p, idx) => {
-    const x = getX(idx);
-    const y = getY(p.portfolioValueKRW);
-    return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
-  }, '');
+  // Helper for smooth cubic spline paths
+  const getSplinePath = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+    let path = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i === 0 ? 0 : i - 1];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2 >= pts.length ? pts.length - 1 : i + 2];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      path += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+    }
+    return path;
+  };
+
+  const portfolioPoints = visiblePoints.map((p, idx) => ({
+    x: getX(idx),
+    y: getY(p.portfolioValueKRW),
+  }));
+
+  const portfolioPathD = getSplinePath(portfolioPoints);
 
   // Build Area Path under portfolio
   const firstX = getX(0);
   const lastX = getX(visiblePoints.length - 1);
   const bottomY = padding.top + plotHeight;
-  const areaPathD = `${portfolioPathD} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
+  const areaPathD = `${portfolioPathD} L ${lastX.toFixed(1)},${bottomY} L ${firstX.toFixed(1)},${bottomY} Z`;
 
   // Build Benchmark Path (if toggled)
-  const benchmarkPathD = showBenchmark
-    ? visiblePoints.reduce((acc, p, idx) => {
-        const x = getX(idx);
-        const y = getY(p.primaryBenchmarkValueKRW);
-        return idx === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
-      }, '')
-    : '';
+  const benchmarkPoints = showBenchmark
+    ? visiblePoints.map((p, idx) => ({
+        x: getX(idx),
+        y: getY(p.primaryBenchmarkValueKRW),
+      }))
+    : [];
+  const benchmarkPathD = showBenchmark ? getSplinePath(benchmarkPoints) : '';
 
   // Baseline Y coordinates
-  const principalY = getY(cumulativePrincipalKRW);
   const currentPeakY = getY(currentPoint.runningPeakKRW);
+  const portfolioY = getY(currentPoint.portfolioValueKRW);
   const benchmarkY = showBenchmark ? getY(currentPoint.primaryBenchmarkValueKRW) : 0;
+
+  // Collision-free label positioning for right side
+  let labelPortfolioY = portfolioY;
+  let labelBenchmarkY = benchmarkY;
+  let labelPeakY = currentPeakY;
+
+  if (showBenchmark && Math.abs(labelPortfolioY - labelBenchmarkY) < 14) {
+    if (labelPortfolioY < labelBenchmarkY) {
+      labelPortfolioY -= 7;
+      labelBenchmarkY += 7;
+    } else {
+      labelPortfolioY += 7;
+      labelBenchmarkY -= 7;
+    }
+  }
+
+  if (Math.abs(labelPortfolioY - labelPeakY) < 14) {
+    labelPeakY = Math.min(labelPortfolioY - 14, labelPeakY);
+  }
 
   const isUnderwater = currentPoint.drawdown < -0.01;
 
@@ -117,12 +159,6 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
             <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span>
             <span>역대 최고점</span>
           </div>
-
-          {/* 4. Principal Baseline */}
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 font-medium text-[10px]">
-            <span className="w-3 h-0.5 border-t-2 border-dashed border-slate-400 inline-block"></span>
-            <span>누적 납입원금</span>
-          </div>
         </div>
 
         {/* New High Tag info */}
@@ -139,7 +175,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
       >
         <defs>
           <linearGradient id="portfolioAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.28" />
             <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
           </linearGradient>
 
@@ -194,29 +230,6 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           );
         })}
 
-        {/* Cumulative Principal Baseline (납입원금 기준선) */}
-        {principalY >= padding.top && principalY <= bottomY && (
-          <g>
-            <line
-              x1={padding.left}
-              y1={principalY}
-              x2={padding.left + plotWidth}
-              y2={principalY}
-              stroke="#64748b"
-              strokeWidth="1.2"
-              strokeDasharray="4 4"
-              opacity="0.75"
-            />
-            <text
-              x={padding.left + plotWidth + 4}
-              y={principalY + 3}
-              className="fill-slate-500 font-sans text-[9px] font-bold"
-            >
-              누적원금
-            </text>
-          </g>
-        )}
-
         {/* Peak Asset Dotted Line (역대 최고점 기준선) */}
         {currentPeakY >= padding.top && currentPeakY <= bottomY && (
           <g>
@@ -228,11 +241,11 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               stroke="#10b981"
               strokeWidth="1"
               strokeDasharray="2 2"
-              opacity="0.6"
+              opacity="0.65"
             />
             <text
-              x={padding.left + plotWidth + 4}
-              y={currentPeakY + 3}
+              x={padding.left + plotWidth + 6}
+              y={labelPeakY + 3}
               className="fill-emerald-600 font-sans text-[9px] font-bold"
             >
               역대 최고점
@@ -247,7 +260,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               x1={lastX}
               y1={currentPeakY}
               x2={lastX}
-              y2={getY(currentPoint.portfolioValueKRW)}
+              y2={portfolioY}
               stroke="#e11d48"
               strokeWidth="1.5"
               strokeDasharray="2 2"
@@ -269,10 +282,9 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               strokeDasharray="4 3"
               opacity="0.85"
             />
-            {/* Direct Label on Benchmark Line */}
             <text
-              x={lastX + 4}
-              y={benchmarkY + 3}
+              x={lastX + 6}
+              y={labelBenchmarkY + 3}
               className="fill-slate-600 font-sans text-[9px] font-extrabold"
             >
               시장 벤치마크
@@ -293,8 +305,8 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
 
         {/* Direct Label on My Portfolio End */}
         <text
-          x={lastX + 4}
-          y={getY(currentPoint.portfolioValueKRW) + 3}
+          x={lastX + 6}
+          y={labelPortfolioY + 3}
           className="fill-blue-700 font-sans text-[9px] font-black"
         >
           내 포트폴리오
