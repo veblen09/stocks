@@ -51,7 +51,10 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
 
   const rawMin = Math.min(...allVisibleValues);
   const rawMax = Math.max(...allVisibleValues);
-  const buffer = Math.max((rawMax - rawMin) * 0.12, rawMax * 0.02);
+  const isUnderwater = currentPoint.runningPeakKRW > currentPoint.portfolioValueKRW * 1.008;
+  const buffer = visiblePoints.length === 1
+    ? Math.max(rawMax * 0.15, 100000)
+    : Math.max((rawMax - rawMin) * 0.12, rawMax * 0.02);
 
   const minVal = Math.max(0, rawMin - buffer);
   const maxVal = rawMax + buffer;
@@ -129,11 +132,9 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
     }
   }
 
-  if (Math.abs(labelPortfolioY - labelPeakY) < 14) {
+  if (isUnderwater && Math.abs(labelPortfolioY - labelPeakY) < 14) {
     labelPeakY = Math.min(labelPortfolioY - 14, labelPeakY);
   }
-
-  const isUnderwater = currentPoint.drawdown < -0.01;
 
   return (
     <div className="relative w-full select-none space-y-2">
@@ -154,11 +155,13 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
             </div>
           )}
 
-          {/* 3. All-time Peak */}
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
-            <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span>
-            <span>역대 최고점</span>
-          </div>
+          {/* 3. All-time Peak (Only shown if currently in drawdown) */}
+          {isUnderwater && (
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
+              <span className="w-3 h-0.5 border-t-2 border-dotted border-emerald-600 inline-block"></span>
+              <span>역대 최고점 (회복선)</span>
+            </div>
+          )}
         </div>
 
         {/* New High Tag info */}
@@ -230,8 +233,8 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           );
         })}
 
-        {/* Peak Asset Dotted Line (역대 최고점 기준선) */}
-        {currentPeakY >= padding.top && currentPeakY <= bottomY && (
+        {/* Peak Asset Dotted Line (역대 최고점 회복 기준선: 오직 낙폭 상태일 때만 표시) */}
+        {isUnderwater && currentPeakY >= padding.top && currentPeakY <= bottomY && (
           <g>
             <line
               x1={padding.left}
@@ -239,9 +242,9 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               x2={padding.left + plotWidth}
               y2={currentPeakY}
               stroke="#10b981"
-              strokeWidth="1"
+              strokeWidth="1.2"
               strokeDasharray="2 2"
-              opacity="0.65"
+              opacity="0.7"
             />
             <text
               x={padding.left + plotWidth + 6}
