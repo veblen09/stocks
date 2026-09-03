@@ -56,9 +56,9 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   }
 
   // Dimensions & ViewBox
-  const width = 700;
-  const height = 240;
-  const padding = { top: 32, right: 110, bottom: 32, left: 58 };
+  const width = 760;
+  const height = 260;
+  const padding = { top: 32, right: 140, bottom: 32, left: 62 };
 
   const plotWidth = width - padding.left - padding.right;
   const plotHeight = height - padding.top - padding.bottom;
@@ -149,12 +149,12 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   const portfolioY = getY(currentPoint.portfolioValueKRW);
   const benchmarkY = showBenchmark ? getY(currentPoint.primaryBenchmarkValueKRW) : 0;
 
-  // Collision-free 2-line label positioning for right side
+  // Collision-free 2-line badge label positioning for right side
   let labelPortfolioY = portfolioY;
   let labelBenchmarkY = benchmarkY;
   let labelPeakY = currentPeakY;
 
-  const minLabelSpacing = 22;
+  const minLabelSpacing = 30;
   const labelItems: { id: string; y: number }[] = [
     { id: 'portfolio', y: labelPortfolioY },
     ...(showBenchmark ? [{ id: 'benchmark', y: labelBenchmarkY }] : []),
@@ -169,7 +169,7 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
     }
   }
 
-  const maxAllowedY = bottomY - 6;
+  const maxAllowedY = bottomY - 10;
   if (labelItems.length > 0 && labelItems[labelItems.length - 1].y > maxAllowedY) {
     const overflow = labelItems[labelItems.length - 1].y - maxAllowedY;
     for (let i = labelItems.length - 1; i >= 0; i--) {
@@ -187,38 +187,88 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
   }
 
   return (
-    <div className="relative w-full select-none space-y-2">
-      {/* Top Legend Bar (직관적 차트 범례) */}
-      <div className="flex items-center justify-between flex-wrap gap-2 text-[11px] pb-1 border-b border-slate-200/80">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* 1. My Portfolio */}
-          <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 font-extrabold shadow-2xs">
-            <span className="w-3.5 h-1 bg-blue-600 rounded-full inline-block"></span>
-            <span>내 포트폴리오</span>
+    <div className="relative w-full select-none space-y-2.5">
+      {/* 1. Real-time Asset & Peak Comparison Status Dashboard */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pb-1">
+        {/* Card 1: My Current Portfolio Value */}
+        <div className="flex flex-col p-2.5 rounded-xl bg-blue-50/90 border border-blue-200 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-extrabold text-blue-700 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-blue-600 inline-block animate-pulse"></span>
+              내 현재 자산 ({currentPoint.month === 0 ? '1/1' : `${currentPoint.month}월`})
+            </span>
+            <span className={`text-[10px] font-black font-mono ${currentPoint.ytdReturn >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              YTD {currentPoint.ytdReturn >= 0 ? '+' : ''}{(currentPoint.ytdReturn * 100).toFixed(1)}%
+            </span>
           </div>
-
-          {/* 2. Market Benchmark */}
-          {showBenchmark && (
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-100 border border-slate-300 text-slate-700 font-bold shadow-2xs">
-              <span className="w-3.5 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span>
-              <span>시장 벤치마크 ({benchmarkLabel})</span>
-            </div>
-          )}
-
-          {/* 3. High-Water Mark Peak Reference Line (Only shown if currently in drawdown) */}
-          {isUnderwater && (
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
-              <span className="w-3.5 h-0.5 border-t-2 border-dashed border-emerald-500 inline-block"></span>
-              <span>최고점 회복 기준선 ({formatKRW(currentPoint.runningPeakKRW)})</span>
-            </div>
-          )}
+          <span className="text-sm font-black text-blue-950 font-mono mt-1">
+            {formatKRW(currentPoint.portfolioValueKRW)}
+          </span>
         </div>
 
-        {/* New High Tag info */}
-        <div className="text-[10px] text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50/80 px-2 py-0.5 rounded-md border border-emerald-200">
-          <span>★ HIGH:</span>
-          <span>신고가 경신 마커</span>
+        {/* Card 2: Historical Peak (High-Water Mark) */}
+        <div className="flex flex-col p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-extrabold text-emerald-800 flex items-center gap-1">
+              👑 역대 최고점
+            </span>
+            {isUnderwater ? (
+              <span className="text-[9.5px] font-black text-rose-600 bg-rose-100/80 px-1.5 py-0.2 rounded border border-rose-200">
+                낙폭 {(currentPoint.drawdown * 100).toFixed(1)}%
+              </span>
+            ) : (
+              <span className="text-[9.5px] font-black text-emerald-800 bg-emerald-200/80 px-1.5 py-0.2 rounded">
+                신고가 달성
+              </span>
+            )}
+          </div>
+          <span className="text-sm font-black text-emerald-950 font-mono mt-1">
+            {formatKRW(currentPoint.runningPeakKRW)}
+          </span>
         </div>
+
+        {/* Card 3: Gap / Recovery Amount to Peak */}
+        <div className={`flex flex-col p-2.5 rounded-xl border shadow-2xs ${
+          isUnderwater ? 'bg-rose-50/90 border-rose-200' : 'bg-emerald-50/90 border-emerald-200'
+        }`}>
+          <div className="flex items-center justify-between">
+            <span className={`text-[10px] font-extrabold flex items-center gap-1 ${
+              isUnderwater ? 'text-rose-700' : 'text-emerald-700'
+            }`}>
+              {isUnderwater ? '📉 고점 대비 차이' : '✨ 최고점 상태'}
+            </span>
+            {isUnderwater && (
+              <span className="text-[9px] font-bold text-rose-600">
+                {currentPoint.monthsUnderwater}개월째 하락
+              </span>
+            )}
+          </div>
+          <span className={`text-sm font-black font-mono mt-1 ${
+            isUnderwater ? 'text-rose-950' : 'text-emerald-900'
+          }`}>
+            {isUnderwater ? `-${formatKRW(currentPoint.lossFromPeakKRW)}` : '🎉 역대 최고가 경신'}
+          </span>
+        </div>
+
+        {/* Card 4: Market Benchmark */}
+        {showBenchmark && (
+          <div className="flex flex-col p-2.5 rounded-xl bg-slate-100/90 border border-slate-200 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-extrabold text-slate-700 flex items-center gap-1 truncate">
+                <span className="w-2.5 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span>
+                벤치마크 ({benchmarkLabel})
+              </span>
+              <span className={`text-[10px] font-black font-mono ${
+                currentPoint.primaryBenchmarkYtdReturn >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}>
+                {currentPoint.primaryBenchmarkYtdReturn >= 0 ? '+' : ''}{(currentPoint.primaryBenchmarkYtdReturn * 100).toFixed(1)}%
+              </span>
+            </div>
+            <span className="text-sm font-black text-slate-900 font-mono mt-1">
+              {formatKRW(currentPoint.primaryBenchmarkValueKRW)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* SVG Canvas */}
@@ -311,31 +361,49 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
         })}
 
         {/* Peak Asset Reference Guideline (회복 목표 수평 기준선: 오직 낙폭 상태일 때만 표시) */}
-        {isUnderwater && currentPeakY >= padding.top && currentPeakY <= bottomY && (
+        {isUnderwater && currentPeakY >= padding.top - 10 && currentPeakY <= bottomY && (
           <g>
             <line
               x1={padding.left}
               y1={currentPeakY}
               x2={padding.left + plotWidth}
               y2={currentPeakY}
-              stroke="#10b981"
-              strokeWidth="1.2"
-              strokeDasharray="3 3"
-              opacity="0.8"
+              stroke="#059669"
+              strokeWidth="1.4"
+              strokeDasharray="4 3"
+              opacity="0.85"
             />
-            {/* Right side label with exact amount */}
+            {/* Small label at the left start of peak line */}
+            <text
+              x={padding.left + 4}
+              y={currentPeakY - 4}
+              className="fill-emerald-700 font-sans text-[8.5px] font-extrabold select-none"
+            >
+              👑 역대 최고점 회복선 ({formatKRW(currentPoint.runningPeakKRW)})
+            </text>
+            {/* Right side badge */}
             <g transform={`translate(${padding.left + plotWidth + 6}, ${labelPeakY})`}>
-              <text
+              <rect
                 x={0}
+                y={-12}
+                width={128}
+                height={25}
+                rx={6}
+                fill="#ecfdf5"
+                stroke="#059669"
+                strokeWidth="1.2"
+              />
+              <text
+                x={6}
                 y={-1}
-                className="fill-emerald-700 font-sans text-[9px] font-black"
+                className="fill-emerald-800 font-sans text-[8.5px] font-black"
               >
-                최고점 회복선
+                👑 역대 최고점
               </text>
               <text
-                x={0}
+                x={6}
                 y={10}
-                className="fill-emerald-600 font-sans text-[8.5px] font-bold"
+                className="fill-emerald-950 font-mono text-[9px] font-black"
               >
                 {formatKRW(currentPoint.runningPeakKRW)}
               </text>
@@ -343,9 +411,17 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           </g>
         )}
 
-        {/* Drawdown Area & Vertical Drop Line */}
+        {/* Visual Gap Connector Line & Drop Column between Peak and Current Portfolio Point */}
         {isUnderwater && (
           <g>
+            <rect
+              x={lastX - 2.5}
+              y={Math.min(currentPeakY, portfolioY)}
+              width={5}
+              height={Math.abs(portfolioY - currentPeakY)}
+              fill="rgba(244, 63, 94, 0.16)"
+              rx={2}
+            />
             <line
               x1={lastX}
               y1={currentPeakY}
@@ -373,17 +449,27 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
               opacity="0.85"
             />
             <g transform={`translate(${lastX + 6}, ${labelBenchmarkY})`}>
-              <text
+              <rect
                 x={0}
+                y={-12}
+                width={128}
+                height={25}
+                rx={6}
+                fill="#f8fafc"
+                stroke="#94a3b8"
+                strokeWidth="1.2"
+              />
+              <text
+                x={6}
                 y={-1}
-                className="fill-slate-600 font-sans text-[9px] font-extrabold"
+                className="fill-slate-700 font-sans text-[8px] font-extrabold truncate"
               >
                 벤치마크 ({benchmarkLabel})
               </text>
               <text
-                x={0}
+                x={6}
                 y={10}
-                className="fill-slate-500 font-sans text-[8.5px] font-bold"
+                className="fill-slate-900 font-mono text-[9px] font-black"
               >
                 {formatKRW(currentPoint.primaryBenchmarkValueKRW)}
               </text>
@@ -402,19 +488,29 @@ export const MarketReplayChart: React.FC<MarketReplayChartProps> = ({
           filter="url(#glow)"
         />
 
-        {/* Direct Label & Value on My Portfolio End */}
+        {/* Direct Label & Value Badge on My Portfolio End */}
         <g transform={`translate(${lastX + 6}, ${labelPortfolioY})`}>
-          <text
+          <rect
             x={0}
+            y={-12}
+            width={128}
+            height={25}
+            rx={6}
+            fill="#eff6ff"
+            stroke="#2563eb"
+            strokeWidth="1.5"
+          />
+          <text
+            x={6}
             y={-1}
-            className="fill-blue-700 font-sans text-[9px] font-black"
+            className="fill-blue-800 font-sans text-[8.5px] font-black"
           >
-            내 포트폴리오
+            🔵 내 포트폴리오
           </text>
           <text
-            x={0}
+            x={6}
             y={10}
-            className="fill-blue-600 font-sans text-[9.5px] font-black"
+            className="fill-blue-950 font-mono text-[9.5px] font-black"
           >
             {formatKRW(currentPoint.portfolioValueKRW)}
           </text>
