@@ -3,6 +3,7 @@ import type {
   GameSettings,
   MonthlyReplayQuality,
   RiskLevel,
+  BenchmarkId,
 } from '../../types/stockGame';
 import type { HistoricalNewsItem } from '../../types/stockNews';
 import type { MonthlyPortfolioPoint, YearReplayData } from './marketReplayTypes';
@@ -11,6 +12,8 @@ import { getStockPriceKRW } from '../../engine/returnEngine';
 import { calculateRiskLevel } from '../../engine/metricsEngine';
 import { getCrisisEventForYear } from '../../engine/crisisEngine';
 import { HISTORICAL_NEWS } from '../../engine/newsEngine';
+import { getFxRate } from '../../engine/fxEngine';
+import { getBenchmarkAnnualReturn } from '../../engine/benchmarkEngine';
 import {
   getYearMonthlyPrices,
   isSyntheticLinearOrFlat,
@@ -83,6 +86,14 @@ function getBenchmarkMonthlyFactor(
   year: number,
   month: number
 ): number {
+  if (month === 0) return 1.0;
+
+  if (benchmarkId === 'blend5050') {
+    const kospiFactor = getBenchmarkMonthlyFactor('kospi', year, month);
+    const sp500Factor = getBenchmarkMonthlyFactor('sp500', year, month);
+    return 0.5 * kospiFactor + 0.5 * sp500Factor;
+  }
+
   const mStr = month.toString().padStart(2, '0');
   const ym = `${year}-${mStr}`;
 
@@ -94,8 +105,10 @@ function getBenchmarkMonthlyFactor(
 
   if (startData && curData && startData.priceLocal > 0) {
     if (benchmarkId === 'sp500') {
-      const fxStart = MONTHLY_PRICES['FX_USDKRW']?.[startYm]?.priceLocal || 1100;
-      const fxCur = MONTHLY_PRICES['FX_USDKRW']?.[ym]?.priceLocal || 1100;
+      const fxDataStart = MONTHLY_PRICES['FX_USDKRW']?.[startYm];
+      const fxDataCur = MONTHLY_PRICES['FX_USDKRW']?.[ym];
+      const fxStart = fxDataStart && fxDataStart.priceLocal > 0 ? fxDataStart.priceLocal : getFxRate(year - 1);
+      const fxCur = fxDataCur && fxDataCur.priceLocal > 0 ? fxDataCur.priceLocal : getFxRate(year);
       const startKRW = startData.priceLocal * fxStart;
       const curKRW = curData.priceLocal * fxCur;
       return curKRW / startKRW;
@@ -103,11 +116,10 @@ function getBenchmarkMonthlyFactor(
     return curData.priceLocal / startData.priceLocal;
   }
 
-  // Smooth benchmark interpolation if monthly point is missing
-  const annualRet = benchmarkId === 'blend5050' ? 0.08 : 0.07;
+  // If monthly point is missing, use authentic historical annual return for that year
+  const annualRet = getBenchmarkAnnualReturn(benchmarkId as BenchmarkId, year, 'KRW');
   const t = month / 12;
-  const wave = Math.sin((month / 12) * Math.PI * 2) * 0.02;
-  return 1.0 + (annualRet * t) + wave;
+  return 1.0 + (annualRet * t);
 }
 
 /**

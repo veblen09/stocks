@@ -383,5 +383,44 @@ describe('Live Market Replay Engine Tests', () => {
     const endPrice = getMonthlyStockPriceKRW('KR_005380', 1980, 12);
     expect(endPrice).toBeCloseTo(137.1359, 2);
   });
+
+  it('13. S&P 500 benchmark monthly trajectory in 1980 and 1984 reflects authentic historical price movements without fixed +7% sine wave', () => {
+    const settingsSP500: GameSettings = {
+      ...DEFAULT_SETTINGS,
+      primaryBenchmark: 'sp500',
+    };
+
+    const data1980 = generateYearReplayData(
+      1980,
+      10000000,
+      {},
+      10000000,
+      10000000,
+      10000000,
+      settingsSP500,
+      0
+    );
+
+    const data1984 = generateYearReplayData(
+      1984,
+      10000000,
+      {},
+      10000000,
+      10000000,
+      10000000,
+      settingsSP500,
+      4
+    );
+
+    // 1980 S&P 500 experienced a major bull run in KRW (closing > +40% YTD), not a fixed +7%
+    const sp1980Month12Return = data1980.points[12].primaryBenchmarkYtdReturn;
+    expect(sp1980Month12Return).toBeGreaterThan(0.35);
+
+    // 1984 S&P 500 should differ from 1980 (e.g. ~5.5% in KRW)
+    const sp1984Month12Return = data1984.points[12].primaryBenchmarkYtdReturn;
+    expect(sp1984Month12Return).toBeCloseTo(0.055, 2);
+    expect(sp1984Month12Return).not.toBe(sp1980Month12Return);
+  });
 });
+
 

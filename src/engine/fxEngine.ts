@@ -8,12 +8,12 @@ export const FX_RATES: FxDataset = rawFx as unknown as FxDataset;
  */
 export function getFxRate(year: number): number {
   const yStr = year.toString();
-  const rates = FX_RATES as Record<string, number>;
-  if (rates[yStr] !== undefined) {
-    return rates[yStr];
+  const ratesObj = (FX_RATES as { rates?: Record<string, number> }).rates || (FX_RATES as unknown as Record<string, number>);
+  if (ratesObj && ratesObj[yStr] !== undefined) {
+    return ratesObj[yStr];
   }
-  if (year < 1980) return rates['1980'] || 659.9;
-  return rates['2025'] || 1445.0;
+  if (year < 1980) return ratesObj['1980'] || ratesObj['1979'] || 580.0;
+  return ratesObj['2025'] || 1445.0;
 }
 
 /**
