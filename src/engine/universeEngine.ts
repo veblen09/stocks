@@ -93,6 +93,19 @@ export function getListingEventByCompanyId(canonicalCompanyId: string): ListingE
   return LISTING_EVENTS_BY_COMPANY[canonicalCompanyId];
 }
 
+/**
+ * Returns the next upcoming historical IPO year and its list of stocks.
+ */
+export function getNextUpcomingIpoInfo(currentYear: number): { year: number; companies: HistoricalStockDefinition[] } | null {
+  for (let y = currentYear + 1; y <= 2025; y++) {
+    const list = getNewlyListedStocksForYear(y);
+    if (list.length > 0) {
+      return { year: y, companies: list };
+    }
+  }
+  return null;
+}
+
 export interface GetTradableStocksOptions {
   asOfDate?: string;
   currentYear?: number;

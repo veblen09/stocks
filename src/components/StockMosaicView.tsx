@@ -8,6 +8,8 @@ import {
   Layers,
   RotateCcw,
   ShoppingCart,
+  Sparkles,
+  Flame,
 } from 'lucide-react';
 import { MosaicTile } from './MosaicTile';
 import type { TradableStockItem, MosaicViewMode } from '../types/stockUniverse';
@@ -31,6 +33,7 @@ interface StockMosaicViewProps {
   onSelectStock: (canonicalId: string) => void;
   onUpdateDraftTargetWeight: (canonicalId: string, weight: number) => void;
   onToggleWatchlist?: (canonicalId: string) => void;
+  onOpenNewListingModal?: () => void;
   yearEndReturns?: Record<string, number | null>;
   isYearEnd?: boolean;
 }
@@ -49,12 +52,13 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   onSelectStock,
   onUpdateDraftTargetWeight,
   onToggleWatchlist,
+  onOpenNewListingModal,
   yearEndReturns,
   isYearEnd = false,
 }) => {
   const [viewFormat, setViewFormat] = useState<'MOSAIC' | 'TABLE'>('MOSAIC');
   const [mosaicMode, setMosaicMode] = useState<MosaicViewMode>(isYearEnd ? 'YEAR_END_PERFORMANCE' : 'EXPLORE');
-  const [marketFilter, setMarketFilter] = useState<'ALL' | 'KR' | 'US' | 'HOLDING' | 'WATCHLIST'>('ALL');
+  const [marketFilter, setMarketFilter] = useState<'ALL' | 'KR' | 'US' | 'NEW' | 'HOLDING' | 'WATCHLIST'>('ALL');
   const [sectorFilter, setSectorFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'DEFAULT' | 'NAME' | 'TARGET_WEIGHT' | 'HOLDING_WEIGHT' | 'NEWS_COUNT'>('DEFAULT');
@@ -62,6 +66,11 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   // Compute portfolio total market value for holding weights
   const holdingStockValues = Object.values(holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
   const totalPortfolioValue = cashKRW + holdingStockValues;
+
+  // Newly listed stocks among tradable
+  const newlyListedStocks = useMemo(() => {
+    return tradableStocks.filter(s => s.isNewlyListed);
+  }, [tradableStocks]);
 
   // Available unique sectors among currently tradable stocks
   const availableSectors = useMemo(() => {
@@ -96,6 +105,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
       // Market filter
       if (marketFilter === 'KR' && stock.market !== 'KR') return false;
       if (marketFilter === 'US' && stock.market !== 'US') return false;
+      if (marketFilter === 'NEW' && !stock.isNewlyListed) return false;
       if (marketFilter === 'HOLDING' && !holdings[stock.canonicalId]) return false;
       if (marketFilter === 'WATCHLIST' && !watchlist.includes(stock.canonicalId)) return false;
 
@@ -142,7 +152,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   }, [tradableStocks, marketFilter, sectorFilter, searchQuery, sortBy, draftTargetWeights, watchlist, holdings]);
 
   // Handler for filter change with sound
-  const handleMarketFilterChange = (filter: 'ALL' | 'KR' | 'US' | 'HOLDING' | 'WATCHLIST') => {
+  const handleMarketFilterChange = (filter: 'ALL' | 'KR' | 'US' | 'NEW' | 'HOLDING' | 'WATCHLIST') => {
     audioManager.playUiSound('filter');
     setMarketFilter(filter);
   };
@@ -159,6 +169,44 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Newly Listed Stocks Banner (Shown when new listings exist in currentYear) */}
+      {newlyListedStocks.length > 0 && (
+        <div className="bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-600 rounded-2xl p-0.5 shadow-md shadow-amber-500/10 animate-fade-in">
+          <div className="bg-white/95 rounded-[14px] p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="p-2.5 rounded-2xl bg-amber-100 text-amber-900 border border-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
+                <Sparkles size={18} className="text-amber-600 fill-amber-500 animate-pulse" />
+              </span>
+              <div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[11px] font-black uppercase text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300 flex items-center gap-1">
+                    <Flame size={11} className="text-amber-600 fill-amber-500" />
+                    {currentYear}년 신규 상장 기업 ({newlyListedStocks.length}개사)
+                  </span>
+                  <span className="text-xs font-black text-slate-900">
+                    {newlyListedStocks.map(s => s.nameKo).join(', ')}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                  정규 증권시장에 첫 상장되어 거래가 개시되었습니다. 기업 소개와 공모 정보를 확인하고 포트폴리오에 편입해보세요.
+                </p>
+              </div>
+            </div>
+
+            {onOpenNewListingModal && (
+              <button
+                type="button"
+                onClick={onOpenNewListingModal}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs shadow-md shadow-amber-500/20 transition flex items-center gap-1.5 shrink-0 cursor-pointer"
+              >
+                <Sparkles size={14} />
+                <span>신규 상장 기업 소개 팝업 보기</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 1. Top Control Bar: Filters, Search & View Mode Switcher */}
       <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
         {/* Row 1: Market Tabs & Format Toggle */}
@@ -176,6 +224,27 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                 {allTradableCount}
               </span>
             </button>
+
+            {newlyListedStocks.length > 0 && (
+              <button
+                type="button"
+                onClick={() => handleMarketFilterChange('NEW')}
+                aria-pressed={marketFilter === 'NEW'}
+                className={`filter-key ${
+                  marketFilter === 'NEW'
+                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
+                    : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                }`}
+              >
+                <Sparkles size={12} className={marketFilter === 'NEW' ? 'text-white' : 'text-amber-600'} />
+                <span>신규 상장</span>
+                <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${
+                  marketFilter === 'NEW' ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-900'
+                }`}>
+                  {newlyListedStocks.length}
+                </span>
+              </button>
+            )}
 
             <button
               type="button"

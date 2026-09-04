@@ -708,8 +708,8 @@
       "COMP_1980_US_AAPL"
     ],
     "firstValidPriceDate": "1980-12-12",
-    "firstValidPrice": 29.0,
-    "ipoOfferingPrice": 22.0,
+    "firstValidPrice": 29,
+    "ipoOfferingPrice": 22,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -733,7 +733,7 @@
     ],
     "firstValidPriceDate": "1986-03-13",
     "firstValidPrice": 27.75,
-    "ipoOfferingPrice": 21.0,
+    "ipoOfferingPrice": 21,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -753,7 +753,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1911-06-16",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -774,7 +774,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1971-10-13",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -798,8 +798,8 @@
       "COMP_1999_US_NVDA"
     ],
     "firstValidPriceDate": "1999-01-22",
-    "firstValidPrice": 12.0,
-    "ipoOfferingPrice": 12.0,
+    "firstValidPrice": 12,
+    "ipoOfferingPrice": 12,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -822,8 +822,8 @@
       "COMP_1997_US_AMZN"
     ],
     "firstValidPriceDate": "1997-05-15",
-    "firstValidPrice": 18.0,
-    "ipoOfferingPrice": 18.0,
+    "firstValidPrice": 18,
+    "ipoOfferingPrice": 18,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -847,7 +847,7 @@
     ],
     "firstValidPriceDate": "2004-08-19",
     "firstValidPrice": 100.34,
-    "ipoOfferingPrice": 85.0,
+    "ipoOfferingPrice": 85,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -871,7 +871,7 @@
     ],
     "firstValidPriceDate": "2012-05-18",
     "firstValidPrice": 38.23,
-    "ipoOfferingPrice": 38.0,
+    "ipoOfferingPrice": 38,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -894,8 +894,8 @@
       "COMP_2010_US_TSLA"
     ],
     "firstValidPriceDate": "2010-06-29",
-    "firstValidPrice": 17.0,
-    "ipoOfferingPrice": 17.0,
+    "firstValidPrice": 17,
+    "ipoOfferingPrice": 17,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -903,8 +903,8 @@
     "id": "LISTING_EVENT_US_JPM",
     "canonicalCompanyId": "US_JPM",
     "eventType": "MERGER_LISTING",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1969-03-05",
+    "firstTradingDate": "1969-03-05",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "Chemical Bank / J.P. Morgan & Co.",
     "tickerAsOfDate": "JPM",
@@ -916,8 +916,8 @@
     "relatedNewsIds": [
       "SEC_1980_JPM"
     ],
-    "firstValidPriceDate": "1980-01-01",
-    "firstValidPrice": 5.0,
+    "firstValidPriceDate": "1969-03-05",
+    "firstValidPrice": 5,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -938,7 +938,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1973-01-02",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -971,7 +971,7 @@
     "canonicalCompanyId": "US_JNJ",
     "eventType": "IPO",
     "listingDate": "1944-09-25",
-    "firstTradingDate": "1980-01-01",
+    "firstTradingDate": "1944-09-25",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "Johnson & Johnson",
     "tickerAsOfDate": "JNJ",
@@ -983,7 +983,7 @@
     "relatedNewsIds": [
       "SEC_1980_JNJ"
     ],
-    "firstValidPriceDate": "1980-01-01",
+    "firstValidPriceDate": "1944-09-25",
     "firstValidPrice": 2.5,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
@@ -1016,8 +1016,8 @@
     "id": "LISTING_EVENT_US_XOM",
     "canonicalCompanyId": "US_XOM",
     "eventType": "IPO",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1928-01-03",
+    "firstTradingDate": "1928-01-03",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "Exxon Corporation",
     "tickerAsOfDate": "XOM",
@@ -1029,8 +1029,8 @@
     "relatedNewsIds": [
       "SEC_1980_XOM"
     ],
-    "firstValidPriceDate": "1980-01-01",
-    "firstValidPrice": 2.0,
+    "firstValidPriceDate": "1928-01-03",
+    "firstValidPrice": 2,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1051,7 +1051,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1921-06-23",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1060,8 +1060,8 @@
     "id": "LISTING_EVENT_US_KO",
     "canonicalCompanyId": "US_KO",
     "eventType": "IPO",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1919-09-05",
+    "firstTradingDate": "1919-09-05",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "The Coca-Cola Company",
     "tickerAsOfDate": "KO",
@@ -1073,7 +1073,7 @@
     "relatedNewsIds": [
       "SEC_1980_KO"
     ],
-    "firstValidPriceDate": "1980-01-01",
+    "firstValidPriceDate": "1919-09-05",
     "firstValidPrice": 1.2,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
@@ -1083,8 +1083,8 @@
     "id": "LISTING_EVENT_US_PEP",
     "canonicalCompanyId": "US_PEP",
     "eventType": "IPO",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1919-12-18",
+    "firstTradingDate": "1919-12-18",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "PepsiCo, Inc.",
     "tickerAsOfDate": "PEP",
@@ -1096,7 +1096,7 @@
     "relatedNewsIds": [
       "SEC_1980_PEP"
     ],
-    "firstValidPriceDate": "1980-01-01",
+    "firstValidPriceDate": "1919-12-18",
     "firstValidPrice": 1.5,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
@@ -1106,8 +1106,8 @@
     "id": "LISTING_EVENT_US_PG",
     "canonicalCompanyId": "US_PG",
     "eventType": "IPO",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1891-03-01",
+    "firstTradingDate": "1891-03-01",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "The Procter & Gamble Company",
     "tickerAsOfDate": "PG",
@@ -1119,8 +1119,8 @@
     "relatedNewsIds": [
       "SEC_1980_PG"
     ],
-    "firstValidPriceDate": "1980-01-01",
-    "firstValidPrice": 3.0,
+    "firstValidPriceDate": "1891-03-01",
+    "firstValidPrice": 3,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1129,8 +1129,8 @@
     "id": "LISTING_EVENT_US_WMT",
     "canonicalCompanyId": "US_WMT",
     "eventType": "IPO",
-    "listingDate": "1972-08-25",
-    "firstTradingDate": "1980-01-01",
+    "listingDate": "1970-10-01",
+    "firstTradingDate": "1970-10-01",
     "datePrecision": "DAY",
     "companyNameAsOfDate": "Wal-Mart Stores, Inc.",
     "tickerAsOfDate": "WMT",
@@ -1142,7 +1142,7 @@
     "relatedNewsIds": [
       "SEC_1980_WMT"
     ],
-    "firstValidPriceDate": "1980-01-01",
+    "firstValidPriceDate": "1970-10-01",
     "firstValidPrice": 0.8,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
@@ -1166,8 +1166,8 @@
       "SEC_IPO_1981_HD"
     ],
     "firstValidPriceDate": "1981-09-22",
-    "firstValidPrice": 12.0,
-    "ipoOfferingPrice": 12.0,
+    "firstValidPrice": 12,
+    "ipoOfferingPrice": 12,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },
@@ -1187,7 +1187,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1965-04-21",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1208,7 +1208,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1957-11-12",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1229,7 +1229,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1929-12-02",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1250,7 +1250,7 @@
     "officialAnnouncementUrl": "https://www.sec.gov",
     "relatedNewsIds": [],
     "firstValidPriceDate": "1980-12-02",
-    "firstValidPrice": 10.0,
+    "firstValidPrice": 10,
     "ipoOfferingPrice": null,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
@@ -1346,8 +1346,8 @@
       "COMP_1999_US_BBI"
     ],
     "firstValidPriceDate": "1999-08-11",
-    "firstValidPrice": 15.0,
-    "ipoOfferingPrice": 15.0,
+    "firstValidPrice": 15,
+    "ipoOfferingPrice": 15,
     "dataQuality": "HIGH",
     "isTradableImmediately": true
   },

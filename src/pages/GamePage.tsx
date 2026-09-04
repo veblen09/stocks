@@ -56,7 +56,12 @@ import { PortfolioGhostRace } from '../features/gameplay/PortfolioGhostRace';
 import { calculatePortfolioValue } from '../engine/portfolioEngine';
 import { calculatePureInvestmentPnL, calculateRiskLevel } from '../engine/metricsEngine';
 import { getMacroNewsForYear, getDecisionCutoffDisplayInfo } from '../engine/newsEngine';
-import { getTradableStocks, getNewlyListedStocksForYear, getDelistedStocksForYear } from '../engine/universeEngine';
+import {
+  getTradableStocks,
+  getNewlyListedStocksForYear,
+  getDelistedStocksForYear,
+  HISTORICAL_STOCKS_BY_ID,
+} from '../engine/universeEngine';
 import { executeCrisisDecision } from '../engine/crisisEngine';
 import { executeRebalanceToTargetWeights } from '../engine/tradeEngine';
 import { STOCKS_BY_ID } from '../engine/returnEngine';
@@ -144,18 +149,84 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   // Main Tab: 'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'
   const [activeTab, setActiveTab] = useState<'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'>('MARKET');
 
-  // Check for chapter start
+  // Helper to trigger chapter intro modal if appropriate
+  const triggerChapterIntroIfNeeded = (year: number) => {
+    const ch = getChapterByYear(year);
+    if (
+      ch &&
+      isChapterStartYear(year, settings.startYear) &&
+      !state.completedChapterIds?.includes(ch.id) &&
+      history.length === (ch.startYear - settings.startYear)
+    ) {
+      setShowChapterIntroModal(true);
+      return true;
+    }
+    return false;
+  };
+
+  // Check for chapter start (only when no blocking transition modal is active)
   const currentChapter = getChapterByYear(currentYear);
   useEffect(() => {
     if (
-      currentChapter &&
-      isChapterStartYear(currentYear, settings.startYear) &&
-      !state.completedChapterIds?.includes(currentChapter.id) &&
-      history.length === (currentChapter.startYear - settings.startYear)
+      !showYearEndModal &&
+      !chapterSummaryData &&
+      !showDelistingModal &&
+      !showNewListingModal &&
+      !showReplayStage
     ) {
-      setShowChapterIntroModal(true);
+      triggerChapterIntroIfNeeded(currentYear);
     }
-  }, [currentYear, currentChapter, state.completedChapterIds, history.length, settings.startYear]);
+  }, [
+    currentYear,
+    currentChapter,
+    state.completedChapterIds,
+    history.length,
+    settings.startYear,
+    showYearEndModal,
+    chapterSummaryData,
+    showDelistingModal,
+    showNewListingModal,
+    showReplayStage,
+  ]);
+
+  // Sequential Modal Transition Handlers
+  const handleProceedAfterYearEnd = () => {
+    setShowYearEndModal(false);
+    if (chapterSummaryData) {
+      // Chapter summary is already queued
+    } else if (pendingDelistings.length > 0) {
+      setShowDelistingModal(true);
+    } else if (pendingNewListings.length > 0) {
+      setShowNewListingModal(true);
+    } else {
+      triggerChapterIntroIfNeeded(currentYear);
+    }
+  };
+
+  const handleCloseChapterSummary = () => {
+    setChapterSummaryData(null);
+    if (pendingDelistings.length > 0) {
+      setShowDelistingModal(true);
+    } else if (pendingNewListings.length > 0) {
+      setShowNewListingModal(true);
+    } else {
+      triggerChapterIntroIfNeeded(currentYear);
+    }
+  };
+
+  const handleCloseDelisting = () => {
+    setShowDelistingModal(false);
+    if (pendingNewListings.length > 0) {
+      setShowNewListingModal(true);
+    } else {
+      triggerChapterIntroIfNeeded(currentYear);
+    }
+  };
+
+  const handleCloseNewListing = () => {
+    setShowNewListingModal(false);
+    triggerChapterIntroIfNeeded(currentYear);
+  };
 
   // Navigate to results if game over
   useEffect(() => {
@@ -192,6 +263,25 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
       holdings,
     });
   }, [currentYear, watchlist, holdings]);
+
+  // Newly listed stocks in current year
+  const currentYearNewlyListed = useMemo(() => {
+    return tradableStocks.filter(s => s.isNewlyListed);
+  }, [tradableStocks]);
+
+  const handleOpenNewListingModal = () => {
+    const listYear = currentYear <= settings.startYear ? currentYear : currentYear - 1;
+    let newlyListed = getNewlyListedStocksForYear(listYear);
+    if (newlyListed.length === 0 && currentYearNewlyListed.length > 0) {
+      newlyListed = currentYearNewlyListed
+        .map(t => HISTORICAL_STOCKS_BY_ID[t.canonicalId])
+        .filter(Boolean) as HistoricalStockDefinition[];
+    }
+    if (newlyListed.length > 0) {
+      setPendingNewListings(newlyListed);
+      setShowNewListingModal(true);
+    }
+  };
 
   // Macro news for currentYear
   const macroNewsList = useMemo(() => {
@@ -370,6 +460,17 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
 
         {/* Global Toolbar Buttons */}
         <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
+          {currentYearNewlyListed.length > 0 && (
+            <button
+              type="button"
+              onClick={handleOpenNewListingModal}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 border border-amber-300 shadow-xs font-black transition flex items-center gap-1 cursor-pointer animate-pulse"
+              title="당해 연도 신규 상장 기업 소개 팝업 열기"
+            >
+              <Sparkles size={14} className="fill-amber-950" /> 신규 상장 ({currentYearNewlyListed.length})
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => {
@@ -655,6 +756,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           onToggleWatchlist={cid => {
             dispatch({ type: 'TOGGLE_WATCHLIST', payload: cid });
           }}
+          onOpenNewListingModal={handleOpenNewListingModal}
         />
       )}
 
@@ -854,14 +956,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         <YearEndBriefingModal
           record={state.history[state.history.length - 1] || null}
           isGameOver={state.isGameOver}
-          onProceed={() => {
-            setShowYearEndModal(false);
-            if (pendingDelistings.length > 0) {
-              setShowDelistingModal(true);
-            } else if (pendingNewListings.length > 0) {
-              setShowNewListingModal(true);
-            }
-          }}
+          onProceed={handleProceedAfterYearEnd}
         />
       )}
 
@@ -872,12 +967,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           holdingsBefore={delistingHoldingsSnapshot}
           year={currentYear - 1}
           isOpen={showDelistingModal}
-          onClose={() => {
-            setShowDelistingModal(false);
-            if (pendingNewListings.length > 0) {
-              setShowNewListingModal(true);
-            }
-          }}
+          onClose={handleCloseDelisting}
         />
       )}
 
@@ -887,10 +977,22 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           listedStocks={pendingNewListings}
           targetYear={currentYear}
           isOpen={showNewListingModal}
-          onClose={() => setShowNewListingModal(false)}
+          watchlist={watchlist}
+          onClose={handleCloseNewListing}
           onSelectStock={cid => {
             setSelectedCanonicalIdForDetail(cid);
             setInitialDetailTab('OVERVIEW');
+          }}
+          onToggleWatchlist={cid => {
+            dispatch({ type: 'TOGGLE_WATCHLIST', payload: cid });
+            audioManager.playUiSound('keyTap');
+          }}
+          onAddToPortfolio={cid => {
+            const currentW = draftTargetWeights[cid] || 0;
+            dispatch({
+              type: 'SET_DRAFT_TARGET_WEIGHT',
+              payload: { canonicalId: cid, weight: Math.min(1.0, currentW + 0.1) },
+            });
           }}
         />
       )}
@@ -900,7 +1002,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         <ChapterSummaryModal
           isOpen={Boolean(chapterSummaryData)}
           summaryData={chapterSummaryData}
-          onClose={() => setChapterSummaryData(null)}
+          onClose={handleCloseChapterSummary}
         />
       )}
 

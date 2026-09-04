@@ -182,6 +182,8 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
       onClick={handleTileClick}
       onKeyDown={handleKeyDown}
       className={`stock-key group hover:z-40 focus-within:z-40 ${isHolding ? 'is-holding' : ''} ${
+        stock.isNewlyListed ? 'border-amber-400/90 ring-1 ring-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.22)]' : ''
+      } ${
         hasTarget ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50/30' : ''
       } ${isSelected ? 'ring-2 ring-blue-700 border-blue-700' : ''}`}
     >
@@ -201,9 +203,9 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
 
           {/* New Listing Badge */}
           {stock.isNewlyListed && (
-            <span className="px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[11px] flex items-center gap-0.5">
-              <Sparkles size={11} className="text-amber-600" />
-              <span>NEW</span>
+            <span className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 font-black text-[11px] flex items-center gap-0.5 shadow-xs border border-amber-300 animate-pulse">
+              <Sparkles size={11} className="text-amber-950 fill-amber-950" />
+              <span>NEW 상장</span>
             </span>
           )}
 

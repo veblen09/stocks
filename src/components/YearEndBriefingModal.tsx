@@ -6,11 +6,18 @@ import {
   FileText,
   TrendingUp,
   Award,
+  Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import type { YearlyPerformanceRecord } from '../types/stockGame';
 import { getReturnBgColor, getReturnColor, formatKRW, formatPercent } from '../utils/formatMoney';
 import { getAvailableNewsForYear, getYearRetrospectiveNews } from '../engine/newsEngine';
+import {
+  getNewlyListedStocksForYear,
+  getDelistedStocksForYear,
+  getNextUpcomingIpoInfo,
+} from '../engine/universeEngine';
 import { useStockGame } from '../store/stockGameStore';
 import { audioManager } from '../utils/audioManager';
 
@@ -42,6 +49,11 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
 
   const currentYear = record.year;
   const priorYear = currentYear - 1;
+
+  // Newly listed and delisted stocks during this completed year
+  const newlyListedInYear = getNewlyListedStocksForYear(currentYear);
+  const delistedInYear = getDelistedStocksForYear(currentYear);
+  const upcomingIpo = getNextUpcomingIpoInfo(currentYear);
 
   // Benchmark returns for this year
   const kospiRet = record.benchmarkReturns?.kospi ?? 0;
@@ -148,13 +160,56 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
             <div className="p-2 bg-emerald-50/70 rounded-xl border border-emerald-200">
               <div className="flex justify-between items-center text-[10px] font-sans">
                 <span className="text-emerald-900 font-bold">⚖️ 50:50 혼합</span>
-                <span className="text-slate-400 font-normal">리밸런싱</span>
+                <span className={`font-bold ${record.annualReturn - blendRet >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {record.annualReturn - blendRet >= 0 ? `+${((record.annualReturn - blendRet) * 100).toFixed(1)}%p` : `${((record.annualReturn - blendRet) * 100).toFixed(1)}%p`}
+                </span>
               </div>
               <span className={`text-xs font-bold block mt-0.5 ${getReturnColor(blendRet)}`}>
                 {formatPercent(blendRet)}
               </span>
             </div>
           </div>
+
+          {/* Exchange IPO & Delisting Trends Strip */}
+          {newlyListedInYear.length > 0 ? (
+            <div className="p-2.5 bg-gradient-to-r from-amber-50 to-indigo-50 border border-amber-200 rounded-xl text-xs space-y-1 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="font-black text-amber-900 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-600 fill-amber-500" />
+                  {currentYear}년 신규 상장({newlyListedInYear.length}개사 등장)
+                </span>
+                <span className="text-[10px] font-bold text-indigo-700 bg-white/90 px-2 py-0.5 rounded-md border border-indigo-200">
+                  {currentYear + 1}년부터 매수 가능
+                </span>
+              </div>
+              <p className="text-slate-700 font-medium text-[11px]">
+                {newlyListedInYear.map(s => `${s.currentName}(${s.currentTicker})`).join(', ')} 기업이 새로 상장되었습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-center justify-between flex-wrap gap-1">
+              <span className="font-medium text-slate-600 text-[11px]">
+                🏛️ <strong>거래소 상장 동향</strong>: 당해 연도 신규 상장 기업 없음
+              </span>
+              {upcomingIpo && (
+                <span className="text-[10px] font-bold text-slate-500 font-mono bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                  다음 예정 IPO: {upcomingIpo.year}년 ({upcomingIpo.companies.map(c => c.currentName).slice(0, 2).join(', ')}{upcomingIpo.companies.length > 2 ? ' 외' : ''})
+                </span>
+              )}
+            </div>
+          )}
+
+          {delistedInYear.length > 0 && (
+            <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-900 space-y-0.5 shadow-2xs">
+              <span className="font-black flex items-center gap-1.5 text-rose-800">
+                <AlertTriangle size={13} className="text-rose-600" />
+                {currentYear}년 거래소 상장폐지 공시 ({delistedInYear.length}개사)
+              </span>
+              <p className="font-medium text-[11px] text-rose-900">
+                {delistedInYear.map(s => `${s.currentName}(${s.currentTicker})`).join(', ')} 주권이 상장폐지 처리되었습니다.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 4 Analysis Tabs */}

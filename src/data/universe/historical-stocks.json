@@ -1244,20 +1244,20 @@
     "currentName": "JP모건 체이스",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1969-03-05",
+    "firstTradingDate": "1969-03-05",
+    "firstValidPriceDate": "1969-03-05",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1969-03-05",
         "name": "Chemical Bank / J.P. Morgan & Co.",
         "ticker": "JPM"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1969-03-05",
         "sector": "Banking / Financial Services"
       }
     ],
@@ -1333,19 +1333,19 @@
     "market": "US",
     "currency": "USD",
     "listingDate": "1944-09-25",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "firstTradingDate": "1944-09-25",
+    "firstValidPriceDate": "1944-09-25",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1944-09-25",
         "name": "Johnson & Johnson",
         "ticker": "JNJ"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1944-09-25",
         "sector": "Healthcare / Pharmaceuticals"
       }
     ],
@@ -1392,20 +1392,20 @@
     "currentName": "엑손모빌",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1928-01-03",
+    "firstTradingDate": "1928-01-03",
+    "firstValidPriceDate": "1928-01-03",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1928-01-03",
         "name": "Exxon Corporation",
         "ticker": "XOM"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1928-01-03",
         "sector": "Energy / Oil & Gas"
       }
     ],
@@ -1450,20 +1450,20 @@
     "currentName": "코카콜라",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1919-09-05",
+    "firstTradingDate": "1919-09-05",
+    "firstValidPriceDate": "1919-09-05",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1919-09-05",
         "name": "The Coca-Cola Company",
         "ticker": "KO"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1919-09-05",
         "sector": "Beverages / Consumer Staples"
       }
     ],
@@ -1480,20 +1480,20 @@
     "currentName": "펩시코",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1919-12-18",
+    "firstTradingDate": "1919-12-18",
+    "firstValidPriceDate": "1919-12-18",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1919-12-18",
         "name": "PepsiCo, Inc.",
         "ticker": "PEP"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1919-12-18",
         "sector": "Food & Beverage"
       }
     ],
@@ -1510,20 +1510,20 @@
     "currentName": "프록터 앤 갬블",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1980-01-01",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1891-03-01",
+    "firstTradingDate": "1891-03-01",
+    "firstValidPriceDate": "1891-03-01",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1891-03-01",
         "name": "The Procter & Gamble Company",
         "ticker": "PG"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1891-03-01",
         "sector": "Consumer Staples"
       }
     ],
@@ -1540,20 +1540,20 @@
     "currentName": "월마트",
     "market": "US",
     "currency": "USD",
-    "listingDate": "1972-08-25",
-    "firstTradingDate": "1980-01-01",
-    "firstValidPriceDate": "1980-01-01",
+    "listingDate": "1970-10-01",
+    "firstTradingDate": "1970-10-01",
+    "firstValidPriceDate": "1970-10-01",
     "delistingDate": null,
     "nameHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1970-10-01",
         "name": "Wal-Mart Stores, Inc.",
         "ticker": "WMT"
       }
     ],
     "sectorHistory": [
       {
-        "validFrom": "1980-01-01",
+        "validFrom": "1970-10-01",
         "sector": "Retail / Consumer Staples"
       }
     ],
