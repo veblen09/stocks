@@ -147,7 +147,7 @@ export interface MonthPriceItem {
 /**
  * Helper to detect if a monthly price sequence is synthetic linear interpolation or flat dummy constants
  */
-function isSyntheticLinearOrFlat(prices: number[]): boolean {
+export function isSyntheticLinearOrFlat(prices: number[]): boolean {
   if (prices.length < 3) return true;
 
   const maxP = Math.max(...prices);

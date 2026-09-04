@@ -344,4 +344,44 @@ describe('Live Market Replay Engine Tests', () => {
     expect(recalculated.points[12].month).toBe(12);
     expect(recalculated.points[12].portfolioValueKRW).toBeGreaterThan(0);
   });
+
+  it('12. 1980 Hyundai Motor portfolio trajectory fluctuates realistically without flatlining from Month 2 to 12', () => {
+    const holdings1980: Record<string, StockHolding> = {
+      'KR_005380': {
+        canonicalId: 'KR_005380',
+        shares: 102854,
+        currentValueKRW: 13000000,
+        currentWeight: 1.0,
+        totalInvestedKRW: 13000000,
+        averageCostKRW: 126.39,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const data1980 = generateYearReplayData(
+      1980,
+      0,
+      holdings1980,
+      13000000,
+      13000000,
+      13000000,
+      DEFAULT_SETTINGS,
+      0
+    );
+
+    expect(data1980.points.length).toBe(13);
+
+    // Month-to-month values should fluctuate, not stay identical
+    const monthlyVals = data1980.points.slice(1).map(p => p.portfolioValueKRW);
+    const uniqueVals = new Set(monthlyVals.map(v => Math.round(v)));
+
+    // Must have at least 5 different monthly values across the 12 months (not flat)
+    expect(uniqueVals.size).toBeGreaterThanOrEqual(5);
+
+    // Check that month 12 lands on the actual year-end stock value
+    const endPrice = getMonthlyStockPriceKRW('KR_005380', 1980, 12);
+    expect(endPrice).toBeCloseTo(137.1359, 2);
+  });
 });
+

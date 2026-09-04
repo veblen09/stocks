@@ -7,10 +7,14 @@ import type {
 import type { HistoricalNewsItem } from '../../types/stockNews';
 import type { MonthlyPortfolioPoint, YearReplayData } from './marketReplayTypes';
 import rawMonthlyPrices from '../../data/normalized/monthly_prices.json';
-import { getStockPriceKRW, STOCKS_BY_ID } from '../../engine/returnEngine';
+import { getStockPriceKRW } from '../../engine/returnEngine';
 import { calculateRiskLevel } from '../../engine/metricsEngine';
 import { getCrisisEventForYear } from '../../engine/crisisEngine';
 import { HISTORICAL_NEWS } from '../../engine/newsEngine';
+import {
+  getYearMonthlyPrices,
+  isSyntheticLinearOrFlat,
+} from '../../engine/companyChartEngine';
 
 const MONTHLY_PRICES: Record<string, Record<string, { priceLocal: number; year: number; month: number; date: string }>> =
   rawMonthlyPrices as unknown as Record<string, Record<string, { priceLocal: number; year: number; month: number; date: string }>>;
@@ -30,8 +34,15 @@ export function getMonthlyReplayQuality(
 
   let withMonthly = 0;
   for (const cid of activeStockIds) {
-    const ym = `${year}-06`;
-    if (MONTHLY_PRICES[cid]?.[ym]) {
+    const prices: number[] = [];
+    for (let m = 1; m <= 12; m++) {
+      const ym = `${year}-${m.toString().padStart(2, '0')}`;
+      const p = MONTHLY_PRICES[cid]?.[ym]?.priceLocal;
+      if (p !== undefined && p !== null && p > 0) {
+        prices.push(p);
+      }
+    }
+    if (prices.length >= 10 && !isSyntheticLinearOrFlat(prices)) {
       withMonthly++;
     }
   }
@@ -47,48 +58,21 @@ export function getMonthlyReplayQuality(
 
 /**
  * Evaluates stock price in KRW for a specific month
- * If granular monthly data is available, uses it.
- * Otherwise, realistically interpolates between year-start price and year-end price
- * with market-aligned waves so all 45 years show smooth, thrilling live 12-month animations.
+ * Uses unified getYearMonthlyPrices so portfolio and individual charts match 100%
  */
 export function getMonthlyStockPriceKRW(
   canonicalId: string,
   year: number,
   month: number
 ): number {
-  const mStr = month.toString().padStart(2, '0');
-  const ym = `${year}-${mStr}`;
-  const monthlyData = MONTHLY_PRICES[canonicalId]?.[ym];
-
-  if (monthlyData && monthlyData.priceLocal > 0) {
-    const stock = STOCKS_BY_ID[canonicalId];
-    if (stock && stock.market === 'US') {
-      const fxData = MONTHLY_PRICES['FX_USDKRW']?.[ym];
-      const fxRate = fxData && fxData.priceLocal > 0 ? fxData.priceLocal : 1150;
-      return monthlyData.priceLocal * fxRate;
-    }
-    return monthlyData.priceLocal;
+  if (month === 0) {
+    return getStockPriceKRW(canonicalId, year - 1) || getStockPriceKRW(canonicalId, year) || 1;
   }
-
-  // Smooth realistic monthly trajectory from start-of-year price to end-of-year price
-  const pStart = getStockPriceKRW(canonicalId, year - 1) || 1;
-  const pEnd = getStockPriceKRW(canonicalId, year) || pStart;
-
-  if (month === 12) {
-    return pEnd;
+  const yearPrices = getYearMonthlyPrices(canonicalId, year, false);
+  if (yearPrices && yearPrices[month - 1]) {
+    return yearPrices[month - 1].price;
   }
-
-  // Linear progression fraction
-  const t = month / 12;
-
-  // Add realistic micro-market wave based on canonicalId & month seed
-  const hash = (canonicalId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + month * 17) % 100;
-  const wiggleFraction = Math.sin((month / 12) * Math.PI * 2 + hash) * 0.035; // +/- 3.5% seasonal fluctuation
-
-  const interpolated = pStart + (pEnd - pStart) * t;
-  const withWiggle = interpolated * (1 + wiggleFraction * (1 - t * 0.5));
-
-  return Math.max(1, withWiggle);
+  return getStockPriceKRW(canonicalId, year) || 1;
 }
 
 /**
