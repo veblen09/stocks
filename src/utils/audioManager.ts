@@ -53,10 +53,13 @@ export interface ClassicalTrack {
   urls: string[];
 }
 
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/veblen09/stocks@main/public/audio';
+
 const bgmPlaylist: ClassicalTrack[] = [
   {
     name: "비발디 - 사계 중 '봄' 1악장 (Allegro) 🎻",
     urls: [
+      `${CDN_BASE}/bgm-vivaldi-spring.ogg`,
       './audio/bgm-vivaldi-spring.ogg',
       '/audio/bgm-vivaldi-spring.ogg',
       'audio/bgm-vivaldi-spring.ogg',
@@ -66,6 +69,7 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '요한 슈트라우스 - 라데츠키 행진곡 🥁 🎺',
     urls: [
+      `${CDN_BASE}/bgm-radetzky.ogg`,
       './audio/bgm-radetzky.ogg',
       '/audio/bgm-radetzky.ogg',
       'audio/bgm-radetzky.ogg',
@@ -75,6 +79,7 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
     urls: [
+      `${CDN_BASE}/bgm-tchaikovsky-concerto.ogg`,
       './audio/bgm-tchaikovsky-concerto.ogg',
       '/audio/bgm-tchaikovsky-concerto.ogg',
       'audio/bgm-tchaikovsky-concerto.ogg',
@@ -85,6 +90,7 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
     urls: [
+      `${CDN_BASE}/bgm-classical-calm.ogg`,
       './audio/bgm-classical-calm.ogg',
       '/audio/bgm-classical-calm.ogg',
       'audio/bgm-classical-calm.ogg',
@@ -94,6 +100,7 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '베토벤 - 엘리제를 위하여 🎹',
     urls: [
+      `${CDN_BASE}/bgm-furelise.ogg`,
       './audio/bgm-furelise.ogg',
       '/audio/bgm-furelise.ogg',
       'audio/bgm-furelise.ogg',
@@ -103,6 +110,7 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '바흐 - 골드베르크 변주곡 아리아 🎼',
     urls: [
+      `${CDN_BASE}/bgm-goldberg.ogg`,
       './audio/bgm-goldberg.ogg',
       '/audio/bgm-goldberg.ogg',
       'audio/bgm-goldberg.ogg',
@@ -117,6 +125,46 @@ let currentCandidateIndex = 0;
 let currentTrackName = bgmNames[0];
 
 const isBrowser = typeof window !== 'undefined';
+
+// In-memory Blob ObjectURL cache for zero-bandwidth instant replay
+const blobUrlCache: Record<string, string> = {};
+
+/**
+ * Fetch audio through CacheStorage so each track is downloaded at most ONCE across all sessions
+ * and served from local disk cache with 0 network bandwidth on replay.
+ */
+const getOrFetchCachedAudioUrl = async (url: string): Promise<string> => {
+  if (blobUrlCache[url]) {
+    return blobUrlCache[url];
+  }
+
+  if (isBrowser && 'caches' in window) {
+    try {
+      const cache = await caches.open('money_track_audio_cache_v2');
+      const cachedResponse = await cache.match(url);
+      if (cachedResponse) {
+        const blob = await cachedResponse.blob();
+        const objUrl = URL.createObjectURL(blob);
+        blobUrlCache[url] = objUrl;
+        return objUrl;
+      }
+
+      // Fetch once from free CDN / static source
+      const networkResponse = await fetch(url, { mode: 'cors' });
+      if (networkResponse.ok) {
+        await cache.put(url, networkResponse.clone());
+        const blob = await networkResponse.blob();
+        const objUrl = URL.createObjectURL(blob);
+        blobUrlCache[url] = objUrl;
+        return objUrl;
+      }
+    } catch {
+      // Ignore and fallback to direct URL
+    }
+  }
+
+  return url;
+};
 
 // Load settings from localStorage
 const loadSettings = (): AudioSettings => {
@@ -155,16 +203,29 @@ const getAudioContext = (): AudioContext | null => {
   return audioCtx;
 };
 
-const loadCurrentTrackCandidate = () => {
+const loadCurrentTrackCandidate = async () => {
   if (!bgmAudio) return;
   const track = bgmPlaylist[currentTrackIndex];
   if (!track || !track.urls || track.urls.length === 0) return;
 
   const candidateUrl = track.urls[currentCandidateIndex % track.urls.length];
   bgmAudio.preload = 'none';
-  bgmAudio.src = candidateUrl;
-  if (currentSettings.bgmEnabled) {
-    bgmAudio.load();
+
+  try {
+    const finalUrl = await getOrFetchCachedAudioUrl(candidateUrl);
+    if (bgmAudio) {
+      bgmAudio.src = finalUrl;
+      if (currentSettings.bgmEnabled) {
+        bgmAudio.load();
+      }
+    }
+  } catch {
+    if (bgmAudio) {
+      bgmAudio.src = candidateUrl;
+      if (currentSettings.bgmEnabled) {
+        bgmAudio.load();
+      }
+    }
   }
 };
 
