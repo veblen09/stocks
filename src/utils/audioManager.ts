@@ -108,13 +108,13 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '바흐 - 골드베르크 변주곡 아리아 🎼',
+    name: '비제 - 카르멘 투우사의 노래 🎺',
     urls: [
-      `${CDN_BASE}/bgm-goldberg.ogg`,
-      './audio/bgm-goldberg.ogg',
-      '/audio/bgm-goldberg.ogg',
-      'audio/bgm-goldberg.ogg',
-      './audio/bgm-classical-calm.ogg',
+      `${CDN_BASE}/bgm-carmen-toreador.ogg`,
+      './audio/bgm-carmen-toreador.ogg',
+      '/audio/bgm-carmen-toreador.ogg',
+      'audio/bgm-carmen-toreador.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/9/9f/Carmen_-_Prelude_to_Act_1.ogg',
     ],
   },
 ];
