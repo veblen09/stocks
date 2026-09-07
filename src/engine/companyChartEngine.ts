@@ -384,19 +384,37 @@ export function getCompany1YrSparkline(
   canonicalId: string,
   upToYear: number
 ): Sparkline1YrData | null {
+  const benchMeta = BENCHMARK_CHARTS[canonicalId];
   const stock = STOCKS_BY_ID[canonicalId];
-  if (!stock || upToYear < stock.firstValidYear) return null;
+  if (!stock && !benchMeta) return null;
 
-  const monthlyList = getYearMonthlyPrices(canonicalId, upToYear, false);
+  const firstValidYear = benchMeta ? benchMeta.firstValidYear : stock.firstValidYear;
+  if (upToYear < firstValidYear) return null;
+
+  const isSP500 = benchMeta ? benchMeta.canonicalId === 'BENCH_SP500' : false;
+  const isKospi = benchMeta ? benchMeta.canonicalId === 'BENCH_KOSPI' : false;
+
+  const monthlyList = getYearMonthlyPrices(canonicalId, upToYear, isSP500);
   if (monthlyList.length === 0) return null;
 
-  const startP =
-    getStockPriceKRW(canonicalId, upToYear - 1) ||
-    monthlyList[0].price ||
-    1000;
-  const endP =
-    getStockPriceKRW(canonicalId, upToYear) ||
-    monthlyList[monthlyList.length - 1].price;
+  let startP: number;
+  let endP: number;
+
+  if (isKospi) {
+    startP = BENCHMARKS.kospi?.prices?.[String(upToYear - 1)] || BENCHMARKS.kospi?.prices?.[String(upToYear)] || 100;
+    endP = BENCHMARKS.kospi?.prices?.[String(upToYear)] || startP;
+  } else if (isSP500) {
+    startP = BENCHMARKS.sp500?.prices?.[String(upToYear - 1)] || BENCHMARKS.sp500?.prices?.[String(upToYear)] || 100;
+    endP = BENCHMARKS.sp500?.prices?.[String(upToYear)] || startP;
+  } else {
+    startP =
+      getStockPriceKRW(canonicalId, upToYear - 1) ||
+      monthlyList[0].price ||
+      1000;
+    endP =
+      getStockPriceKRW(canonicalId, upToYear) ||
+      monthlyList[monthlyList.length - 1].price;
+  }
 
   const rawPrices = [startP, ...monthlyList.map(pt => pt.price)];
 

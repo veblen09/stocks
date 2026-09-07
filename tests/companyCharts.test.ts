@@ -169,4 +169,24 @@ describe('Individual Company Price Charts Engine Tests', () => {
       });
     });
   });
+
+  describe('5. Benchmark Sparklines & Charts', () => {
+    it('should generate valid 1-year sparklines for KOSPI 200 and S&P 500 benchmarks', () => {
+      const kospiSpark = getCompany1YrSparkline('BENCH_KOSPI', 2008);
+      expect(kospiSpark).not.toBeNull();
+      expect(kospiSpark?.points.length).toBeGreaterThan(1);
+      expect(kospiSpark?.svgPath).toBeDefined();
+      expect(kospiSpark?.svgAreaPath).toBeDefined();
+      expect(Number.isFinite(kospiSpark?.return1Yr)).toBe(true);
+      expect(kospiSpark?.return1Yr).toBeLessThan(0); // 2008 financial crisis should be negative return
+
+      const sp500Spark = getCompany1YrSparkline('BENCH_SP500', 2008);
+      expect(sp500Spark).not.toBeNull();
+      expect(sp500Spark?.points.length).toBeGreaterThan(1);
+      expect(sp500Spark?.svgPath).toBeDefined();
+      expect(sp500Spark?.svgAreaPath).toBeDefined();
+      expect(Number.isFinite(sp500Spark?.return1Yr)).toBe(true);
+      expect(sp500Spark?.return1Yr).toBeLessThan(0); // 2008 S&P500 was negative
+    });
+  });
 });
