@@ -53,63 +53,53 @@ export interface ClassicalTrack {
   urls: string[];
 }
 
-const CDN_BASE = 'https://cdn.jsdelivr.net/gh/veblen09/stocks@main/public/audio';
-
 const bgmPlaylist: ClassicalTrack[] = [
   {
     name: "비발디 - 사계 중 '봄' 1악장 (Allegro) 🎻",
     urls: [
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
       './audio/bgm-classical-calm.ogg',
       'audio/bgm-classical-calm.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/f/ff/Vivaldi_-_Four_Seasons_1_Spring_mvt_1_Allegro_-_John_Harrison_violin.oga',
     ],
   },
   {
-    name: '파헬벨 - 캐논 변주곡 (Canon in D) 🎼',
+    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
     urls: [
-      `${CDN_BASE}/bgm-canon.ogg`,
-      './audio/bgm-canon.ogg',
-      'audio/bgm-canon.ogg',
+      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/b/b4/Radetzky_March.ogg',
     ],
   },
   {
-    name: '차이코프스키 - 호두까기 인형 행진곡 🎹',
+    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
     urls: [
-      `${CDN_BASE}/bgm-nutcracker.ogg`,
       './audio/bgm-nutcracker.ogg',
       'audio/bgm-nutcracker.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/6/6c/Tchaikovsky--PianoConcerto1.ogg',
     ],
   },
   {
-    name: '베토벤 - 월광 소나타 1악장 (Moonlight Sonata) 🌙',
+    name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
     urls: [
-      `${CDN_BASE}/bgm-moonlight.ogg`,
-      './audio/bgm-moonlight.ogg',
-      'audio/bgm-moonlight.ogg',
+      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg',
     ],
   },
   {
-    name: '베토벤 - 엘리제를 위하여 (Für Elise) 🎹',
+    name: '베토벤 - 엘리제를 위하여 🎹',
     urls: [
-      `${CDN_BASE}/bgm-furelise.ogg`,
       './audio/bgm-furelise.ogg',
       'audio/bgm-furelise.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg',
     ],
   },
   {
     name: '바흐 - 골드베르크 변주곡 아리아 🎼',
     urls: [
-      `${CDN_BASE}/bgm-goldberg.ogg`,
       './audio/bgm-goldberg.ogg',
       'audio/bgm-goldberg.ogg',
-    ],
-  },
-  {
-    name: '에릭 사티 - 짐노페디 1번 (Gymnopédie No.1) ☕',
-    urls: [
-      `${CDN_BASE}/bgm-gymnopedie.ogg`,
-      './audio/bgm-gymnopedie.ogg',
-      'audio/bgm-gymnopedie.ogg',
+      './audio/bgm-classical-calm.ogg',
     ],
   },
 ];
@@ -120,46 +110,6 @@ let currentCandidateIndex = 0;
 let currentTrackName = bgmNames[0];
 
 const isBrowser = typeof window !== 'undefined';
-
-// In-memory Blob ObjectURL cache for zero-bandwidth instant replay
-const blobUrlCache: Record<string, string> = {};
-
-/**
- * Fetch audio through CacheStorage so each track is downloaded at most ONCE across all sessions
- * and served from local disk cache with 0 network bandwidth on replay.
- */
-const getOrFetchCachedAudioUrl = async (url: string): Promise<string> => {
-  if (blobUrlCache[url]) {
-    return blobUrlCache[url];
-  }
-
-  if (isBrowser && 'caches' in window) {
-    try {
-      const cache = await caches.open('money_track_audio_cache_v1');
-      const cachedResponse = await cache.match(url);
-      if (cachedResponse) {
-        const blob = await cachedResponse.blob();
-        const objUrl = URL.createObjectURL(blob);
-        blobUrlCache[url] = objUrl;
-        return objUrl;
-      }
-
-      // Fetch once from free CDN / static source
-      const networkResponse = await fetch(url, { mode: 'cors' });
-      if (networkResponse.ok) {
-        await cache.put(url, networkResponse.clone());
-        const blob = await networkResponse.blob();
-        const objUrl = URL.createObjectURL(blob);
-        blobUrlCache[url] = objUrl;
-        return objUrl;
-      }
-    } catch {
-      // Ignore and fallback to direct URL
-    }
-  }
-
-  return url;
-};
 
 // Load settings from localStorage
 const loadSettings = (): AudioSettings => {
@@ -198,22 +148,16 @@ const getAudioContext = (): AudioContext | null => {
   return audioCtx;
 };
 
-const loadCurrentTrackCandidate = async () => {
+const loadCurrentTrackCandidate = () => {
   if (!bgmAudio) return;
   const track = bgmPlaylist[currentTrackIndex];
   if (!track || !track.urls || track.urls.length === 0) return;
 
   const candidateUrl = track.urls[currentCandidateIndex % track.urls.length];
   bgmAudio.preload = 'none';
-
+  bgmAudio.src = candidateUrl;
   if (currentSettings.bgmEnabled) {
-    const cachedOrCdnUrl = await getOrFetchCachedAudioUrl(candidateUrl);
-    if (bgmAudio) {
-      bgmAudio.src = cachedOrCdnUrl;
-      bgmAudio.load();
-    }
-  } else {
-    bgmAudio.src = candidateUrl;
+    bgmAudio.load();
   }
 };
 
@@ -234,20 +178,18 @@ const initAudio = () => {
       const track = bgmPlaylist[currentTrackIndex];
       if (track && currentCandidateIndex + 1 < track.urls.length) {
         currentCandidateIndex += 1;
-        loadCurrentTrackCandidate().then(() => {
-          if (currentSettings.bgmEnabled) {
-            bgmAudio?.play().catch(() => {});
-          }
-        });
+        loadCurrentTrackCandidate();
+        if (currentSettings.bgmEnabled) {
+          bgmAudio?.play().catch(() => {});
+        }
       } else {
         currentCandidateIndex = 0;
         currentTrackIndex = (currentTrackIndex + 1) % bgmPlaylist.length;
         currentTrackName = bgmPlaylist[currentTrackIndex].name;
-        loadCurrentTrackCandidate().then(() => {
-          if (currentSettings.bgmEnabled) {
-            bgmAudio?.play().catch(() => {});
-          }
-        });
+        loadCurrentTrackCandidate();
+        if (currentSettings.bgmEnabled) {
+          bgmAudio?.play().catch(() => {});
+        }
       }
     });
 
@@ -291,7 +233,7 @@ export const audioManager = {
 
 
 
-  playTrack: async (index: number) => {
+  playTrack: (index: number) => {
     initAudio();
     if (!bgmAudio) return;
 
@@ -299,7 +241,7 @@ export const audioManager = {
     currentCandidateIndex = 0;
     const track = bgmPlaylist[currentTrackIndex];
     currentTrackName = track.name;
-    await loadCurrentTrackCandidate();
+    loadCurrentTrackCandidate();
 
     updateBgmVolume();
     if (currentSettings.bgmEnabled) {
@@ -332,7 +274,7 @@ export const audioManager = {
     if (!bgmAudio) return;
 
     if (!bgmAudio.src || bgmAudio.src === '' || (typeof window !== 'undefined' && bgmAudio.src === window.location.href)) {
-      await loadCurrentTrackCandidate();
+      loadCurrentTrackCandidate();
     }
 
     if (audioCtx && audioCtx.state === 'suspended') {
@@ -365,7 +307,7 @@ export const audioManager = {
     currentCandidateIndex = 0;
     const track = bgmPlaylist[currentTrackIndex];
     currentTrackName = track.name;
-    await loadCurrentTrackCandidate();
+    loadCurrentTrackCandidate();
 
     if (currentSettings.bgmEnabled) {
       try {
@@ -377,7 +319,7 @@ export const audioManager = {
     }
   },
 
-  setSettings: async (newSettings: AudioSettings) => {
+  setSettings: (newSettings: AudioSettings) => {
     const wasEnabled = currentSettings.bgmEnabled;
     currentSettings = { ...newSettings };
     saveSettings(currentSettings);
@@ -386,7 +328,7 @@ export const audioManager = {
       updateBgmVolume();
       if (currentSettings.bgmEnabled) {
         if (!wasEnabled || !bgmAudio.src || bgmAudio.src === window.location.href) {
-          await loadCurrentTrackCandidate();
+          loadCurrentTrackCandidate();
         }
         if (bgmAudio.paused) {
           audioManager.playBgm();
