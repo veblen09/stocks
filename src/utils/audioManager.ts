@@ -98,13 +98,13 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '베토벤 - 엘리제를 위하여 🎹',
+    name: '모차르트 - 터키 행진곡 🎹',
     urls: [
-      `${CDN_BASE}/bgm-furelise.ogg`,
-      './audio/bgm-furelise.ogg',
-      '/audio/bgm-furelise.ogg',
-      'audio/bgm-furelise.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg',
+      `${CDN_BASE}/bgm-turkish-march.ogg`,
+      './audio/bgm-turkish-march.ogg',
+      '/audio/bgm-turkish-march.ogg',
+      'audio/bgm-turkish-march.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/b/bf/Mozart_-_Piano_Sonata_No._11_in_A_major_-_III._Allegro_%28Turkish_March%29.ogg',
     ],
   },
   {
