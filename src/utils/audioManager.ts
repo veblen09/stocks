@@ -65,37 +65,35 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
+    name: '파헬벨 - 캐논 변주곡 (Canon in D) 🎼',
     urls: [
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+      `${CDN_BASE}/bgm-canon.ogg`,
+      './audio/bgm-canon.ogg',
+      'audio/bgm-canon.ogg',
     ],
   },
   {
-    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
+    name: '차이코프스키 - 호두까기 인형 행진곡 🎹',
     urls: [
       `${CDN_BASE}/bgm-nutcracker.ogg`,
       './audio/bgm-nutcracker.ogg',
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
-      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-nutcracker.ogg',
     ],
   },
   {
-    name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
+    name: '베토벤 - 월광 소나타 1악장 (Moonlight Sonata) 🌙',
     urls: [
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+      `${CDN_BASE}/bgm-moonlight.ogg`,
+      './audio/bgm-moonlight.ogg',
+      'audio/bgm-moonlight.ogg',
     ],
   },
   {
-    name: '베토벤 - 엘리제를 위하여 🎹',
+    name: '베토벤 - 엘리제를 위하여 (Für Elise) 🎹',
     urls: [
       `${CDN_BASE}/bgm-furelise.ogg`,
       './audio/bgm-furelise.ogg',
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
-      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-furelise.ogg',
     ],
   },
   {
@@ -103,8 +101,15 @@ const bgmPlaylist: ClassicalTrack[] = [
     urls: [
       `${CDN_BASE}/bgm-goldberg.ogg`,
       './audio/bgm-goldberg.ogg',
-      `${CDN_BASE}/bgm-classical-calm.ogg`,
-      './audio/bgm-classical-calm.ogg',
+      'audio/bgm-goldberg.ogg',
+    ],
+  },
+  {
+    name: '에릭 사티 - 짐노페디 1번 (Gymnopédie No.1) ☕',
+    urls: [
+      `${CDN_BASE}/bgm-gymnopedie.ogg`,
+      './audio/bgm-gymnopedie.ogg',
+      'audio/bgm-gymnopedie.ogg',
     ],
   },
 ];
