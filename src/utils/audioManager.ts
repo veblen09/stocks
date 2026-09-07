@@ -65,16 +65,15 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '요한 슈트라우스 - 라데츠키 행진곡 / 파헬벨 캐논 🥁🎺',
+    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
     urls: [
-      `${CDN_BASE}/bgm-canon.ogg`,
-      './audio/bgm-canon.ogg',
       `${CDN_BASE}/bgm-classical-calm.ogg`,
       './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg',
     ],
   },
   {
-    name: '차이코프스키 - 피아노 협주곡 / 호두까기 인형 🎹',
+    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
     urls: [
       `${CDN_BASE}/bgm-nutcracker.ogg`,
       './audio/bgm-nutcracker.ogg',
@@ -83,12 +82,11 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '모차르트 - 아이네 클라이네 나흐트무지크 / 월광 🎻',
+    name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
     urls: [
-      `${CDN_BASE}/bgm-moonlight.ogg`,
-      './audio/bgm-moonlight.ogg',
       `${CDN_BASE}/bgm-classical-calm.ogg`,
       './audio/bgm-classical-calm.ogg',
+      'audio/bgm-classical-calm.ogg',
     ],
   },
   {
@@ -101,12 +99,12 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '바흐 - 골드베르크 변주곡 / 짐노페디 🎼',
+    name: '바흐 - 골드베르크 변주곡 아리아 🎼',
     urls: [
       `${CDN_BASE}/bgm-goldberg.ogg`,
       './audio/bgm-goldberg.ogg',
-      `${CDN_BASE}/bgm-gymnopedie.ogg`,
-      './audio/bgm-gymnopedie.ogg',
+      `${CDN_BASE}/bgm-classical-calm.ogg`,
+      './audio/bgm-classical-calm.ogg',
     ],
   },
 ];
