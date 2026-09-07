@@ -421,6 +421,54 @@ describe('Live Market Replay Engine Tests', () => {
     expect(sp1984Month12Return).toBeCloseTo(0.055, 2);
     expect(sp1984Month12Return).not.toBe(sp1980Month12Return);
   });
+
+  it('14. 1980 Samsung & Hyundai Motor holdings generate full 12-month trajectory for step-by-step replay', () => {
+    const holdings1980: Record<string, StockHolding> = {
+      'KR_005930': {
+        canonicalId: 'KR_005930',
+        shares: 50,
+        currentValueKRW: 5000000,
+        currentWeight: 0.5,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 100000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+      'KR_005380': {
+        canonicalId: 'KR_005380',
+        shares: 50,
+        currentValueKRW: 5000000,
+        currentWeight: 0.5,
+        totalInvestedKRW: 5000000,
+        averageCostKRW: 100000,
+        unrealizedPnlKRW: 0,
+        unrealizedPnlPercent: 0,
+      },
+    };
+
+    const replayData1980 = generateYearReplayData(
+      1980,
+      3000000,
+      holdings1980,
+      13000000,
+      13000000,
+      13000000,
+      DEFAULT_SETTINGS,
+      0
+    );
+
+    // Points must contain 13 items (1/1 baseline and 1월 ~ 12월)
+    expect(replayData1980.points.length).toBe(13);
+    expect(replayData1980.points[0].month).toBe(0);
+    expect(replayData1980.points[12].month).toBe(12);
+
+    // Each month must have valid portfolio value and progressive date
+    for (let m = 1; m <= 12; m++) {
+      expect(replayData1980.points[m].portfolioValueKRW).toBeGreaterThan(0);
+      expect(replayData1980.points[m].month).toBe(m);
+    }
+  });
 });
+
 
 

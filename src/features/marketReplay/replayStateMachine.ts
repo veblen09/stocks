@@ -80,7 +80,7 @@ export function useMarketReplayState({
 
     handledCrisisEventIdsRef.current.clear();
 
-    if (yearData.quality === 'ANNUAL_ONLY' || settings.speed === 'INSTANT') {
+    if (settings.speed === 'INSTANT') {
       setCurrentMonthIndex(yearData.points.length - 1);
       setStatus('YEAR_COMPLETE');
       onYearComplete();
