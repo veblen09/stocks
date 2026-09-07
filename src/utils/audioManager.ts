@@ -126,46 +126,6 @@ let currentTrackName = bgmNames[0];
 
 const isBrowser = typeof window !== 'undefined';
 
-// In-memory Blob ObjectURL cache for zero-bandwidth instant replay
-const blobUrlCache: Record<string, string> = {};
-
-/**
- * Fetch audio through CacheStorage so each track is downloaded at most ONCE across all sessions
- * and served from local disk cache with 0 network bandwidth on replay.
- */
-const getOrFetchCachedAudioUrl = async (url: string): Promise<string> => {
-  if (blobUrlCache[url]) {
-    return blobUrlCache[url];
-  }
-
-  if (isBrowser && 'caches' in window) {
-    try {
-      const cache = await caches.open('money_track_audio_cache_v2');
-      const cachedResponse = await cache.match(url);
-      if (cachedResponse) {
-        const blob = await cachedResponse.blob();
-        const objUrl = URL.createObjectURL(blob);
-        blobUrlCache[url] = objUrl;
-        return objUrl;
-      }
-
-      // Fetch once from free CDN / static source
-      const networkResponse = await fetch(url, { mode: 'cors' });
-      if (networkResponse.ok) {
-        await cache.put(url, networkResponse.clone());
-        const blob = await networkResponse.blob();
-        const objUrl = URL.createObjectURL(blob);
-        blobUrlCache[url] = objUrl;
-        return objUrl;
-      }
-    } catch {
-      // Ignore and fallback to direct URL
-    }
-  }
-
-  return url;
-};
-
 // Load settings from localStorage
 const loadSettings = (): AudioSettings => {
   if (!isBrowser) return DEFAULT_SETTINGS;
@@ -203,29 +163,18 @@ const getAudioContext = (): AudioContext | null => {
   return audioCtx;
 };
 
-const loadCurrentTrackCandidate = async () => {
+const loadCurrentTrackCandidate = () => {
   if (!bgmAudio) return;
   const track = bgmPlaylist[currentTrackIndex];
   if (!track || !track.urls || track.urls.length === 0) return;
 
   const candidateUrl = track.urls[currentCandidateIndex % track.urls.length];
   bgmAudio.preload = 'none';
-
-  try {
-    const finalUrl = await getOrFetchCachedAudioUrl(candidateUrl);
-    if (bgmAudio) {
-      bgmAudio.src = finalUrl;
-      if (currentSettings.bgmEnabled) {
-        bgmAudio.load();
-      }
-    }
-  } catch {
-    if (bgmAudio) {
-      bgmAudio.src = candidateUrl;
-      if (currentSettings.bgmEnabled) {
-        bgmAudio.load();
-      }
-    }
+  if (bgmAudio.src !== candidateUrl) {
+    bgmAudio.src = candidateUrl;
+  }
+  if (currentSettings.bgmEnabled) {
+    bgmAudio.load();
   }
 };
 
