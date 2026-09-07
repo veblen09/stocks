@@ -57,24 +57,28 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: "비발디 - 사계 중 '봄' 1악장 (Allegro) 🎻",
     urls: [
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+      './audio/bgm-vivaldi-spring.ogg',
+      '/audio/bgm-vivaldi-spring.ogg',
+      'audio/bgm-vivaldi-spring.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/f/ff/Vivaldi_-_Four_Seasons_1_Spring_mvt_1_Allegro_-_John_Harrison_violin.oga',
     ],
   },
   {
-    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
+    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁 🎺',
     urls: [
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+      './audio/bgm-radetzky.ogg',
+      '/audio/bgm-radetzky.ogg',
+      'audio/bgm-radetzky.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/b/b4/Radetzky_March.ogg',
     ],
   },
   {
     name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
     urls: [
+      './audio/bgm-tchaikovsky-concerto.ogg',
+      '/audio/bgm-tchaikovsky-concerto.ogg',
+      'audio/bgm-tchaikovsky-concerto.ogg',
       './audio/bgm-nutcracker.ogg',
-      'audio/bgm-nutcracker.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/6/6c/Tchaikovsky--PianoConcerto1.ogg',
     ],
   },
@@ -82,6 +86,7 @@ const bgmPlaylist: ClassicalTrack[] = [
     name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
     urls: [
       './audio/bgm-classical-calm.ogg',
+      '/audio/bgm-classical-calm.ogg',
       'audio/bgm-classical-calm.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg',
     ],
@@ -90,6 +95,7 @@ const bgmPlaylist: ClassicalTrack[] = [
     name: '베토벤 - 엘리제를 위하여 🎹',
     urls: [
       './audio/bgm-furelise.ogg',
+      '/audio/bgm-furelise.ogg',
       'audio/bgm-furelise.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg',
     ],
@@ -98,6 +104,7 @@ const bgmPlaylist: ClassicalTrack[] = [
     name: '바흐 - 골드베르크 변주곡 아리아 🎼',
     urls: [
       './audio/bgm-goldberg.ogg',
+      '/audio/bgm-goldberg.ogg',
       'audio/bgm-goldberg.ogg',
       './audio/bgm-classical-calm.ogg',
     ],
