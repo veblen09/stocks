@@ -10,6 +10,7 @@ import {
   FolderOpen,
   ShieldAlert,
   TrendingDown,
+  TrendingUp,
   Lock,
   AlertTriangle,
   RotateCcw,
@@ -33,6 +34,7 @@ import { CrisisDecisionModal } from '../components/CrisisDecisionModal';
 import { RiskDashboardView } from '../components/RiskDashboardView';
 import { NewListingModal } from '../components/NewListingModal';
 import { DelistingAlertModal } from '../components/DelistingAlertModal';
+import { BenchmarkDetailModal, type BenchmarkKey } from '../components/BenchmarkDetailModal';
 
 // Live Market Replay System
 import { MarketReplayStage } from '../features/marketReplay/MarketReplayStage';
@@ -145,6 +147,8 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const [showYearbookModal, setShowYearbookModal] = useState<boolean>(false);
   const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
   const [showSaveSlotModal, setShowSaveSlotModal] = useState<boolean>(false);
+  const [showBenchmarkModal, setShowBenchmarkModal] = useState<boolean>(false);
+  const [selectedBenchmarkId, setSelectedBenchmarkId] = useState<BenchmarkKey>('BENCH_KOSPI');
 
   // Main Tab: 'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'
   const [activeTab, setActiveTab] = useState<'MARKET' | 'PORTFOLIO' | 'NEWS' | 'RISK' | 'PROGRESS'>('MARKET');
@@ -281,6 +285,12 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
       setPendingNewListings(newlyListed);
       setShowNewListingModal(true);
     }
+  };
+
+  const handleOpenBenchmarkChart = (key: BenchmarkKey = 'BENCH_KOSPI') => {
+    audioManager.playUiSound('tab');
+    setSelectedBenchmarkId(key);
+    setShowBenchmarkModal(true);
   };
 
   // Macro news for currentYear
@@ -502,6 +512,15 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
 
           <button
             type="button"
+            onClick={() => handleOpenBenchmarkChart('BENCH_KOSPI')}
+            className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition flex items-center gap-1 cursor-pointer font-bold"
+            title="KOSPI 200 & S&P 500 시장 지수 차트실 열기"
+          >
+            <TrendingUp size={14} /> 시장 지수 차트 (KOSPI/S&P)
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowPredictionModal(true)}
             className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition flex items-center gap-1 cursor-pointer"
           >
@@ -647,6 +666,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
         <PortfolioGhostRace
           history={history}
           currentYear={currentYear}
+          onOpenBenchmarkChart={handleOpenBenchmarkChart}
         />
       )}
 
@@ -757,6 +777,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             dispatch({ type: 'TOGGLE_WATCHLIST', payload: cid });
           }}
           onOpenNewListingModal={handleOpenNewListingModal}
+          onOpenBenchmarkChart={handleOpenBenchmarkChart}
         />
       )}
 
@@ -1057,6 +1078,14 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           onClose={() => setSelectedCanonicalIdForDetail(null)}
         />
       )}
+
+      {/* Benchmark Detail Modal (KOSPI & S&P 500) */}
+      <BenchmarkDetailModal
+        isOpen={showBenchmarkModal}
+        initialBenchmark={selectedBenchmarkId}
+        currentYear={currentYear}
+        onClose={() => setShowBenchmarkModal(false)}
+      />
 
       {/* Historical News Center Modal */}
       <HistoricalNewsCenterModal

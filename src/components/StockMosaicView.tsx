@@ -18,6 +18,10 @@ import { formatKRW, formatCompactKRW, formatPercent } from '../utils/formatMoney
 import { audioManager } from '../utils/audioManager';
 import { getCompany1YrSparkline } from '../engine/companyChartEngine';
 import { getStockPriceKRW, getStockPriceLocal } from '../engine/returnEngine';
+import rawBenchmarks from '../data/normalized/benchmarks.json';
+import type { BenchmarksDataset } from '../types/stockGame';
+
+const BENCHMARKS: BenchmarksDataset = rawBenchmarks as unknown as BenchmarksDataset;
 
 interface StockMosaicViewProps {
   tradableStocks: TradableStockItem[];
@@ -34,6 +38,7 @@ interface StockMosaicViewProps {
   onUpdateDraftTargetWeight: (canonicalId: string, weight: number) => void;
   onToggleWatchlist?: (canonicalId: string) => void;
   onOpenNewListingModal?: () => void;
+  onOpenBenchmarkChart?: (key: 'BENCH_KOSPI' | 'BENCH_SP500') => void;
   yearEndReturns?: Record<string, number | null>;
   isYearEnd?: boolean;
 }
@@ -53,6 +58,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   onUpdateDraftTargetWeight,
   onToggleWatchlist,
   onOpenNewListingModal,
+  onOpenBenchmarkChart,
   yearEndReturns,
   isYearEnd = false,
 }) => {
@@ -66,6 +72,15 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   // Compute portfolio total market value for holding weights
   const holdingStockValues = Object.values(holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
   const totalPortfolioValue = cashKRW + holdingStockValues;
+
+  // Benchmark levels for current cutoff year
+  const kospiCurrentLevel = BENCHMARKS.kospi?.prices?.[String(currentYear)] || BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || 100;
+  const kospiPriorLevel = BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || kospiCurrentLevel;
+  const kospiYearReturn = kospiPriorLevel > 0 ? (kospiCurrentLevel - kospiPriorLevel) / kospiPriorLevel : 0;
+
+  const sp500CurrentLevel = BENCHMARKS.sp500?.prices?.[String(currentYear)] || BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || 100;
+  const sp500PriorLevel = BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || sp500CurrentLevel;
+  const sp500YearReturn = sp500PriorLevel > 0 ? (sp500CurrentLevel - sp500PriorLevel) / sp500PriorLevel : 0;
 
   // Newly listed stocks among tradable
   const newlyListedStocks = useMemo(() => {
@@ -293,6 +308,49 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                 {watchlist.length}
               </span>
             </button>
+
+            {/* Quick Benchmark Chart Launchers */}
+            {onOpenBenchmarkChart && (
+              <div className="flex items-center gap-1.5 flex-wrap pl-1 sm:pl-2 sm:border-l sm:border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => onOpenBenchmarkChart('BENCH_KOSPI')}
+                  className="px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer group"
+                  title="코스피 200 지수 차트 및 과거 위기 분석 열기"
+                >
+                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                  <span className="font-extrabold">🇰🇷 코스피 200</span>
+                  <span className="text-[10.5px] text-blue-700 bg-white/90 px-1 py-0.2 rounded font-mono tabular-nums font-bold">
+                    {kospiCurrentLevel.toFixed(1)}pt
+                  </span>
+                  <span className={`text-[10px] font-mono tabular-nums font-black ${kospiYearReturn >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                    {kospiYearReturn >= 0 ? '+' : ''}{(kospiYearReturn * 100).toFixed(1)}%
+                  </span>
+                  <span className="text-[10px] text-blue-600 underline font-semibold group-hover:text-blue-800">
+                    차트
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenBenchmarkChart('BENCH_SP500')}
+                  className="px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer group"
+                  title="S&P 500 지수 차트 및 과거 위기 분석 열기"
+                >
+                  <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+                  <span className="font-extrabold">🇺🇸 S&P 500</span>
+                  <span className="text-[10.5px] text-purple-700 bg-white/90 px-1 py-0.2 rounded font-mono tabular-nums font-bold">
+                    ${sp500CurrentLevel.toFixed(1)}
+                  </span>
+                  <span className={`text-[10px] font-mono tabular-nums font-black ${sp500YearReturn >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                    {sp500YearReturn >= 0 ? '+' : ''}{(sp500YearReturn * 100).toFixed(1)}%
+                  </span>
+                  <span className="text-[10px] text-purple-600 underline font-semibold group-hover:text-purple-800">
+                    차트
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* View Format (Mosaic vs Table) */}

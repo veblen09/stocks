@@ -91,9 +91,16 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
 
   const isUsStock = market === 'US';
   const isLocalCurrency = isUsStock && currencyMode === 'LOCAL';
+  const isBench = canonicalId.startsWith('BENCH_') || canonicalId === 'kospi' || canonicalId === 'sp500';
 
   const formatPrice = (val: number | null | undefined) => {
     if (val === null || val === undefined) return '-';
+    if (isBench) {
+      if (isLocalCurrency) {
+        return `$${val.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} pt`;
+      }
+      return `${val.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} pt`;
+    }
     if (isLocalCurrency) {
       return `$${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }

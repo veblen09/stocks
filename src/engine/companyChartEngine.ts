@@ -8,6 +8,64 @@ import {
 } from './returnEngine';
 import { getFxRate } from './fxEngine';
 import rawMonthlyPrices from '../data/normalized/monthly_prices.json';
+import rawBenchmarks from '../data/normalized/benchmarks.json';
+import type { BenchmarksDataset } from '../types/stockGame';
+
+const BENCHMARKS: BenchmarksDataset = rawBenchmarks as unknown as BenchmarksDataset;
+
+export interface BenchmarkChartMeta {
+  canonicalId: string;
+  nameKo: string;
+  nameEn: string;
+  ticker: string;
+  market: 'KR' | 'US';
+  currency: 'KRW' | 'USD';
+  firstValidYear: number;
+  description: string;
+}
+
+export const BENCHMARK_CHARTS: Record<string, BenchmarkChartMeta> = {
+  BENCH_KOSPI: {
+    canonicalId: 'BENCH_KOSPI',
+    nameKo: '한국 코스피 200 지수 (KOSPI 200)',
+    nameEn: 'KOSPI 200 Index',
+    ticker: 'KS200',
+    market: 'KR',
+    currency: 'KRW',
+    firstValidYear: 1980,
+    description: '대한민국 유가증권시장 시가총액 상위 200대 우량 대형주 지수',
+  },
+  kospi: {
+    canonicalId: 'BENCH_KOSPI',
+    nameKo: '한국 코스피 200 지수 (KOSPI 200)',
+    nameEn: 'KOSPI 200 Index',
+    ticker: 'KS200',
+    market: 'KR',
+    currency: 'KRW',
+    firstValidYear: 1980,
+    description: '대한민국 유가증권시장 시가총액 상위 200대 우량 대형주 지수',
+  },
+  BENCH_SP500: {
+    canonicalId: 'BENCH_SP500',
+    nameKo: '미국 S&P 500 지수 (S&P 500 Index)',
+    nameEn: 'S&P 500 Index',
+    ticker: 'SPX',
+    market: 'US',
+    currency: 'USD',
+    firstValidYear: 1980,
+    description: '미국 증시 시가총액 상위 500대 대표 우량 기업 지수',
+  },
+  sp500: {
+    canonicalId: 'BENCH_SP500',
+    nameKo: '미국 S&P 500 지수 (S&P 500 Index)',
+    nameEn: 'S&P 500 Index',
+    ticker: 'SPX',
+    market: 'US',
+    currency: 'USD',
+    firstValidYear: 1980,
+    description: '미국 증시 시가총액 상위 500대 대표 우량 기업 지수',
+  },
+};
 
 const MONTHLY_PRICES: Record<string, Record<string, { priceLocal: number; year: number; month: number; date: string }>> =
   rawMonthlyPrices as unknown as Record<string, Record<string, { priceLocal: number; year: number; month: number; date: string }>>;
@@ -184,16 +242,29 @@ export function getYearMonthlyPrices(
   year: number,
   useLocal = false
 ): MonthPriceItem[] {
-  const stock = STOCKS_BY_ID[canonicalId];
+  const benchMeta = BENCHMARK_CHARTS[canonicalId];
+  const stock = benchMeta
+    ? {
+        canonicalId: benchMeta.canonicalId,
+        nameKo: benchMeta.nameKo,
+        nameEn: benchMeta.nameEn,
+        ticker: benchMeta.ticker,
+        market: benchMeta.market,
+        currency: benchMeta.currency,
+        firstValidYear: benchMeta.firstValidYear,
+      }
+    : STOCKS_BY_ID[canonicalId];
+
   if (!stock) return [];
 
+  const dataKey = benchMeta ? benchMeta.canonicalId : canonicalId;
   const rawMonths: (MonthPriceItem | null)[] = [];
   let validCount = 0;
 
   for (let m = 1; m <= 12; m++) {
     const mStr = m.toString().padStart(2, '0');
     const ym = `${year}-${mStr}`;
-    const mData = MONTHLY_PRICES[canonicalId]?.[ym];
+    const mData = MONTHLY_PRICES[dataKey]?.[ym];
 
     if (mData && mData.priceLocal > 0) {
       let p = mData.priceLocal;
@@ -241,14 +312,30 @@ export function getYearMonthlyPrices(
   }
 
   // Otherwise, construct a smooth momentum-driven monthly series with natural market swings
-  const startP =
-    (useLocal ? getStockPriceLocal(canonicalId, year - 1) : getStockPriceKRW(canonicalId, year - 1)) ||
-    (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
-    1000;
+  let startP = 1000;
+  let endP = 1000;
 
-  const endP =
-    (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
-    startP;
+  if (benchMeta) {
+    if (benchMeta.canonicalId === 'BENCH_KOSPI') {
+      startP = BENCHMARKS.kospi?.prices?.[String(year - 1)] || BENCHMARKS.kospi?.prices?.[String(year)] || 100;
+      endP = BENCHMARKS.kospi?.prices?.[String(year)] || startP;
+    } else {
+      const fxPrior = getFxRate(year - 1);
+      const fxCur = getFxRate(year);
+      const spPrior = BENCHMARKS.sp500?.prices?.[String(year - 1)] || 100;
+      const spCur = BENCHMARKS.sp500?.prices?.[String(year)] || spPrior;
+      startP = useLocal ? spPrior : spPrior * fxPrior;
+      endP = useLocal ? spCur : spCur * fxCur;
+    }
+  } else {
+    startP =
+      (useLocal ? getStockPriceLocal(canonicalId, year - 1) : getStockPriceKRW(canonicalId, year - 1)) ||
+      (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
+      1000;
+    endP =
+      (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
+      startP;
+  }
 
   const result: MonthPriceItem[] = [];
   const seedBase = hashSeed(canonicalId, year, 101);
@@ -374,7 +461,19 @@ export function getCompanyNaverChartData(
   period: NaverPeriodType = '1Y',
   currencyMode: 'KRW' | 'LOCAL' = 'KRW'
 ): NaverChartData | null {
-  const stock = STOCKS_BY_ID[canonicalId];
+  const benchMeta = BENCHMARK_CHARTS[canonicalId];
+  const stock = benchMeta
+    ? {
+        canonicalId: benchMeta.canonicalId,
+        nameKo: benchMeta.nameKo,
+        nameEn: benchMeta.nameEn,
+        ticker: benchMeta.ticker,
+        market: benchMeta.market,
+        currency: benchMeta.currency,
+        firstValidYear: benchMeta.firstValidYear,
+      }
+    : STOCKS_BY_ID[canonicalId];
+
   if (!stock || upToYear < stock.firstValidYear) return null;
 
   const isUsStock = stock.market === 'US';
@@ -658,7 +757,21 @@ export function getCompanyNaverChartData(
   const high52w = Math.max(...last52wCandles.map(c => c.high));
   const low52w = Math.min(...last52wCandles.map(c => c.low));
 
-  const stats = getHistoricalStockStats(canonicalId, upToYear, true);
+  const stats = benchMeta
+    ? {
+        yearsOfData: upToYear - 1980 + 1,
+        last1YrReturn: periodChangePercent,
+        prior1YReturn: periodChangePercent,
+        past3YrCAGR: 0.08,
+        cagr3Y: 0.08,
+        past5YrCAGR: 0.09,
+        cagr5Y: 0.09,
+        historicalVolatility: 0.18,
+        volatility3Y: 0.18,
+        historicalMDD: 0.35,
+        mddHistorical: 0.35,
+      }
+    : getHistoricalStockStats(canonicalId, upToYear, true);
 
   return {
     canonicalId,
@@ -699,7 +812,19 @@ export function getCompanyHistoricalPriceSeries(
   upToYear: number,
   resolution: 'ANNUAL' | 'MONTHLY' = 'ANNUAL'
 ): CompanyHistoricalPriceSeries | null {
-  const stock = STOCKS_BY_ID[canonicalId];
+  const benchMeta = BENCHMARK_CHARTS[canonicalId];
+  const stock = benchMeta
+    ? {
+        canonicalId: benchMeta.canonicalId,
+        nameKo: benchMeta.nameKo,
+        nameEn: benchMeta.nameEn,
+        ticker: benchMeta.ticker,
+        market: benchMeta.market,
+        currency: benchMeta.currency,
+        firstValidYear: benchMeta.firstValidYear,
+      }
+    : STOCKS_BY_ID[canonicalId];
+
   if (!stock) return null;
 
   const startYear = Math.max(1980, stock.firstValidYear - 1);
@@ -788,7 +913,7 @@ export function getCompanyHistoricalPriceSeries(
     ticker: stock.ticker,
     currency: stock.currency,
     market: stock.market,
-    listingDate: stock.listingDate,
+    listingDate: 'listingDate' in stock ? stock.listingDate : undefined,
     firstValidYear: stock.firstValidYear,
     upToYear,
     points,

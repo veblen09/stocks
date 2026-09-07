@@ -7,12 +7,14 @@ interface PortfolioGhostRaceProps {
   history: YearlyPerformanceRecord[];
   currentYear: number;
   compact?: boolean;
+  onOpenBenchmarkChart?: (key: 'BENCH_KOSPI' | 'BENCH_SP500') => void;
 }
 
 export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
   history,
   currentYear,
   compact = false,
+  onOpenBenchmarkChart,
 }) => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<'TWR' | 'VALUE'>('TWR');
@@ -134,7 +136,7 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
             </div>
 
             {/* 2. KOSPI Index */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1 relative group">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-slate-600 font-sans font-bold">
                   🇰🇷 코스피 200 지수
@@ -149,13 +151,24 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
               <span className="text-base sm:text-lg font-black text-slate-800 block">
                 {viewMode === 'TWR' ? latest.kospiTwr.toFixed(1) : formatKRW(latest.kospiVal)}
               </span>
-              <span className="text-[10px] text-slate-500 font-sans font-medium block">
-                누적 TWR: {formatPercent((latest.kospiTwr - 100) / 100)}
-              </span>
+              <div className="flex items-center justify-between pt-0.5">
+                <span className="text-[10px] text-slate-500 font-sans font-medium block">
+                  누적 TWR: {formatPercent((latest.kospiTwr - 100) / 100)}
+                </span>
+                {onOpenBenchmarkChart && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenBenchmarkChart('BENCH_KOSPI')}
+                    className="text-[10px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer"
+                  >
+                    차트 보기 📈
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* 3. S&P 500 Index */}
-            <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-200 space-y-1">
+            <div className="p-3 bg-purple-50/70 rounded-xl border border-purple-200 space-y-1 relative group">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-purple-900 font-sans font-bold">
                   🇺🇸 S&P 500 (원화)
@@ -170,9 +183,20 @@ export const PortfolioGhostRace: React.FC<PortfolioGhostRaceProps> = ({
               <span className="text-base sm:text-lg font-black text-purple-700 block">
                 {viewMode === 'TWR' ? latest.sp500Twr.toFixed(1) : formatKRW(latest.sp500Val)}
               </span>
-              <span className="text-[10px] text-purple-600 font-sans font-medium block">
-                누적 TWR: {formatPercent((latest.sp500Twr - 100) / 100)}
-              </span>
+              <div className="flex items-center justify-between pt-0.5">
+                <span className="text-[10px] text-purple-600 font-sans font-medium block">
+                  누적 TWR: {formatPercent((latest.sp500Twr - 100) / 100)}
+                </span>
+                {onOpenBenchmarkChart && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenBenchmarkChart('BENCH_SP500')}
+                    className="text-[10px] text-purple-700 hover:text-purple-900 font-bold underline cursor-pointer"
+                  >
+                    차트 보기 📈
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* 4. 50:50 Blend */}
