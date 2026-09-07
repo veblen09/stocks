@@ -120,11 +120,12 @@ export function AnimatedCharacterGuide({
           <div className={(mood === 'thinking' || mood === 'warning') ? 'character-tilt' : ''}>
             <div className="relative transition-all duration-500 transform group-hover:-translate-y-2.5 group-hover:scale-[1.03] z-20">
               <img
-                src={isHovered ? 'images/character-guide.gif' : 'images/character-guide.png'}
+                src="images/character-guide.png"
                 alt="머니트랙 투자 길잡이"
                 className={[
                   compact ? 'h-44' : 'h-64',
-                  'character-motion object-contain drop-shadow-2xl relative z-20 mix-blend-multiply',
+                  'character-motion object-contain drop-shadow-2xl relative z-20 mix-blend-multiply transition-transform duration-300',
+                  isHovered ? 'scale-105 -translate-y-1' : '',
                 ].join(' ')}
               />
 

@@ -1,6 +1,10 @@
 /**
- * Web Audio API based UI Sound & BGM Engine
+ * Web Audio API based UI Sound & Zero-Bandwidth Procedural BGM Engine
  * 머니트랙: 45년 한·미 주식투자 실험실 사운드 시스템
+ *
+ * 100% Web Audio API procedural synthesis:
+ * - 0 Network Requests, 0 KB Server Bandwidth consumption
+ * - Instant offline playback, seamless loop, high-fidelity 48kHz audio
  */
 
 export type UiSoundType =
@@ -22,7 +26,6 @@ export type UiSoundType =
   | 'replayNewHigh'
   | 'replayYearComplete';
 
-// Legacy compatibility
 export type SoundType = 'click' | 'notification' | 'success' | 'error' | 'warningLevel' | 'crisisAlert' | UiSoundType;
 
 export interface AudioSettings {
@@ -42,67 +45,200 @@ const DEFAULT_SETTINGS: AudioSettings = {
 };
 
 let audioCtx: AudioContext | null = null;
-let bgmAudio: HTMLAudioElement | null = null;
+let bgmGainNode: GainNode | null = null;
 let currentSettings: AudioSettings = { ...DEFAULT_SETTINGS };
 
 // Debouncing timestamps to prevent audio duplication (min 40ms)
 let lastPlayedSound: { type: string; time: number } = { type: '', time: 0 };
 
-export interface ClassicalTrack {
+// Note to Frequency mapping
+const NOTE_SEMITONES: Record<string, number> = {
+  C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5,
+  'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11,
+};
+
+const noteToFreq = (noteStr: string): number => {
+  const match = noteStr.match(/^([A-G][#b]?)(-?\d+)$/);
+  if (!match) return 440;
+  const name = match[1];
+  const octave = parseInt(match[2], 10);
+  const semi = NOTE_SEMITONES[name] ?? 0;
+  const midi = 12 * (octave + 1) + semi;
+  return 440 * Math.pow(2, (midi - 69) / 12);
+};
+
+// Procedural Classical Music Tracks
+export interface ClassicalPiece {
   name: string;
-  urls: string[];
+  bpm: number;
+  steps: { notes: string[]; duration: number; velocity?: number }[];
 }
 
-const bgmPlaylist: ClassicalTrack[] = [
+const PIECES: ClassicalPiece[] = [
+  // 1. Bach - Prelude in C Major (BWV 846)
   {
-    name: '비발디 - 사계 중 \'봄\' 1악장 (Allegro) 🎻',
-    urls: [
-      'https://upload.wikimedia.org/wikipedia/commons/f/ff/Vivaldi_-_Four_Seasons_1_Spring_mvt_1_Allegro_-_John_Harrison_violin.oga',
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+    name: "바흐 - 평균율 클라비어 프렐류드 C장조 🎹",
+    bpm: 84,
+    steps: [
+      // Measure 1: C - E - G - C5 - E5
+      { notes: ['C3', 'E4', 'G4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['C3', 'E4', 'G4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      // Measure 2: D - D4 - A4 - D5 - F5
+      { notes: ['D3', 'D4', 'A4', 'D5', 'F5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'D5', 'F5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['D3', 'D4', 'A4', 'D5', 'F5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'D5', 'F5'], duration: 0.5, velocity: 0.5 },
+      // Measure 3: G - D4 - G4 - B4 - F5
+      { notes: ['G2', 'D4', 'G4', 'B4', 'F5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'B4', 'F5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['G2', 'D4', 'G4', 'B4', 'F5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'B4', 'F5'], duration: 0.5, velocity: 0.5 },
+      // Measure 4: C - E - G - C5 - E5
+      { notes: ['C3', 'E4', 'G4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['C3', 'E4', 'G4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      // Measure 5: C - E - A - E5 - A5
+      { notes: ['C3', 'E4', 'A4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['C3', 'E4', 'A4', 'C5', 'E5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'C5', 'E5'], duration: 0.5, velocity: 0.5 },
+      // Measure 6: D - F# - A - D5 - F#5
+      { notes: ['D3', 'F#4', 'A4', 'D5', 'F#5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'D5', 'F#5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['D3', 'F#4', 'A4', 'D5', 'F#5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['A4', 'D5', 'F#5'], duration: 0.5, velocity: 0.5 },
+      // Measure 7: G - D4 - G4 - B4 - D5
+      { notes: ['G2', 'D4', 'G4', 'B4', 'D5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'B4', 'D5'], duration: 0.5, velocity: 0.5 },
+      { notes: ['G2', 'D4', 'G4', 'B4', 'D5'], duration: 0.5, velocity: 0.7 },
+      { notes: ['G4', 'B4', 'D5'], duration: 0.5, velocity: 0.5 },
+      // Measure 8: Resolution C major
+      { notes: ['C3', 'G3', 'E4', 'C5'], duration: 1.0, velocity: 0.8 },
+      { notes: ['E4', 'G4', 'C5', 'E5'], duration: 1.0, velocity: 0.6 },
     ],
   },
+  // 2. Pachelbel - Canon in D Major
   {
-    name: '요한 슈트라우스 - 라데츠키 행진곡 🥁🎺',
-    urls: [
-      'https://upload.wikimedia.org/wikipedia/commons/b/b4/Radetzky_March.ogg',
-      './audio/bgm-classical-calm.ogg',
-      'audio/bgm-classical-calm.ogg',
+    name: "파헬벨 - 캐논 변주곡 (Canon in D) 🎼",
+    bpm: 72,
+    steps: [
+      { notes: ['D3', 'F#4', 'A4', 'D5'], duration: 1.0, velocity: 0.75 },
+      { notes: ['A2', 'E4', 'A4', 'C#5'], duration: 1.0, velocity: 0.75 },
+      { notes: ['B2', 'D4', 'F#4', 'B4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['F#2', 'C#4', 'F#4', 'A4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['G2', 'B3', 'D4', 'G4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['D2', 'A3', 'D4', 'F#4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['G2', 'B3', 'D4', 'G4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['A2', 'C#4', 'E4', 'A4'], duration: 1.0, velocity: 0.75 },
+      // Melodic arpeggio cycle
+      { notes: ['D3', 'A4', 'F#5'], duration: 0.5, velocity: 0.8 },
+      { notes: ['F#4', 'D5'], duration: 0.5, velocity: 0.6 },
+      { notes: ['A2', 'E5', 'C#5'], duration: 0.5, velocity: 0.8 },
+      { notes: ['E4', 'A4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['B2', 'F#5', 'D5'], duration: 0.5, velocity: 0.8 },
+      { notes: ['D4', 'B4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['F#2', 'C#5', 'A4'], duration: 0.5, velocity: 0.8 },
+      { notes: ['C#4', 'F#4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['G2', 'D5', 'B4'], duration: 0.5, velocity: 0.8 },
+      { notes: ['B3', 'G4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['D2', 'A4', 'F#4'], duration: 0.5, velocity: 0.8 },
+      { notes: ['A3', 'D4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['G2', 'B4', 'G4'], duration: 0.5, velocity: 0.8 },
+      { notes: ['D4', 'B4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['A2', 'C#5', 'E5'], duration: 1.0, velocity: 0.8 },
     ],
   },
+  // 3. Erik Satie - Gymnopédie No. 1
   {
-    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
-    urls: [
-      './audio/bgm-nutcracker.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/6/6c/Tchaikovsky--PianoConcerto1.ogg',
+    name: "에릭 사티 - 짐노페디 1번 (Gymnopédie No.1) ☕",
+    bpm: 60,
+    steps: [
+      { notes: ['G2'], duration: 1.0, velocity: 0.65 },
+      { notes: ['B3', 'D4', 'F#4'], duration: 1.0, velocity: 0.5 },
+      { notes: ['B3', 'D4', 'F#4'], duration: 1.0, velocity: 0.5 },
+      { notes: ['D2'], duration: 1.0, velocity: 0.65 },
+      { notes: ['F#3', 'A3', 'C#4', 'E4'], duration: 1.0, velocity: 0.5 },
+      { notes: ['F#3', 'A3', 'C#4', 'E4'], duration: 1.0, velocity: 0.5 },
+      // Melody enters
+      { notes: ['G2', 'B4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['B3', 'D4', 'F#4', 'A4'], duration: 1.0, velocity: 0.6 },
+      { notes: ['B3', 'D4', 'F#4', 'G4'], duration: 1.0, velocity: 0.6 },
+      { notes: ['D2', 'F#4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['F#3', 'A3', 'C#4', 'D4'], duration: 1.0, velocity: 0.55 },
+      { notes: ['F#3', 'A3', 'C#4', 'E4'], duration: 1.0, velocity: 0.55 },
+      { notes: ['G2', 'B4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['B3', 'D4', 'F#4', 'C#5'], duration: 1.0, velocity: 0.65 },
+      { notes: ['B3', 'D4', 'F#4', 'B4'], duration: 1.0, velocity: 0.6 },
+      { notes: ['D2', 'A4'], duration: 1.5, velocity: 0.7 },
+      { notes: ['F#3', 'A3', 'C#4'], duration: 1.5, velocity: 0.5 },
     ],
   },
+  // 4. Beethoven - Moonlight Sonata
   {
-    name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
-    urls: [
-      './audio/bgm-classical-calm.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg',
+    name: "베토벤 - 월광 소나타 1악장 (Moonlight Sonata) 🌙",
+    bpm: 54,
+    steps: [
+      { notes: ['C#2', 'G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.65 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      { notes: ['C#2', 'G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.65 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      // B bass
+      { notes: ['B1', 'G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.65 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      { notes: ['G#3', 'C#4', 'E4'], duration: 0.66, velocity: 0.5 },
+      // A bass with G# melody
+      { notes: ['A1', 'A3', 'C#4', 'E4', 'G#4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['A3', 'C#4', 'E4', 'G#4'], duration: 0.5, velocity: 0.6 },
+      { notes: ['F#1', 'A3', 'D4', 'F#4'], duration: 1.0, velocity: 0.7 },
+      { notes: ['G#1', 'G#3', 'C#4', 'E4'], duration: 1.0, velocity: 0.75 },
     ],
   },
+  // 5. Mozart - Twinkle Variations & Sonata Theme
   {
-    name: '베토벤 - 엘리제를 위하여 🎹',
-    urls: [
-      './audio/bgm-furelise.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/8/8f/Fur_Elise.ogg',
+    name: "모차르트 - 작은별 변주곡 & 소나타 테마 ✨",
+    bpm: 96,
+    steps: [
+      { notes: ['C3', 'C4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['C4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['G2', 'G4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['G4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['A2', 'A4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['A4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['G2', 'E4', 'G4'], duration: 1.0, velocity: 0.75 },
+      { notes: ['F2', 'F4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['F4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['E2', 'E4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['E4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['D2', 'D4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['D4'], duration: 0.5, velocity: 0.65 },
+      { notes: ['C2', 'E4', 'C4'], duration: 1.0, velocity: 0.8 },
     ],
   },
+  // 6. Vivaldi - Four Seasons 'Spring'
   {
-    name: '바흐 - 골드베르크 변주곡 아리아 🎼',
-    urls: [
-      './audio/bgm-goldberg.ogg',
-      './audio/bgm-classical-calm.ogg',
+    name: "비발디 - 사계 중 '봄' (Spring Allegro) 🎻",
+    bpm: 108,
+    steps: [
+      { notes: ['E3', 'E4', 'G#4', 'B4', 'E5'], duration: 0.5, velocity: 0.8 },
+      { notes: ['G#4', 'B4', 'E5'], duration: 0.5, velocity: 0.6 },
+      { notes: ['G#4', 'B4', 'E5'], duration: 0.5, velocity: 0.6 },
+      { notes: ['B2', 'F#4', 'A4', 'D#5'], duration: 0.5, velocity: 0.75 },
+      { notes: ['E3', 'E4', 'G#4', 'B4', 'E5'], duration: 1.0, velocity: 0.8 },
+      { notes: ['B2', 'D#4', 'F#4', 'B4'], duration: 0.5, velocity: 0.75 },
+      { notes: ['C#3', 'E4', 'G#4', 'C#5'], duration: 0.5, velocity: 0.75 },
+      { notes: ['B2', 'D#4', 'F#4', 'B4'], duration: 1.0, velocity: 0.8 },
+      { notes: ['E3', 'E4', 'G#4', 'B4'], duration: 1.0, velocity: 0.85 },
     ],
   },
 ];
 
-const bgmNames = bgmPlaylist.map(track => track.name);
+const bgmNames = PIECES.map(p => p.name);
 let currentTrackIndex = 0;
-let currentCandidateIndex = 0;
 let currentTrackName = bgmNames[0];
 
 const isBrowser = typeof window !== 'undefined';
@@ -144,56 +280,138 @@ const getAudioContext = (): AudioContext | null => {
   return audioCtx;
 };
 
-const loadCurrentTrackCandidate = () => {
-  if (!bgmAudio) return;
-  const track = bgmPlaylist[currentTrackIndex];
-  if (!track || !track.urls || track.urls.length === 0) return;
-
-  const candidateUrl = track.urls[currentCandidateIndex % track.urls.length];
-  bgmAudio.src = candidateUrl;
-  bgmAudio.load();
-};
-
-const initAudio = () => {
-  if (!isBrowser) return;
-  getAudioContext();
-
-  if (!bgmAudio) {
-    bgmAudio = new Audio();
-    bgmAudio.loop = false;
-
-    bgmAudio.addEventListener('ended', () => {
-      audioManager.playNextBgm();
-    });
-
-    bgmAudio.addEventListener('error', () => {
-      const track = bgmPlaylist[currentTrackIndex];
-      if (track && currentCandidateIndex + 1 < track.urls.length) {
-        currentCandidateIndex += 1;
-        loadCurrentTrackCandidate();
-        if (currentSettings.bgmEnabled) {
-          bgmAudio?.play().catch(() => {});
-        }
-      } else {
-        currentCandidateIndex = 0;
-        currentTrackIndex = (currentTrackIndex + 1) % bgmPlaylist.length;
-        currentTrackName = bgmPlaylist[currentTrackIndex].name;
-        loadCurrentTrackCandidate();
-        if (currentSettings.bgmEnabled) {
-          bgmAudio?.play().catch(() => {});
-        }
-      }
-    });
-
-    loadCurrentTrackCandidate();
-    updateBgmVolume();
+const getBgmGainNode = (ctx: AudioContext): GainNode => {
+  if (!bgmGainNode) {
+    bgmGainNode = ctx.createGain();
+    bgmGainNode.connect(ctx.destination);
   }
+  updateBgmVolume();
+  return bgmGainNode;
 };
 
 const updateBgmVolume = () => {
-  if (bgmAudio) {
-    bgmAudio.volume = Math.max(0, Math.min(1, currentSettings.masterVolume * currentSettings.bgmVolume));
+  if (bgmGainNode && audioCtx) {
+    const targetVol = currentSettings.bgmEnabled
+      ? Math.max(0, Math.min(1, currentSettings.masterVolume * currentSettings.bgmVolume))
+      : 0;
+    bgmGainNode.gain.setValueAtTime(targetVol, audioCtx.currentTime);
   }
+};
+
+// Procedural synthesizer note playback (warm piano/bell tone)
+const playSynthChord = (
+  ctx: AudioContext,
+  destGain: GainNode,
+  notes: string[],
+  startTime: number,
+  durationSec: number,
+  velocity: number = 0.7
+) => {
+  notes.forEach((noteStr, idx) => {
+    const freq = noteToFreq(noteStr);
+    if (!freq || freq <= 0) return;
+
+    // Dual-oscillator for warmth (Sine + Triangle with subtle detune)
+    const oscSine = ctx.createOscillator();
+    const oscTri = ctx.createOscillator();
+    const noteGain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    oscSine.type = 'sine';
+    oscSine.frequency.setValueAtTime(freq, startTime);
+
+    oscTri.type = 'triangle';
+    oscTri.frequency.setValueAtTime(freq * 1.002, startTime); // +0.2% subtle chorus detune
+
+    // Warm resonant lowpass filter
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(Math.min(3200, freq * 3.5), startTime);
+    filter.frequency.exponentialRampToValueAtTime(Math.min(1200, freq * 1.5), startTime + durationSec);
+    filter.Q.setValueAtTime(1.2, startTime);
+
+    // ADSR Envelope
+    const noteVol = 0.12 * velocity * (idx === 0 ? 1.0 : 0.85);
+    const attack = 0.012;
+    const decay = Math.min(durationSec * 0.7, 0.45);
+    const release = Math.max(0.25, durationSec * 0.9);
+
+    noteGain.gain.setValueAtTime(0.0001, startTime);
+    noteGain.gain.exponentialRampToValueAtTime(noteVol, startTime + attack);
+    noteGain.gain.exponentialRampToValueAtTime(noteVol * 0.45, startTime + attack + decay);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + attack + decay + release);
+
+    oscSine.connect(filter);
+    oscTri.connect(filter);
+    filter.connect(noteGain);
+    noteGain.connect(destGain);
+
+    const stopTime = startTime + attack + decay + release + 0.05;
+    oscSine.start(startTime);
+    oscTri.start(startTime);
+    oscSine.stop(stopTime);
+    oscTri.stop(stopTime);
+  });
+};
+
+// Scheduler for procedural music playback
+let isPlayingProcedural = false;
+let currentStepIndex = 0;
+let nextNoteTime = 0;
+let scheduleTimerId: number | null = null;
+
+const scheduleProceduralBgm = () => {
+  if (!isPlayingProcedural || !currentSettings.bgmEnabled) return;
+
+  const ctx = getAudioContext();
+  if (!ctx || ctx.state === 'suspended') {
+    scheduleTimerId = window.setTimeout(scheduleProceduralBgm, 200);
+    return;
+  }
+
+  const piece = PIECES[currentTrackIndex % PIECES.length];
+  const dest = getBgmGainNode(ctx);
+  const secondsPerBeat = 60 / piece.bpm;
+
+  // Schedule up to 0.6 seconds ahead
+  while (nextNoteTime < ctx.currentTime + 0.6 && isPlayingProcedural) {
+    const step = piece.steps[currentStepIndex];
+    if (step && step.notes.length > 0) {
+      const stepDurationSec = step.duration * secondsPerBeat;
+      playSynthChord(ctx, dest, step.notes, nextNoteTime, stepDurationSec, step.velocity || 0.7);
+      nextNoteTime += stepDurationSec;
+    } else {
+      nextNoteTime += 0.5 * secondsPerBeat;
+    }
+
+    currentStepIndex = (currentStepIndex + 1) % piece.steps.length;
+  }
+
+  scheduleTimerId = window.setTimeout(scheduleProceduralBgm, 120);
+};
+
+const startProceduralBgm = () => {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  if (scheduleTimerId !== null) {
+    clearTimeout(scheduleTimerId);
+    scheduleTimerId = null;
+  }
+
+  isPlayingProcedural = true;
+  currentStepIndex = 0;
+  nextNoteTime = ctx.currentTime + 0.05;
+  updateBgmVolume();
+  scheduleProceduralBgm();
+};
+
+const stopProceduralBgm = () => {
+  isPlayingProcedural = false;
+  if (scheduleTimerId !== null) {
+    clearTimeout(scheduleTimerId);
+    scheduleTimerId = null;
+  }
+  updateBgmVolume();
 };
 
 // Generate mechanical noise burst buffer (for keycap thock/click)
@@ -212,7 +430,8 @@ const getNoiseBuffer = (ctx: AudioContext): AudioBuffer => {
 
 export const audioManager = {
   init: () => {
-    initAudio();
+    if (!isBrowser) return;
+    getAudioContext();
   },
   getSettings: (): AudioSettings => ({ ...currentSettings }),
   getBgmPlaylist: () => [...bgmNames],
@@ -221,108 +440,69 @@ export const audioManager = {
   getTrackName: () => currentTrackName,
   getCurrentTrackIndex: () => currentTrackIndex,
 
-
-
   playTrack: (index: number) => {
-    initAudio();
-    if (!bgmAudio) return;
-
-    currentTrackIndex = index % bgmPlaylist.length;
-    currentCandidateIndex = 0;
-    const track = bgmPlaylist[currentTrackIndex];
-    currentTrackName = track.name;
-    loadCurrentTrackCandidate();
-
-    updateBgmVolume();
+    currentTrackIndex = index % PIECES.length;
+    currentTrackName = PIECES[currentTrackIndex].name;
     if (currentSettings.bgmEnabled) {
-      bgmAudio.play().catch(() => {});
+      startProceduralBgm();
     }
   },
 
   unlockAudioContext: async () => {
-    initAudio();
-    if (audioCtx && audioCtx.state === 'suspended') {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
       try {
-        await audioCtx.resume();
+        await ctx.resume();
       } catch {
         // ignore
       }
     }
 
-    if (currentSettings.bgmEnabled && bgmAudio && bgmAudio.paused) {
-      try {
-        updateBgmVolume();
-        await bgmAudio.play();
-      } catch {
-        // ignore
-      }
+    if (currentSettings.bgmEnabled && !isPlayingProcedural) {
+      startProceduralBgm();
     }
   },
 
   playBgm: async () => {
-    initAudio();
-    if (!bgmAudio) return;
-
-    if (audioCtx && audioCtx.state === 'suspended') {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
       try {
-        await audioCtx.resume();
+        await ctx.resume();
       } catch {
         // ignore
       }
     }
-
-    try {
-      updateBgmVolume();
-      await bgmAudio.play();
-    } catch {
-      // ignore
-    }
+    startProceduralBgm();
   },
 
   pauseBgm: () => {
-    if (bgmAudio) {
-      bgmAudio.pause();
-    }
+    stopProceduralBgm();
   },
 
   playNextBgm: async () => {
-    initAudio();
-    if (!bgmAudio) return;
-
-    currentTrackIndex = (currentTrackIndex + 1) % bgmPlaylist.length;
-    currentCandidateIndex = 0;
-    const track = bgmPlaylist[currentTrackIndex];
-    currentTrackName = track.name;
-    loadCurrentTrackCandidate();
-
+    currentTrackIndex = (currentTrackIndex + 1) % PIECES.length;
+    currentTrackName = PIECES[currentTrackIndex].name;
     if (currentSettings.bgmEnabled) {
-      try {
-        updateBgmVolume();
-        await bgmAudio.play();
-      } catch {
-        // ignore
-      }
+      startProceduralBgm();
     }
   },
 
   setSettings: (newSettings: AudioSettings) => {
+    const wasEnabled = currentSettings.bgmEnabled;
     currentSettings = { ...newSettings };
     saveSettings(currentSettings);
 
-    if (bgmAudio) {
-      updateBgmVolume();
-      if (currentSettings.bgmEnabled) {
-        if (bgmAudio.paused) {
-          audioManager.playBgm();
-        }
-      } else {
-        bgmAudio.pause();
-      }
+    updateBgmVolume();
+
+    if (currentSettings.bgmEnabled && !wasEnabled) {
+      startProceduralBgm();
+    } else if (!currentSettings.bgmEnabled && wasEnabled) {
+      stopProceduralBgm();
     }
   },
 
   /**
-   * Synthesize mechanical keycap and UI sounds using Web Audio API
+   * Synthesize mechanical keycap and UI sounds using Web Audio API (0 Network Bandwidth)
    */
   playUiSound: (type: UiSoundType, options?: { pitchVariation?: number; intensity?: number }) => {
     if (!currentSettings.sfxEnabled) return;
