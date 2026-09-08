@@ -43,13 +43,15 @@ const bgmPlaylist: ClassicalTrack[] = [
     ]
   },
   {
-    name: '차이코프스키 - 피아노 협주곡 1번 (Allegro) 🎹',
+    name: '로시니 - 윌리엄 텔 서곡, 피날레 🎺 🏇',
     urls: [
-      './audio/bgm-nutcracker.ogg',
-      './public/audio/bgm-nutcracker.ogg',
-      'audio/bgm-nutcracker.ogg',
-      'public/audio/bgm-nutcracker.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/6/6c/Tchaikovsky--PianoConcerto1.ogg'
+      './audio/bgm-william-tell.ogg',
+      './public/audio/bgm-william-tell.ogg',
+      'audio/bgm-william-tell.ogg',
+      'public/audio/bgm-william-tell.ogg',
+      './audio/bgm-william-tell-finale.ogg',
+      './public/audio/bgm-william-tell-finale.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/4/43/Gioachino_Rossini%2C_William_Tell_Overture_%28military_band_version%2C_2000%29.ogg'
     ]
   },
   {
