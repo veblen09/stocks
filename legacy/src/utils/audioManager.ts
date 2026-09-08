@@ -45,12 +45,23 @@ const bgmPlaylist: ClassicalTrack[] = [
   {
     name: '로시니 - 윌리엄 텔 서곡, 피날레 🎺 🏇',
     urls: [
+      './audio/bgm-william-tell-finale.ogg',
+      './public/audio/bgm-william-tell-finale.ogg',
+      'audio/bgm-william-tell-finale.ogg',
       './audio/bgm-william-tell.ogg',
       './public/audio/bgm-william-tell.ogg',
       'audio/bgm-william-tell.ogg',
       'public/audio/bgm-william-tell.ogg',
-      './audio/bgm-william-tell-finale.ogg',
-      './public/audio/bgm-william-tell-finale.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/4/43/Gioachino_Rossini%2C_William_Tell_Overture_%28military_band_version%2C_2000%29.ogg'
+    ]
+  },
+  {
+    name: '로시니 - 윌리엄 텔 서곡 (전곡) 🎻 🎺',
+    urls: [
+      './audio/bgm-william-tell-full.ogg',
+      './public/audio/bgm-william-tell-full.ogg',
+      'audio/bgm-william-tell-full.ogg',
+      'public/audio/bgm-william-tell-full.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/4/43/Gioachino_Rossini%2C_William_Tell_Overture_%28military_band_version%2C_2000%29.ogg'
     ]
   },
@@ -61,6 +72,16 @@ const bgmPlaylist: ClassicalTrack[] = [
       './public/audio/bgm-classical-calm.ogg',
       'audio/bgm-classical-calm.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg'
+    ]
+  },
+  {
+    name: "모차르트 - 교향곡 38번 D장조 '프라하' 1악장 (Adagio-Allegro) 🎻 🎼",
+    urls: [
+      './audio/bgm-mozart-symphony38.ogg',
+      './public/audio/bgm-mozart-symphony38.ogg',
+      'audio/bgm-mozart-symphony38.ogg',
+      'public/audio/bgm-mozart-symphony38.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/7/73/Mozart_Symphony_38_D_major_Prague_KV_504_-_1_Adagio%E2%80%94Allegro.oga'
     ]
   },
   {
@@ -79,6 +100,17 @@ const bgmPlaylist: ClassicalTrack[] = [
       './public/audio/bgm-goldberg.ogg',
       'audio/bgm-goldberg.ogg',
       './audio/bgm-classical-calm.ogg'
+    ]
+  },
+  {
+    name: 'J.F. 바그너 - 쌍두독수리 행진곡 🦅 🥁 🎺',
+    urls: [
+      './audio/bgm-double-eagle.ogg',
+      './public/audio/bgm-double-eagle.ogg',
+      'audio/bgm-double-eagle.ogg',
+      'public/audio/bgm-double-eagle.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Under_the_Double_Eagle.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/d/dc/Josef_Wagner_-_Under_the_Double_Eagle_%281893%29.ogg'
     ]
   }
 ];
