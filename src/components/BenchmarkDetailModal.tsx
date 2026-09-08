@@ -118,24 +118,24 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
   const availableMilestones = HISTORICAL_CRISIS_MILESTONES.filter(m => m.year <= currentYear);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 lg:p-6 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 w-full max-w-6xl xl:max-w-7xl max-h-[96vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+        <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-2xl ${isKospi ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300'}`}>
-              <TrendingUp size={22} />
+            <div className={`p-3 rounded-2xl ${isKospi ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' : 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300'}`}>
+              <TrendingUp size={24} />
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                <span className="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
                   시장 대표 벤치마크 지수
                 </span>
                 <span className="text-xs font-bold text-slate-500">
                   {currentYear}년 기준 차트
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-0.5">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
                 {currentMeta.nameKo}
               </h2>
             </div>
@@ -253,12 +253,13 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-5 flex-1 overflow-y-auto space-y-4">
+        <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4">
           {activeTab === 'CHART' && (
             <div className="space-y-3">
               <CompanyPriceChart
                 canonicalId={activeBenchmark}
                 upToYear={currentYear}
+                isExpanded={true}
               />
             </div>
           )}

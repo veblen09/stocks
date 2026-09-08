@@ -319,26 +319,26 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
 
             {/* Quick Benchmark Chart Launchers with Enlarged Mini Sparklines */}
             {onOpenBenchmarkChart && (
-              <div className="flex items-center gap-2.5 flex-wrap pl-1 sm:pl-3 sm:border-l-2 sm:border-slate-200">
+              <div className="flex items-center gap-3 flex-wrap pl-1 sm:pl-3 sm:border-l-2 sm:border-slate-200">
                 {/* KOSPI 200 Benchmark Card (Enlarged) */}
                 <button
                   type="button"
                   onClick={() => onOpenBenchmarkChart('BENCH_KOSPI')}
-                  className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/70 to-blue-100/60 hover:from-blue-100 hover:to-indigo-100 text-blue-950 border border-blue-200/90 hover:border-blue-400 text-xs font-bold transition-all duration-200 flex items-center gap-2 sm:gap-2.5 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
+                  className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/70 to-blue-100/60 hover:from-blue-100 hover:to-indigo-100 text-blue-950 border border-blue-200 hover:border-blue-400 text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2.5 sm:gap-3 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
                   title="클릭 시 코스피 200 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
                 >
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
-                    <span className="font-black text-xs sm:text-[13px] whitespace-nowrap text-blue-950">🇰🇷 코스피 200</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="w-3 h-3 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
+                    <span className="font-black text-xs sm:text-sm whitespace-nowrap text-blue-950">🇰🇷 코스피 200</span>
                   </div>
 
-                  <span className="text-xs sm:text-[13px] text-blue-900 bg-white/95 px-2 py-0.5 rounded-lg font-mono tabular-nums font-black border border-blue-100 shadow-xs">
+                  <span className="text-xs sm:text-sm text-blue-900 bg-white/95 px-2.5 py-1 rounded-xl font-mono tabular-nums font-black border border-blue-100 shadow-xs">
                     {kospiCurrentLevel.toFixed(1)}pt
                   </span>
 
                   {/* Enlarged 1-Year Mini Sparkline Graph */}
                   {kospiSparkline && kospiSparkline.points.length > 1 && (
-                    <div className="w-20 sm:w-28 h-6 sm:h-7 flex items-center bg-white/90 px-1.5 py-0.5 rounded-lg border border-blue-200/70 shadow-2xs group-hover:border-blue-400 transition-colors">
+                    <div className="w-24 sm:w-36 h-7 sm:h-8 flex items-center bg-white/95 px-2 py-0.5 rounded-xl border border-blue-200/80 shadow-2xs group-hover:border-blue-400 transition-colors">
                       <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                         <defs>
                           <linearGradient id="bench-grad-kospi" x1="0" y1="0" x2="0" y2="1">
@@ -360,7 +360,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   )}
 
                   <span
-                    className={`text-[11px] sm:text-xs font-mono tabular-nums font-black px-2 py-0.5 rounded-lg border shadow-2xs flex items-center gap-0.5 ${
+                    className={`text-xs sm:text-[13px] font-mono tabular-nums font-black px-2.5 py-1 rounded-xl border shadow-2xs flex items-center gap-1 ${
                       kospiYearReturn >= 0
                         ? 'text-red-700 bg-red-50/95 border-red-200'
                         : 'text-blue-700 bg-blue-50/95 border-blue-200'
@@ -370,9 +370,9 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                     <span>{kospiYearReturn >= 0 ? '+' : ''}{(kospiYearReturn * 100).toFixed(1)}%</span>
                   </span>
 
-                  <span className="text-[10.5px] sm:text-xs text-blue-700 font-extrabold group-hover:text-blue-900 flex items-center gap-1 bg-blue-100/80 group-hover:bg-blue-200 px-2 py-0.5 rounded-lg transition-colors shrink-0">
+                  <span className="text-xs sm:text-[13px] text-blue-700 font-black group-hover:text-blue-900 flex items-center gap-1 bg-blue-100 group-hover:bg-blue-200 px-2.5 py-1 rounded-xl transition-colors shrink-0 shadow-2xs">
                     <span>차트</span>
-                    <span className="text-[10px]">↗</span>
+                    <span className="text-[11px]">↗</span>
                   </span>
                 </button>
 
@@ -380,21 +380,21 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onOpenBenchmarkChart('BENCH_SP500')}
-                  className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-gradient-to-r from-purple-50 via-fuchsia-50/70 to-purple-100/60 hover:from-purple-100 hover:to-fuchsia-100 text-purple-950 border border-purple-200/90 hover:border-purple-400 text-xs font-bold transition-all duration-200 flex items-center gap-2 sm:gap-2.5 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
+                  className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-gradient-to-r from-purple-50 via-fuchsia-50/70 to-purple-100/60 hover:from-purple-100 hover:to-fuchsia-100 text-purple-950 border border-purple-200 hover:border-purple-400 text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2.5 sm:gap-3 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
                   title="클릭 시 S&P 500 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
                 >
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
-                    <span className="font-black text-xs sm:text-[13px] whitespace-nowrap text-purple-950">🇺🇸 S&P 500</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="w-3 h-3 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
+                    <span className="font-black text-xs sm:text-sm whitespace-nowrap text-purple-950">🇺🇸 S&P 500</span>
                   </div>
 
-                  <span className="text-xs sm:text-[13px] text-purple-900 bg-white/95 px-2 py-0.5 rounded-lg font-mono tabular-nums font-black border border-purple-100 shadow-xs">
+                  <span className="text-xs sm:text-sm text-purple-900 bg-white/95 px-2.5 py-1 rounded-xl font-mono tabular-nums font-black border border-purple-100 shadow-xs">
                     ${sp500CurrentLevel.toFixed(1)}
                   </span>
 
                   {/* Enlarged 1-Year Mini Sparkline Graph */}
                   {sp500Sparkline && sp500Sparkline.points.length > 1 && (
-                    <div className="w-20 sm:w-28 h-6 sm:h-7 flex items-center bg-white/90 px-1.5 py-0.5 rounded-lg border border-purple-200/70 shadow-2xs group-hover:border-purple-400 transition-colors">
+                    <div className="w-24 sm:w-36 h-7 sm:h-8 flex items-center bg-white/95 px-2 py-0.5 rounded-xl border border-purple-200/80 shadow-2xs group-hover:border-purple-400 transition-colors">
                       <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                         <defs>
                           <linearGradient id="bench-grad-sp500" x1="0" y1="0" x2="0" y2="1">
@@ -416,7 +416,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   )}
 
                   <span
-                    className={`text-[11px] sm:text-xs font-mono tabular-nums font-black px-2 py-0.5 rounded-lg border shadow-2xs flex items-center gap-0.5 ${
+                    className={`text-xs sm:text-[13px] font-mono tabular-nums font-black px-2.5 py-1 rounded-xl border shadow-2xs flex items-center gap-1 ${
                       sp500YearReturn >= 0
                         ? 'text-red-700 bg-red-50/95 border-red-200'
                         : 'text-blue-700 bg-blue-50/95 border-blue-200'
@@ -426,9 +426,9 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                     <span>{sp500YearReturn >= 0 ? '+' : ''}{(sp500YearReturn * 100).toFixed(1)}%</span>
                   </span>
 
-                  <span className="text-[10.5px] sm:text-xs text-purple-700 font-extrabold group-hover:text-purple-900 flex items-center gap-1 bg-purple-100/80 group-hover:bg-purple-200 px-2 py-0.5 rounded-lg transition-colors shrink-0">
+                  <span className="text-xs sm:text-[13px] text-purple-700 font-black group-hover:text-purple-900 flex items-center gap-1 bg-purple-100 group-hover:bg-purple-200 px-2.5 py-1 rounded-xl transition-colors shrink-0 shadow-2xs">
                     <span>차트</span>
-                    <span className="text-[10px]">↗</span>
+                    <span className="text-[11px]">↗</span>
                   </span>
                 </button>
               </div>

@@ -40,6 +40,17 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
   const [showMA, setShowMA] = useState({ ma5: true, ma20: true, ma60: true, ma120: false });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [internalExpanded, setInternalExpanded] = useState(isExpanded);
+
+  const effectiveExpanded = onToggleExpand ? isExpanded : internalExpanded;
+
+  const handleToggleExpand = () => {
+    if (onToggleExpand) {
+      onToggleExpand();
+    } else {
+      setInternalExpanded(!internalExpanded);
+    }
+  };
 
   // Tab Selection Handler (Naver Pay Securities Style)
   const handleSelectTab = (type: 'CANDLE' | 'PERIOD', val: NaverCandleType | NaverPeriodType) => {
@@ -125,24 +136,24 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
   const activeCandle =
     hoveredIndex !== null && candles[hoveredIndex] ? candles[hoveredIndex] : candles[candles.length - 1];
 
-  // SVG Geometry Settings
-  const svgWidth = isExpanded ? 920 : 680;
-  const svgHeight = isExpanded ? 350 : 280;
+  // SVG Geometry Settings - Large, High-Resolution, Taller Viewport
+  const svgWidth = effectiveExpanded ? 1320 : 1000;
+  const svgHeight = effectiveExpanded ? 640 : 490;
 
-  const padLeft = 68; // Y-axis price labels
-  const padRight = 24;
-  const padTop = 24;
-  const padBottom = 28; // X-axis date labels
+  const padLeft = 82; // Y-axis price labels
+  const padRight = 28;
+  const padTop = 32;
+  const padBottom = 36; // X-axis date labels
 
-  const volumeHeightRatio = 0.17;
+  const volumeHeightRatio = 0.16;
   const volumeH = (svgHeight - padTop - padBottom) * volumeHeightRatio;
-  const mainChartH = (svgHeight - padTop - padBottom) * (1 - volumeHeightRatio) - 12;
+  const mainChartH = (svgHeight - padTop - padBottom) * (1 - volumeHeightRatio) - 14;
   const baseY = padTop + mainChartH;
 
   const chartW = svgWidth - padLeft - padRight;
   const candleCount = candles.length;
   const slotW = chartW / Math.max(1, candleCount);
-  const barW = Math.max(1.5, Math.min(10, slotW * 0.72));
+  const barW = Math.max(2.2, Math.min(14, slotW * 0.74));
 
   // Y-Scale calculations
   const allYValues: number[] = [];
@@ -398,16 +409,19 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
             </button>
 
             {/* Expand Toggle */}
-            {onToggleExpand && (
-              <button
-                type="button"
-                onClick={onToggleExpand}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 transition cursor-pointer"
-                title={isExpanded ? '차트 축소' : '차트 크게 보기'}
-              >
-                {isExpanded ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleToggleExpand}
+              className={`p-2 rounded-xl transition cursor-pointer flex items-center gap-1 font-bold text-xs ${
+                effectiveExpanded
+                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-300'
+                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80'
+              }`}
+              title={effectiveExpanded ? '차트 기본 크기로 보기' : '차트 전체 크게 보기'}
+            >
+              {effectiveExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              <span className="hidden sm:inline">{effectiveExpanded ? '표준 크기' : '크게 보기'}</span>
+            </button>
           </div>
         </div>
 
@@ -578,17 +592,17 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                   x2={svgWidth - padRight}
                   y2={y}
                   stroke={isDarkMode ? '#1e293b' : '#f1f5f9'}
-                  strokeDasharray="3 3"
-                  strokeWidth="1"
+                  strokeDasharray="4 4"
+                  strokeWidth="1.2"
                 />
                 <text
-                  x={padLeft - 8}
-                  y={y + 3.5}
+                  x={padLeft - 10}
+                  y={y + 4}
                   textAnchor="end"
-                  fill={isDarkMode ? '#64748b' : '#94a3b8'}
-                  fontSize="9.5"
+                  fill={isDarkMode ? '#94a3b8' : '#64748b'}
+                  fontSize="11"
                   fontFamily="monospace"
-                  fontWeight="600"
+                  fontWeight="700"
                 >
                   {isLocalCurrency ? `$${priceVal.toFixed(2)}` : Math.round(priceVal).toLocaleString()}
                 </text>
@@ -602,8 +616,8 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
             y1={baseY}
             x2={svgWidth - padRight}
             y2={baseY}
-            stroke={isDarkMode ? '#334155' : '#e2e8f0'}
-            strokeWidth="1.2"
+            stroke={isDarkMode ? '#334155' : '#cbd5e1'}
+            strokeWidth="1.5"
           />
 
           {/* ======================================================== */}
@@ -620,7 +634,7 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                   d={smoothLinePath}
                   fill="none"
                   stroke={mountainStroke}
-                  strokeWidth="2.2"
+                  strokeWidth="2.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -642,7 +656,7 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                     height={vHeight}
                     fill={isDarkMode ? '#64748b' : '#cbd5e1'}
                     opacity={isHov ? 0.95 : 0.45}
-                    rx="0.5"
+                    rx="1"
                   />
                 );
               })}
@@ -662,14 +676,14 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                 const yLow = getY(c.low);
 
                 const candleTop = Math.min(yOpen, yClose);
-                const candleHeight = Math.max(2, Math.abs(yClose - yOpen));
+                const candleHeight = Math.max(2.5, Math.abs(yClose - yOpen));
                 const isYang = c.isYangbong;
                 const color = isYang ? '#f04452' : '#1e70e7';
 
                 return (
                   <g key={idx}>
                     {/* High-Low Wick */}
-                    <line x1={x} y1={yHigh} x2={x} y2={yLow} stroke={color} strokeWidth="1.2" />
+                    <line x1={x} y1={yHigh} x2={x} y2={yLow} stroke={color} strokeWidth="1.5" />
                     {/* Open-Close Body */}
                     <rect
                       x={x - barW / 2}
@@ -677,7 +691,7 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                       width={barW}
                       height={candleHeight}
                       fill={color}
-                      rx="0.5"
+                      rx="1"
                     />
                   </g>
                 );
@@ -685,16 +699,16 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
 
               {/* Moving Average Polyline Overlays */}
               {showMA.ma5 && (
-                <path d={buildMAPath('ma5')} fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
+                <path d={buildMAPath('ma5')} fill="none" stroke="#ef4444" strokeWidth="1.8" strokeLinecap="round" />
               )}
               {showMA.ma20 && (
-                <path d={buildMAPath('ma20')} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
+                <path d={buildMAPath('ma20')} fill="none" stroke="#f59e0b" strokeWidth="1.8" strokeLinecap="round" />
               )}
               {showMA.ma60 && (
-                <path d={buildMAPath('ma60')} fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" />
+                <path d={buildMAPath('ma60')} fill="none" stroke="#10b981" strokeWidth="1.8" strokeLinecap="round" />
               )}
               {showMA.ma120 && (
-                <path d={buildMAPath('ma120')} fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeLinecap="round" />
+                <path d={buildMAPath('ma120')} fill="none" stroke="#8b5cf6" strokeWidth="1.8" strokeLinecap="round" />
               )}
 
               {/* Candle Volume Bars */}
@@ -712,8 +726,8 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                     width={barW}
                     height={vHeight}
                     fill={color}
-                    opacity={hoveredIndex === idx ? 0.95 : 0.4}
-                    rx="0.5"
+                    opacity={hoveredIndex === idx ? 0.95 : 0.45}
+                    rx="1"
                   />
                 );
               })}
@@ -727,25 +741,25 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                 x1={highestX}
                 y1={highestY}
                 x2={highestX}
-                y2={Math.max(padTop - 6, highestY - 14)}
+                y2={Math.max(padTop - 6, highestY - 16)}
                 stroke="#f04452"
-                strokeWidth="1"
+                strokeWidth="1.2"
                 strokeDasharray="2 2"
               />
               <rect
-                x={Math.min(svgWidth - padRight - 68, Math.max(padLeft, highestX - 34))}
-                y={Math.max(4, highestY - 20)}
-                width="68"
-                height="16"
-                rx="4"
+                x={Math.min(svgWidth - padRight - 80, Math.max(padLeft, highestX - 40))}
+                y={Math.max(4, highestY - 24)}
+                width="80"
+                height="20"
+                rx="6"
                 fill="#f04452"
               />
               <text
-                x={Math.min(svgWidth - padRight - 34, Math.max(padLeft + 34, highestX))}
-                y={Math.max(15, highestY - 8)}
+                x={Math.min(svgWidth - padRight - 40, Math.max(padLeft + 40, highestX))}
+                y={Math.max(18, highestY - 10)}
                 textAnchor="middle"
                 fill="#ffffff"
-                fontSize="8.5"
+                fontSize="10.5"
                 fontWeight="bold"
                 fontFamily="monospace"
               >
@@ -761,25 +775,25 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                 x1={lowestX}
                 y1={lowestY}
                 x2={lowestX}
-                y2={Math.min(baseY - 4, lowestY + 14)}
+                y2={Math.min(baseY - 4, lowestY + 16)}
                 stroke="#1e70e7"
-                strokeWidth="1"
+                strokeWidth="1.2"
                 strokeDasharray="2 2"
               />
               <rect
-                x={Math.min(svgWidth - padRight - 68, Math.max(padLeft, lowestX - 34))}
-                y={Math.min(baseY - 18, lowestY + 4)}
-                width="68"
-                height="16"
-                rx="4"
+                x={Math.min(svgWidth - padRight - 80, Math.max(padLeft, lowestX - 40))}
+                y={Math.min(baseY - 22, lowestY + 6)}
+                width="80"
+                height="20"
+                rx="6"
                 fill="#1e70e7"
               />
               <text
-                x={Math.min(svgWidth - padRight - 34, Math.max(padLeft + 34, lowestX))}
-                y={Math.min(baseY - 6, lowestY + 16)}
+                x={Math.min(svgWidth - padRight - 40, Math.max(padLeft + 40, lowestX))}
+                y={Math.min(baseY - 8, lowestY + 20)}
                 textAnchor="middle"
                 fill="#ffffff"
-                fontSize="8.5"
+                fontSize="10.5"
                 fontWeight="bold"
                 fontFamily="monospace"
               >
@@ -798,12 +812,12 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
               <text
                 key={`x-${idx}`}
                 x={getX(idx)}
-                y={svgHeight - 8}
+                y={svgHeight - 10}
                 textAnchor="middle"
-                fill={isDarkMode ? '#64748b' : '#94a3b8'}
-                fontSize="9.5"
+                fill={isDarkMode ? '#94a3b8' : '#64748b'}
+                fontSize="11"
                 fontFamily="monospace"
-                fontWeight="600"
+                fontWeight="700"
               >
                 {c.label}
               </text>
@@ -819,29 +833,29 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
                 y1={padTop}
                 x2={hoveredX}
                 y2={baseY}
-                stroke={isDarkMode ? '#94a3b8' : '#64748b'}
+                stroke={isDarkMode ? '#94a3b8' : '#475569'}
                 strokeDasharray="3 3"
-                strokeWidth="1"
+                strokeWidth="1.2"
               />
               {/* Current Point Dot */}
               <circle
                 cx={hoveredX}
                 cy={hoveredY}
-                r="5"
+                r="6"
                 fill={chartMode === 'CANDLE' ? (hoveredCandle.isYangbong ? '#f04452' : '#1e70e7') : mountainStroke}
                 stroke="#ffffff"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 className="shadow-md"
               />
 
               {/* Bottom Date Badge */}
-              <rect x={hoveredX - 30} y={svgHeight - 20} width="60" height="16" fill="#0f172a" rx="4" />
+              <rect x={hoveredX - 36} y={svgHeight - 24} width="72" height="20" fill="#0f172a" rx="5" />
               <text
                 x={hoveredX}
-                y={svgHeight - 8}
+                y={svgHeight - 10}
                 textAnchor="middle"
                 fill="#ffffff"
-                fontSize="8.5"
+                fontSize="10.5"
                 fontFamily="monospace"
                 fontWeight="bold"
               >

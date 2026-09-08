@@ -25,9 +25,9 @@ benchmarks_path = os.path.join(NORMALIZED_DIR, 'benchmarks.json')
 with open(benchmarks_path, 'r', encoding='utf-8') as f:
     benchmarks = json.load(f)
 
-# KOSPI: 1980 price = 106.87, 1979 price = 100.0, 1980 return = +6.87%
+# KOSPI 200: 1980 price = 11.71, 1979 price = 10.96, 1980 return = +6.84%
 if 'kospi' in benchmarks:
-    benchmarks['kospi']['prices']['1979'] = 100.0
+    benchmarks['kospi']['prices']['1979'] = 10.96
     benchmarks['kospi']['annualReturns']['1980'] = 0.0687
 
 # SP500: 1980 return USD = +25.77%, FX USDKRW 1979->1980 = 580->660 (+13.79%), KRW return = +43.09%
