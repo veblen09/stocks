@@ -102,6 +102,19 @@ export interface CompanyHistoricalPriceSeries {
   stats: HistoricalStockStats;
 }
 
+export interface SparklineDailyCandle {
+  dayIdx: number;
+  month: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  isYangbong: boolean;
+  ma5?: number | null;
+  ma20?: number | null;
+}
+
 export interface Sparkline1YrData {
   canonicalId: string;
   year: number;
@@ -117,6 +130,9 @@ export interface Sparkline1YrData {
   volumes?: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[];
   dailyVolumes?: { dayIdx: number; month: number; volume: number; isYangbong: boolean; normalizedH: number }[];
   dailyVolumeMaPath?: string;
+  dailyCandles?: SparklineDailyCandle[];
+  dailyMa5Path?: string;
+  dailyMa20Path?: string;
 }
 
 export type NaverCandleType = 'DAY' | 'WEEK' | 'MONTH' | 'LINE';
@@ -535,7 +551,8 @@ export function getCompany1YrSparkline(
     });
   });
 
-  // 120-day high-density daily volume simulation (10 trading days per month)
+  // 120-day high-density daily candle simulation (10 trading days per month)
+  const dailyCandles: SparklineDailyCandle[] = [];
   const dailyVolumes: { dayIdx: number; month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
   const rawDailyVols: number[] = [];
   const tempDailyItems: { dayIdx: number; month: number; isYangbong: boolean; vol: number }[] = [];
@@ -551,10 +568,17 @@ export function getCompany1YrSparkline(
     const progress = (dayInMonth + 1) / 10;
     const stepSeed = hashSeed(canonicalId, upToYear * 1000 + dIdx, 43);
     const intraMonthShock = pseudoRandNorm(stepSeed) * 0.012;
-    const dayPrice = dayInMonth === 9 ? mTargetEnd : Math.max(1, mPriorEnd + (mTargetEnd - mPriorEnd) * progress + mTargetEnd * intraMonthShock);
-    const isYangbong = dayPrice >= prevInterpPrice;
-    const dayPriceMove = Math.abs(dayPrice - prevInterpPrice) / Math.max(1, prevInterpPrice);
-    prevInterpPrice = dayPrice;
+    const dayClose = dayInMonth === 9 ? mTargetEnd : Math.max(1, mPriorEnd + (mTargetEnd - mPriorEnd) * progress + mTargetEnd * intraMonthShock);
+    const dayOpen = prevInterpPrice;
+    const isYangbong = dayClose >= dayOpen;
+    const dayPriceMove = Math.abs(dayClose - dayOpen) / Math.max(1, dayOpen);
+
+    const highWick = Math.abs(pseudoRandNorm(stepSeed + 2)) * 0.007 * dayClose;
+    const lowWick = Math.abs(pseudoRandNorm(stepSeed + 3)) * 0.007 * dayClose;
+    const dayHigh = Math.max(dayOpen, dayClose) + highWick;
+    const dayLow = Math.max(1, Math.min(dayOpen, dayClose) - lowWick);
+
+    prevInterpPrice = dayClose;
 
     // Daily volume shocks: spikes on volatile breakout days, light on consolidation days
     const volNoise = pseudoRand(stepSeed + 1) * 0.7 + 0.15;
@@ -564,6 +588,17 @@ export function getCompany1YrSparkline(
 
     rawDailyVols.push(dayVol);
     tempDailyItems.push({ dayIdx: dIdx, month: m, isYangbong, vol: dayVol });
+
+    dailyCandles.push({
+      dayIdx: dIdx,
+      month: m,
+      open: dayOpen,
+      high: dayHigh,
+      low: dayLow,
+      close: dayClose,
+      volume: dayVol,
+      isYangbong,
+    });
   }
 
   const minDailyV = Math.min(...rawDailyVols);
@@ -580,6 +615,81 @@ export function getCompany1YrSparkline(
       normalizedH: Number(norm.toFixed(3)),
     });
   });
+
+  // Calculate Moving Averages on 120 Daily Candles
+  for (let i = 0; i < 120; i++) {
+    // 5-day MA
+    if (i >= 4) {
+      let sum5 = 0;
+      for (let k = i - 4; k <= i; k++) sum5 += dailyCandles[k].close;
+      dailyCandles[i].ma5 = sum5 / 5;
+    } else {
+      dailyCandles[i].ma5 = null;
+    }
+
+    // 20-day MA
+    if (i >= 19) {
+      let sum20 = 0;
+      for (let k = i - 19; k <= i; k++) sum20 += dailyCandles[k].close;
+      dailyCandles[i].ma20 = sum20 / 20;
+    } else {
+      dailyCandles[i].ma20 = null;
+    }
+  }
+
+  // Price range for 120 Daily Candles (viewBox 0 0 120 40)
+  const candleAllHighs = dailyCandles.map(c => c.high);
+  const candleAllLows = dailyCandles.map(c => c.low);
+  const candleMinP = Math.min(...candleAllLows);
+  const candleMaxP = Math.max(...candleAllHighs);
+  const candlePRange = candleMaxP - candleMinP || 1;
+
+  const padT = 4;
+  const usableH40 = 32;
+
+  // 5MA SVG Path
+  const ma5Points: { x: number; y: number }[] = [];
+  dailyCandles.forEach(c => {
+    if (c.ma5 !== null && c.ma5 !== undefined) {
+      const x = c.dayIdx + 0.375;
+      const y = padT + usableH40 * (1 - (c.ma5 - candleMinP) / candlePRange);
+      ma5Points.push({ x, y });
+    }
+  });
+
+  let dailyMa5Path = '';
+  if (ma5Points.length > 1) {
+    dailyMa5Path = `M ${ma5Points[0].x.toFixed(1)},${ma5Points[0].y.toFixed(1)}`;
+    for (let i = 0; i < ma5Points.length - 1; i++) {
+      const p1 = ma5Points[i];
+      const p2 = ma5Points[i + 1];
+      const mx = (p1.x + p2.x) / 2;
+      dailyMa5Path += ` Q ${p1.x.toFixed(1)},${p1.y.toFixed(1)} ${mx.toFixed(1)},${((p1.y + p2.y) / 2).toFixed(1)}`;
+    }
+    dailyMa5Path += ` L ${ma5Points[ma5Points.length - 1].x.toFixed(1)},${ma5Points[ma5Points.length - 1].y.toFixed(1)}`;
+  }
+
+  // 20MA SVG Path
+  const ma20Points: { x: number; y: number }[] = [];
+  dailyCandles.forEach(c => {
+    if (c.ma20 !== null && c.ma20 !== undefined) {
+      const x = c.dayIdx + 0.375;
+      const y = padT + usableH40 * (1 - (c.ma20 - candleMinP) / candlePRange);
+      ma20Points.push({ x, y });
+    }
+  });
+
+  let dailyMa20Path = '';
+  if (ma20Points.length > 1) {
+    dailyMa20Path = `M ${ma20Points[0].x.toFixed(1)},${ma20Points[0].y.toFixed(1)}`;
+    for (let i = 0; i < ma20Points.length - 1; i++) {
+      const p1 = ma20Points[i];
+      const p2 = ma20Points[i + 1];
+      const mx = (p1.x + p2.x) / 2;
+      dailyMa20Path += ` Q ${p1.x.toFixed(1)},${p1.y.toFixed(1)} ${mx.toFixed(1)},${((p1.y + p2.y) / 2).toFixed(1)}`;
+    }
+    dailyMa20Path += ` L ${ma20Points[ma20Points.length - 1].x.toFixed(1)},${ma20Points[ma20Points.length - 1].y.toFixed(1)}`;
+  }
 
   // Calculate 10-day Volume Moving Average curve
   const maPeriod = 10;
@@ -621,6 +731,9 @@ export function getCompany1YrSparkline(
     volumes,
     dailyVolumes,
     dailyVolumeMaPath,
+    dailyCandles,
+    dailyMa5Path,
+    dailyMa20Path,
   };
 }
 

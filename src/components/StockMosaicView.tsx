@@ -68,6 +68,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   const [sectorFilter, setSectorFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'DEFAULT' | 'NAME' | 'TARGET_WEIGHT' | 'HOLDING_WEIGHT' | 'NEWS_COUNT'>('DEFAULT');
+  const [benchmarkChartMode, setBenchmarkChartMode] = useState<'CANDLE' | 'LINE'>('CANDLE');
 
   // Compute portfolio total market value for holding weights
   const holdingStockValues = Object.values(holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
@@ -341,7 +342,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
           </button>
         </div>
 
-        {/* Dedicated Row: Quick Benchmark Chart Launchers (Side-by-Side 2-Column Grid with Compact Sleek Mini Wave Charts & Volume) */}
+        {/* Dedicated Row: Quick Benchmark Chart Launchers (Side-by-Side 2-Column Grid with Daily Candlestick / Line Mini Charts & Daily Volume) */}
         {onOpenBenchmarkChart && (
           <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-3 pt-0.5">
             {/* 1. KOSPI 200 Benchmark Card */}
@@ -353,7 +354,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-slate-50/70 hover:from-blue-100/90 text-blue-950 border border-blue-200/90 hover:border-blue-400 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between gap-2 active:scale-[0.995]"
               title="클릭 시 코스피 200 지수 인터랙티브 대형 차트 및 상세 분석 열기"
             >
-              {/* Top Header: Badge, Level, Change, High/Low, Button */}
+              {/* Top Header: Badge, Level, Change, Mode Switcher, High/Low, Button */}
               <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-blue-100/90">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
@@ -384,6 +385,43 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                     <span className="text-[10px] font-bold opacity-85">({(kospiYearReturn * 100).toFixed(2)}%)</span>
                   </span>
 
+                  {/* Mini Mode Switcher (일봉 vs 라인) */}
+                  <div
+                    className="flex items-center bg-white/90 p-0.5 rounded-lg border border-slate-200/90 text-[10px] font-bold shadow-2xs"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        audioManager.playUiSound('tab');
+                        setBenchmarkChartMode('CANDLE');
+                      }}
+                      className={`px-1.5 py-0.5 rounded-md transition cursor-pointer ${
+                        benchmarkChartMode === 'CANDLE'
+                          ? 'bg-blue-600 text-white shadow-2xs font-extrabold'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      일봉
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        audioManager.playUiSound('tab');
+                        setBenchmarkChartMode('LINE');
+                      }}
+                      className={`px-1.5 py-0.5 rounded-md transition cursor-pointer ${
+                        benchmarkChartMode === 'LINE'
+                          ? 'bg-blue-600 text-white shadow-2xs font-extrabold'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      라인
+                    </button>
+                  </div>
+
                   {/* High / Low Range */}
                   <div className="hidden sm:flex items-center gap-1 text-[10.5px] font-mono bg-white/90 px-1.5 py-0.5 rounded-lg border border-slate-200/80 shadow-2xs">
                     <span className="text-red-600 font-bold">고 {kospiSparkline?.maxPrice.toFixed(2)}</span>
@@ -403,71 +441,163 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               <div className="w-full bg-white/95 rounded-xl border border-blue-100/90 p-2 sm:p-2.5 shadow-2xs group-hover:border-blue-300 transition-colors flex flex-col gap-1.5">
                 {kospiSparkline && kospiSparkline.points.length > 1 ? (
                   <>
-                    {/* 1. Price Wave Area */}
+                    {/* 1. Price Area (Daily Candlestick vs Wave Line) */}
                     <div className="w-full h-18 sm:h-20 relative overflow-visible">
-                      {/* Scale Indicators */}
-                      <div className="absolute left-1 top-0 text-[9px] font-mono font-bold text-red-600 bg-red-50/80 px-1 py-0.2 rounded border border-red-100 pointer-events-none z-10">
-                        최고 {kospiSparkline.maxPrice.toFixed(2)} pt
+                      {/* Scale Indicators & Legend */}
+                      <div className="absolute left-1 top-0 flex items-center gap-1.5 z-10 pointer-events-none">
+                        <span className="text-[9px] font-mono font-bold text-red-600 bg-red-50/90 px-1 py-0.2 rounded border border-red-100">
+                          최고 {kospiSparkline.maxPrice.toFixed(2)} pt
+                        </span>
+                        {benchmarkChartMode === 'CANDLE' && (
+                          <>
+                            <span className="text-[8.5px] font-mono font-bold text-amber-600 bg-amber-50/80 px-1 py-0.2 rounded border border-amber-200/60 hidden sm:inline-block">
+                              5일선
+                            </span>
+                            <span className="text-[8.5px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-1 py-0.2 rounded border border-cyan-200/60 hidden sm:inline-block">
+                              20일선
+                            </span>
+                          </>
+                        )}
                       </div>
-                      <div className="absolute left-1 bottom-0 text-[9px] font-mono font-bold text-blue-600 bg-blue-50/80 px-1 py-0.2 rounded border border-blue-100 pointer-events-none z-10">
+
+                      <div className="absolute left-1 bottom-0 text-[9px] font-mono font-bold text-blue-600 bg-blue-50/90 px-1 py-0.2 rounded border border-blue-100 pointer-events-none z-10">
                         최저 {kospiSparkline.minPrice.toFixed(2)} pt
                       </div>
-                      <div className="absolute right-1 top-0 text-[9px] font-mono font-bold text-slate-500 bg-slate-100/80 px-1 py-0.2 rounded pointer-events-none z-10">
+                      <div className="absolute right-1 top-0 text-[9px] font-mono font-bold text-slate-500 bg-slate-100/90 px-1 py-0.2 rounded pointer-events-none z-10">
                         시작 {kospiSparkline.startPrice.toFixed(2)} pt
                       </div>
 
-                      <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="bench-line-grad-kospi" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#fb7185' : '#60a5fa'} />
-                            <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#e11d48' : '#2563eb'} />
-                          </linearGradient>
-                          <linearGradient id="bench-area-grad-kospi" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.10" />
-                            <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-
-                        {/* Starting Baseline Reference */}
-                        {kospiSparkline.points[0] && (
+                      {benchmarkChartMode === 'CANDLE' ? (
+                        /* Daily Candlestick SVG (120 trading days) */
+                        <svg viewBox="0 0 120 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                          {/* Starting Baseline Reference */}
                           <line
                             x1="0"
-                            y1={kospiSparkline.points[0].y}
-                            x2="100"
-                            y2={kospiSparkline.points[0].y}
-                            stroke="#cbd5e1"
+                            y1={4 + 32 * (1 - (kospiSparkline.startPrice - kospiSparkline.minPrice) / (kospiSparkline.maxPrice - kospiSparkline.minPrice || 1))}
+                            x2="120"
+                            y2={4 + 32 * (1 - (kospiSparkline.startPrice - kospiSparkline.minPrice) / (kospiSparkline.maxPrice - kospiSparkline.minPrice || 1))}
+                            stroke="#e2e8f0"
                             strokeWidth="1"
                             strokeDasharray="3 3"
                             vectorEffect="non-scaling-stroke"
                           />
-                        )}
 
-                        {/* Gradient Area Fill */}
-                        <path d={kospiSparkline.svgAreaPath} fill="url(#bench-area-grad-kospi)" />
+                          {/* 120 Daily Candles (Wicks + Bodies) */}
+                          {kospiSparkline.dailyCandles?.map((c, i) => {
+                            const pRange = kospiSparkline.maxPrice - kospiSparkline.minPrice || 1;
+                            const x = c.dayIdx + 0.375;
+                            const yHigh = 4 + 32 * (1 - (c.high - kospiSparkline.minPrice) / pRange);
+                            const yLow = 4 + 32 * (1 - (c.low - kospiSparkline.minPrice) / pRange);
+                            const yOpen = 4 + 32 * (1 - (c.open - kospiSparkline.minPrice) / pRange);
+                            const yClose = 4 + 32 * (1 - (c.close - kospiSparkline.minPrice) / pRange);
+                            const candleColor = c.isYangbong ? '#f43f5e' : '#3b82f6';
 
-                        {/* Crisp, Slim, Elegant Price Line */}
-                        <path
-                          d={kospiSparkline.svgPath}
-                          fill="none"
-                          stroke="url(#bench-line-grad-kospi)"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          vectorEffect="non-scaling-stroke"
-                        />
-                      </svg>
+                            return (
+                              <g key={i}>
+                                {/* Wick */}
+                                <line
+                                  x1={x}
+                                  y1={yHigh}
+                                  x2={x}
+                                  y2={yLow}
+                                  stroke={candleColor}
+                                  strokeWidth="0.6"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                                {/* Body */}
+                                <rect
+                                  x={x - 0.35}
+                                  y={Math.min(yOpen, yClose)}
+                                  width="0.75"
+                                  height={Math.max(0.4, Math.abs(yClose - yOpen))}
+                                  fill={candleColor}
+                                  rx="0.1"
+                                />
+                              </g>
+                            );
+                          })}
 
-                      {/* Small, perfectly circular live terminal dot (Non-distorted HTML element) */}
-                      {kospiSparkline.points[kospiSparkline.points.length - 1] && (
-                        <div
-                          style={{
-                            left: `${kospiSparkline.points[kospiSparkline.points.length - 1].x}%`,
-                            top: `${(kospiSparkline.points[kospiSparkline.points.length - 1].y / 40) * 100}%`,
-                          }}
-                          className={`absolute w-2 h-2 rounded-full border-[1.5px] border-white shadow-xs -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 ${
-                            kospiSparkline.isPositive ? 'bg-rose-600' : 'bg-blue-600'
-                          }`}
-                        />
+                          {/* 20-Day MA Curve (Cyan) */}
+                          {kospiSparkline.dailyMa20Path && (
+                            <path
+                              d={kospiSparkline.dailyMa20Path}
+                              fill="none"
+                              stroke="#06b6d4"
+                              strokeWidth="0.9"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.85"
+                            />
+                          )}
+
+                          {/* 5-Day MA Curve (Orange) */}
+                          {kospiSparkline.dailyMa5Path && (
+                            <path
+                              d={kospiSparkline.dailyMa5Path}
+                              fill="none"
+                              stroke="#f59e0b"
+                              strokeWidth="1.1"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.95"
+                            />
+                          )}
+                        </svg>
+                      ) : (
+                        /* Wave Line SVG */
+                        <>
+                          <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="bench-line-grad-kospi" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#fb7185' : '#60a5fa'} />
+                                <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#e11d48' : '#2563eb'} />
+                              </linearGradient>
+                              <linearGradient id="bench-area-grad-kospi" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.10" />
+                                <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
+                              </linearGradient>
+                            </defs>
+
+                            {/* Starting Baseline Reference */}
+                            {kospiSparkline.points[0] && (
+                              <line
+                                x1="0"
+                                y1={kospiSparkline.points[0].y}
+                                x2="100"
+                                y2={kospiSparkline.points[0].y}
+                                stroke="#cbd5e1"
+                                strokeWidth="1"
+                                strokeDasharray="3 3"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                            )}
+
+                            {/* Gradient Area Fill */}
+                            <path d={kospiSparkline.svgAreaPath} fill="url(#bench-area-grad-kospi)" />
+
+                            {/* Crisp, Slim, Elegant Price Line */}
+                            <path
+                              d={kospiSparkline.svgPath}
+                              fill="none"
+                              stroke="url(#bench-line-grad-kospi)"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              vectorEffect="non-scaling-stroke"
+                            />
+                          </svg>
+
+                          {/* Small circular live terminal dot */}
+                          {kospiSparkline.points[kospiSparkline.points.length - 1] && (
+                            <div
+                              style={{
+                                left: `${kospiSparkline.points[kospiSparkline.points.length - 1].x}%`,
+                                top: `${(kospiSparkline.points[kospiSparkline.points.length - 1].y / 40) * 100}%`,
+                              }}
+                              className={`absolute w-2 h-2 rounded-full border-[1.5px] border-white shadow-xs -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 ${
+                                kospiSparkline.isPositive ? 'bg-rose-600' : 'bg-blue-600'
+                              }`}
+                            />
+                          )}
+                        </>
                       )}
                     </div>
 
@@ -547,7 +677,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               className="p-3 sm:p-3.5 rounded-2xl bg-gradient-to-br from-purple-50/80 via-white to-slate-50/70 hover:from-purple-100/90 text-purple-950 border border-purple-200/90 hover:border-purple-400 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between gap-2 active:scale-[0.995]"
               title="클릭 시 S&P 500 지수 인터랙티브 대형 차트 및 상세 분석 열기"
             >
-              {/* Top Header: Badge, Level, Change, High/Low, Button */}
+              {/* Top Header: Badge, Level, Change, Mode Switcher, High/Low, Button */}
               <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-purple-100/90">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
@@ -577,6 +707,43 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                     <span className="text-[10px] font-bold opacity-85">({(sp500YearReturn * 100).toFixed(2)}%)</span>
                   </span>
 
+                  {/* Mini Mode Switcher (일봉 vs 라인) */}
+                  <div
+                    className="flex items-center bg-white/90 p-0.5 rounded-lg border border-slate-200/90 text-[10px] font-bold shadow-2xs"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        audioManager.playUiSound('tab');
+                        setBenchmarkChartMode('CANDLE');
+                      }}
+                      className={`px-1.5 py-0.5 rounded-md transition cursor-pointer ${
+                        benchmarkChartMode === 'CANDLE'
+                          ? 'bg-purple-600 text-white shadow-2xs font-extrabold'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      일봉
+                    </button>
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation();
+                        audioManager.playUiSound('tab');
+                        setBenchmarkChartMode('LINE');
+                      }}
+                      className={`px-1.5 py-0.5 rounded-md transition cursor-pointer ${
+                        benchmarkChartMode === 'LINE'
+                          ? 'bg-purple-600 text-white shadow-2xs font-extrabold'
+                          : 'text-slate-500 hover:text-slate-800'
+                      }`}
+                    >
+                      라인
+                    </button>
+                  </div>
+
                   {/* High / Low Range */}
                   <div className="hidden sm:flex items-center gap-1 text-[10.5px] font-mono bg-white/90 px-1.5 py-0.5 rounded-lg border border-slate-200/80 shadow-2xs">
                     <span className="text-red-600 font-bold">고 ${sp500Sparkline?.maxPrice.toFixed(2)}</span>
@@ -596,71 +763,163 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
               <div className="w-full bg-white/95 rounded-xl border border-purple-100/90 p-2 sm:p-2.5 shadow-2xs group-hover:border-purple-300 transition-colors flex flex-col gap-1.5">
                 {sp500Sparkline && sp500Sparkline.points.length > 1 ? (
                   <>
-                    {/* 1. Price Wave Area */}
+                    {/* 1. Price Area (Daily Candlestick vs Wave Line) */}
                     <div className="w-full h-18 sm:h-20 relative overflow-visible">
-                      {/* Scale Indicators */}
-                      <div className="absolute left-1 top-0 text-[9px] font-mono font-bold text-red-600 bg-red-50/80 px-1 py-0.2 rounded border border-red-100 pointer-events-none z-10">
-                        최고 ${sp500Sparkline.maxPrice.toFixed(2)}
+                      {/* Scale Indicators & Legend */}
+                      <div className="absolute left-1 top-0 flex items-center gap-1.5 z-10 pointer-events-none">
+                        <span className="text-[9px] font-mono font-bold text-red-600 bg-red-50/90 px-1 py-0.2 rounded border border-red-100">
+                          최고 ${sp500Sparkline.maxPrice.toFixed(2)}
+                        </span>
+                        {benchmarkChartMode === 'CANDLE' && (
+                          <>
+                            <span className="text-[8.5px] font-mono font-bold text-amber-600 bg-amber-50/80 px-1 py-0.2 rounded border border-amber-200/60 hidden sm:inline-block">
+                              5일선
+                            </span>
+                            <span className="text-[8.5px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-1 py-0.2 rounded border border-cyan-200/60 hidden sm:inline-block">
+                              20일선
+                            </span>
+                          </>
+                        )}
                       </div>
-                      <div className="absolute left-1 bottom-0 text-[9px] font-mono font-bold text-blue-600 bg-blue-50/80 px-1 py-0.2 rounded border border-blue-100 pointer-events-none z-10">
+
+                      <div className="absolute left-1 bottom-0 text-[9px] font-mono font-bold text-blue-600 bg-blue-50/90 px-1 py-0.2 rounded border border-blue-100 pointer-events-none z-10">
                         최저 ${sp500Sparkline.minPrice.toFixed(2)}
                       </div>
-                      <div className="absolute right-1 top-0 text-[9px] font-mono font-bold text-slate-500 bg-slate-100/80 px-1 py-0.2 rounded pointer-events-none z-10">
+                      <div className="absolute right-1 top-0 text-[9px] font-mono font-bold text-slate-500 bg-slate-100/90 px-1 py-0.2 rounded pointer-events-none z-10">
                         시작 ${sp500Sparkline.startPrice.toFixed(2)}
                       </div>
 
-                      <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="bench-line-grad-sp500" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#fb7185' : '#60a5fa'} />
-                            <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#e11d48' : '#2563eb'} />
-                          </linearGradient>
-                          <linearGradient id="bench-area-grad-sp500" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.10" />
-                            <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-
-                        {/* Starting Baseline Reference */}
-                        {sp500Sparkline.points[0] && (
+                      {benchmarkChartMode === 'CANDLE' ? (
+                        /* Daily Candlestick SVG (120 trading days) */
+                        <svg viewBox="0 0 120 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                          {/* Starting Baseline Reference */}
                           <line
                             x1="0"
-                            y1={sp500Sparkline.points[0].y}
-                            x2="100"
-                            y2={sp500Sparkline.points[0].y}
-                            stroke="#cbd5e1"
+                            y1={4 + 32 * (1 - (sp500Sparkline.startPrice - sp500Sparkline.minPrice) / (sp500Sparkline.maxPrice - sp500Sparkline.minPrice || 1))}
+                            x2="120"
+                            y2={4 + 32 * (1 - (sp500Sparkline.startPrice - sp500Sparkline.minPrice) / (sp500Sparkline.maxPrice - sp500Sparkline.minPrice || 1))}
+                            stroke="#e2e8f0"
                             strokeWidth="1"
                             strokeDasharray="3 3"
                             vectorEffect="non-scaling-stroke"
                           />
-                        )}
 
-                        {/* Gradient Area Fill */}
-                        <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-area-grad-sp500)" />
+                          {/* 120 Daily Candles (Wicks + Bodies) */}
+                          {sp500Sparkline.dailyCandles?.map((c, i) => {
+                            const pRange = sp500Sparkline.maxPrice - sp500Sparkline.minPrice || 1;
+                            const x = c.dayIdx + 0.375;
+                            const yHigh = 4 + 32 * (1 - (c.high - sp500Sparkline.minPrice) / pRange);
+                            const yLow = 4 + 32 * (1 - (c.low - sp500Sparkline.minPrice) / pRange);
+                            const yOpen = 4 + 32 * (1 - (c.open - sp500Sparkline.minPrice) / pRange);
+                            const yClose = 4 + 32 * (1 - (c.close - sp500Sparkline.minPrice) / pRange);
+                            const candleColor = c.isYangbong ? '#f43f5e' : '#3b82f6';
 
-                        {/* Crisp, Slim, Elegant Price Line */}
-                        <path
-                          d={sp500Sparkline.svgPath}
-                          fill="none"
-                          stroke="url(#bench-line-grad-sp500)"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          vectorEffect="non-scaling-stroke"
-                        />
-                      </svg>
+                            return (
+                              <g key={i}>
+                                {/* Wick */}
+                                <line
+                                  x1={x}
+                                  y1={yHigh}
+                                  x2={x}
+                                  y2={yLow}
+                                  stroke={candleColor}
+                                  strokeWidth="0.6"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                                {/* Body */}
+                                <rect
+                                  x={x - 0.35}
+                                  y={Math.min(yOpen, yClose)}
+                                  width="0.75"
+                                  height={Math.max(0.4, Math.abs(yClose - yOpen))}
+                                  fill={candleColor}
+                                  rx="0.1"
+                                />
+                              </g>
+                            );
+                          })}
 
-                      {/* Small, perfectly circular live terminal dot (Non-distorted HTML element) */}
-                      {sp500Sparkline.points[sp500Sparkline.points.length - 1] && (
-                        <div
-                          style={{
-                            left: `${sp500Sparkline.points[sp500Sparkline.points.length - 1].x}%`,
-                            top: `${(sp500Sparkline.points[sp500Sparkline.points.length - 1].y / 40) * 100}%`,
-                          }}
-                          className={`absolute w-2 h-2 rounded-full border-[1.5px] border-white shadow-xs -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 ${
-                            sp500Sparkline.isPositive ? 'bg-rose-600' : 'bg-blue-600'
-                          }`}
-                        />
+                          {/* 20-Day MA Curve (Cyan) */}
+                          {sp500Sparkline.dailyMa20Path && (
+                            <path
+                              d={sp500Sparkline.dailyMa20Path}
+                              fill="none"
+                              stroke="#06b6d4"
+                              strokeWidth="0.9"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.85"
+                            />
+                          )}
+
+                          {/* 5-Day MA Curve (Orange) */}
+                          {sp500Sparkline.dailyMa5Path && (
+                            <path
+                              d={sp500Sparkline.dailyMa5Path}
+                              fill="none"
+                              stroke="#f59e0b"
+                              strokeWidth="1.1"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.95"
+                            />
+                          )}
+                        </svg>
+                      ) : (
+                        /* Wave Line SVG */
+                        <>
+                          <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="bench-line-grad-sp500" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#fb7185' : '#60a5fa'} />
+                                <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#e11d48' : '#2563eb'} />
+                              </linearGradient>
+                              <linearGradient id="bench-area-grad-sp500" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.10" />
+                                <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
+                              </linearGradient>
+                            </defs>
+
+                            {/* Starting Baseline Reference */}
+                            {sp500Sparkline.points[0] && (
+                              <line
+                                x1="0"
+                                y1={sp500Sparkline.points[0].y}
+                                x2="100"
+                                y2={sp500Sparkline.points[0].y}
+                                stroke="#cbd5e1"
+                                strokeWidth="1"
+                                strokeDasharray="3 3"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                            )}
+
+                            {/* Gradient Area Fill */}
+                            <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-area-grad-sp500)" />
+
+                            {/* Crisp, Slim, Elegant Price Line */}
+                            <path
+                              d={sp500Sparkline.svgPath}
+                              fill="none"
+                              stroke="url(#bench-line-grad-sp500)"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              vectorEffect="non-scaling-stroke"
+                            />
+                          </svg>
+
+                          {/* Small circular live terminal dot */}
+                          {sp500Sparkline.points[sp500Sparkline.points.length - 1] && (
+                            <div
+                              style={{
+                                left: `${sp500Sparkline.points[sp500Sparkline.points.length - 1].x}%`,
+                                top: `${(sp500Sparkline.points[sp500Sparkline.points.length - 1].y / 40) * 100}%`,
+                              }}
+                              className={`absolute w-2 h-2 rounded-full border-[1.5px] border-white shadow-xs -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 ${
+                                sp500Sparkline.isPositive ? 'bg-rose-600' : 'bg-blue-600'
+                              }`}
+                            />
+                          )}
+                        </>
                       )}
                     </div>
 
