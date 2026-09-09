@@ -115,6 +115,8 @@ export interface Sparkline1YrData {
   svgPath: string;
   svgAreaPath: string;
   volumes?: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[];
+  dailyVolumes?: { dayIdx: number; month: number; volume: number; isYangbong: boolean; normalizedH: number }[];
+  dailyVolumeMaPath?: string;
 }
 
 export type NaverCandleType = 'DAY' | 'WEEK' | 'MONTH' | 'LINE';
@@ -533,6 +535,77 @@ export function getCompany1YrSparkline(
     });
   });
 
+  // 120-day high-density daily volume simulation (10 trading days per month)
+  const dailyVolumes: { dayIdx: number; month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
+  const rawDailyVols: number[] = [];
+  const tempDailyItems: { dayIdx: number; month: number; isYangbong: boolean; vol: number }[] = [];
+  const dailyBaseVol = baseVol / 20;
+
+  let prevInterpPrice = startP;
+  for (let dIdx = 0; dIdx < 120; dIdx++) {
+    const m = Math.floor(dIdx / 10) + 1; // 1 ~ 12
+    const dayInMonth = dIdx % 10; // 0 ~ 9
+    const mTargetEnd = monthlyList[m - 1]?.price || endP;
+    const mPriorEnd = m === 1 ? startP : (monthlyList[m - 2]?.price || startP);
+
+    const progress = (dayInMonth + 1) / 10;
+    const stepSeed = hashSeed(canonicalId, upToYear * 1000 + dIdx, 43);
+    const intraMonthShock = pseudoRandNorm(stepSeed) * 0.012;
+    const dayPrice = dayInMonth === 9 ? mTargetEnd : Math.max(1, mPriorEnd + (mTargetEnd - mPriorEnd) * progress + mTargetEnd * intraMonthShock);
+    const isYangbong = dayPrice >= prevInterpPrice;
+    const dayPriceMove = Math.abs(dayPrice - prevInterpPrice) / Math.max(1, prevInterpPrice);
+    prevInterpPrice = dayPrice;
+
+    // Daily volume shocks: spikes on volatile breakout days, light on consolidation days
+    const volNoise = pseudoRand(stepSeed + 1) * 0.7 + 0.15;
+    const dailySurge = Math.min(3.5, dayPriceMove * 45);
+    const dMultiplier = Math.max(0.12, 0.2 + volNoise * 0.75 + dailySurge);
+    const dayVol = Math.round(dailyBaseVol * dMultiplier);
+
+    rawDailyVols.push(dayVol);
+    tempDailyItems.push({ dayIdx: dIdx, month: m, isYangbong, vol: dayVol });
+  }
+
+  const minDailyV = Math.min(...rawDailyVols);
+  const maxDailyV = Math.max(...rawDailyVols);
+  const spanDailyV = maxDailyV - minDailyV || 1;
+
+  tempDailyItems.forEach(item => {
+    const norm = 0.08 + ((item.vol - minDailyV) / spanDailyV) * 0.92;
+    dailyVolumes.push({
+      dayIdx: item.dayIdx,
+      month: item.month,
+      volume: item.vol,
+      isYangbong: item.isYangbong,
+      normalizedH: Number(norm.toFixed(3)),
+    });
+  });
+
+  // Calculate 10-day Volume Moving Average curve
+  const maPeriod = 10;
+  const maPoints: { x: number; y: number }[] = [];
+  for (let i = 0; i < 120; i++) {
+    const startIdx = Math.max(0, i - maPeriod + 1);
+    let sum = 0;
+    for (let k = startIdx; k <= i; k++) {
+      sum += dailyVolumes[k].volume;
+    }
+    const avgVol = sum / (i - startIdx + 1);
+    const normMa = 0.08 + ((avgVol - minDailyV) / spanDailyV) * 0.92;
+    const x = i + 0.375;
+    const y = 24 - normMa * 22;
+    maPoints.push({ x, y });
+  }
+
+  let dailyVolumeMaPath = `M ${maPoints[0].x.toFixed(1)},${maPoints[0].y.toFixed(1)}`;
+  for (let i = 0; i < maPoints.length - 1; i++) {
+    const p1 = maPoints[i];
+    const p2 = maPoints[i + 1];
+    const mx = (p1.x + p2.x) / 2;
+    dailyVolumeMaPath += ` Q ${p1.x.toFixed(1)},${p1.y.toFixed(1)} ${mx.toFixed(1)},${((p1.y + p2.y) / 2).toFixed(1)}`;
+  }
+  dailyVolumeMaPath += ` L ${maPoints[maPoints.length - 1].x.toFixed(1)},${maPoints[maPoints.length - 1].y.toFixed(1)}`;
+
   return {
     canonicalId,
     year: upToYear,
@@ -546,6 +619,8 @@ export function getCompany1YrSparkline(
     svgPath,
     svgAreaPath,
     volumes,
+    dailyVolumes,
+    dailyVolumeMaPath,
   };
 }
 

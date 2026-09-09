@@ -471,37 +471,64 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                       )}
                     </div>
 
-                    {/* 2. Monthly Volume Bars Area (Compact & Dynamic) */}
-                    <div className="w-full h-9 sm:h-10 pt-1 border-t border-slate-100 flex flex-col justify-between">
+                    {/* 2. Daily Volume Histogram Area (일별 거래량 120거래일) */}
+                    <div className="w-full h-11 sm:h-12 pt-1 border-t border-slate-100 flex flex-col justify-between">
                       <div className="flex items-center justify-between text-[9.5px] font-mono text-slate-500 font-bold px-0.5">
                         <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                          <span>월별 거래량</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                          <span>일별 거래량</span>
                         </span>
-                        <span className="text-[8.5px] text-slate-400 font-normal">1월 ~ 12월</span>
+                        <span className="text-[8.5px] text-slate-400 font-normal">연간 120거래일 추이</span>
                       </div>
 
-                      {/* 12-Month Volume Bars */}
-                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-0.5 min-h-[20px]">
-                        {kospiSparkline.volumes?.map((v, vIdx) => (
-                          <div
-                            key={vIdx}
-                            className="flex-1 flex flex-col justify-end items-center h-full group/vol cursor-pointer"
-                            title={`${v.month}월 거래량: ${(v.volume).toLocaleString()}주 (${v.isYangbong ? '상승월' : '하락월'})`}
-                          >
-                            <div
-                              style={{ height: `${Math.max(12, Math.round(v.normalizedH * 100))}%` }}
-                              className={`w-full max-w-[10px] rounded-t-[1.5px] transition-all duration-150 ${
-                                v.isYangbong
-                                  ? 'bg-rose-400/90 group-hover/vol:bg-rose-600'
-                                  : 'bg-blue-400/90 group-hover/vol:bg-blue-600'
-                              }`}
+                      {/* SVG Daily Volume Bars & Moving Average */}
+                      <div className="w-full flex-1 relative h-6 overflow-hidden my-0.5">
+                        <svg viewBox="0 0 120 24" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                          {/* Daily Volume Bars */}
+                          {kospiSparkline.dailyVolumes?.map((dv, i) => {
+                            const barH = Math.max(1.8, dv.normalizedH * 22);
+                            return (
+                              <rect
+                                key={i}
+                                x={dv.dayIdx}
+                                y={24 - barH}
+                                width="0.75"
+                                height={barH}
+                                fill={dv.isYangbong ? '#f43f5e' : '#3b82f6'}
+                                opacity="0.82"
+                                rx="0.15"
+                              />
+                            );
+                          })}
+
+                          {/* 10-Day Volume MA Line */}
+                          {kospiSparkline.dailyVolumeMaPath && (
+                            <path
+                              d={kospiSparkline.dailyVolumeMaPath}
+                              fill="none"
+                              stroke="#94a3b8"
+                              strokeWidth="0.75"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.8"
                             />
-                            <span className="text-[8px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-0.5 leading-none">
-                              {v.month}
-                            </span>
-                          </div>
-                        ))}
+                          )}
+                        </svg>
+                      </div>
+
+                      {/* Month Label Indicators Along Bottom */}
+                      <div className="w-full flex justify-between items-center text-[7.5px] sm:text-[8px] font-mono text-slate-400 px-0.5 leading-none">
+                        <span>1월</span>
+                        <span>2월</span>
+                        <span>3월</span>
+                        <span>4월</span>
+                        <span>5월</span>
+                        <span>6월</span>
+                        <span>7월</span>
+                        <span>8월</span>
+                        <span>9월</span>
+                        <span>10월</span>
+                        <span>11월</span>
+                        <span>12월</span>
                       </div>
                     </div>
                   </>
@@ -637,37 +664,64 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                       )}
                     </div>
 
-                    {/* 2. Monthly Volume Bars Area (Compact & Dynamic) */}
-                    <div className="w-full h-9 sm:h-10 pt-1 border-t border-slate-100 flex flex-col justify-between">
+                    {/* 2. Daily Volume Histogram Area (일별 거래량 120거래일) */}
+                    <div className="w-full h-11 sm:h-12 pt-1 border-t border-slate-100 flex flex-col justify-between">
                       <div className="flex items-center justify-between text-[9.5px] font-mono text-slate-500 font-bold px-0.5">
                         <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                          <span>월별 거래량</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                          <span>일별 거래량</span>
                         </span>
-                        <span className="text-[8.5px] text-slate-400 font-normal">1월 ~ 12월</span>
+                        <span className="text-[8.5px] text-slate-400 font-normal">연간 120거래일 추이</span>
                       </div>
 
-                      {/* 12-Month Volume Bars */}
-                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-0.5 min-h-[20px]">
-                        {sp500Sparkline.volumes?.map((v, vIdx) => (
-                          <div
-                            key={vIdx}
-                            className="flex-1 flex flex-col justify-end items-center h-full group/vol cursor-pointer"
-                            title={`${v.month}월 거래량: ${(v.volume).toLocaleString()}주 (${v.isYangbong ? '상승월' : '하락월'})`}
-                          >
-                            <div
-                              style={{ height: `${Math.max(12, Math.round(v.normalizedH * 100))}%` }}
-                              className={`w-full max-w-[10px] rounded-t-[1.5px] transition-all duration-150 ${
-                                v.isYangbong
-                                  ? 'bg-rose-400/90 group-hover/vol:bg-rose-600'
-                                  : 'bg-blue-400/90 group-hover/vol:bg-blue-600'
-                              }`}
+                      {/* SVG Daily Volume Bars & Moving Average */}
+                      <div className="w-full flex-1 relative h-6 overflow-hidden my-0.5">
+                        <svg viewBox="0 0 120 24" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                          {/* Daily Volume Bars */}
+                          {sp500Sparkline.dailyVolumes?.map((dv, i) => {
+                            const barH = Math.max(1.8, dv.normalizedH * 22);
+                            return (
+                              <rect
+                                key={i}
+                                x={dv.dayIdx}
+                                y={24 - barH}
+                                width="0.75"
+                                height={barH}
+                                fill={dv.isYangbong ? '#f43f5e' : '#3b82f6'}
+                                opacity="0.82"
+                                rx="0.15"
+                              />
+                            );
+                          })}
+
+                          {/* 10-Day Volume MA Line */}
+                          {sp500Sparkline.dailyVolumeMaPath && (
+                            <path
+                              d={sp500Sparkline.dailyVolumeMaPath}
+                              fill="none"
+                              stroke="#94a3b8"
+                              strokeWidth="0.75"
+                              vectorEffect="non-scaling-stroke"
+                              opacity="0.8"
                             />
-                            <span className="text-[8px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-0.5 leading-none">
-                              {v.month}
-                            </span>
-                          </div>
-                        ))}
+                          )}
+                        </svg>
+                      </div>
+
+                      {/* Month Label Indicators Along Bottom */}
+                      <div className="w-full flex justify-between items-center text-[7.5px] sm:text-[8px] font-mono text-slate-400 px-0.5 leading-none">
+                        <span>1월</span>
+                        <span>2월</span>
+                        <span>3월</span>
+                        <span>4월</span>
+                        <span>5월</span>
+                        <span>6월</span>
+                        <span>7월</span>
+                        <span>8월</span>
+                        <span>9월</span>
+                        <span>10월</span>
+                        <span>11월</span>
+                        <span>12월</span>
                       </div>
                     </div>
                   </>
