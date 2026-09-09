@@ -108,14 +108,15 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
   const currentMeta = BENCHMARK_CHARTS[activeBenchmark];
   const isKospi = activeBenchmark === 'BENCH_KOSPI';
 
-  // Benchmark stats calculation up to currentYear
+  // Benchmark stats and chart data up to observed prior year (미래 데이터 사전 유출 방지)
+  const chartYear = currentYear > 1980 ? currentYear - 1 : 1979;
   const benchDataset = isKospi ? BENCHMARKS.kospi : BENCHMARKS.sp500;
-  const currentPrice = benchDataset?.prices?.[String(currentYear)] || benchDataset?.prices?.[String(currentYear - 1)] || 100;
-  const priorPrice = benchDataset?.prices?.[String(currentYear - 1)] || currentPrice;
+  const currentPrice = benchDataset?.prices?.[String(chartYear)] || benchDataset?.prices?.[String(chartYear - 1)] || 100;
+  const priorPrice = benchDataset?.prices?.[String(chartYear - 1)] || currentPrice;
   const yearReturn = priorPrice > 0 ? (currentPrice - priorPrice) / priorPrice : 0;
 
-  // Milestone filtered up to currentYear
-  const availableMilestones = HISTORICAL_CRISIS_MILESTONES.filter(m => m.year <= currentYear);
+  // Milestone filtered up to chartYear
+  const availableMilestones = HISTORICAL_CRISIS_MILESTONES.filter(m => m.year <= chartYear);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 lg:p-6 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
@@ -132,7 +133,7 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
                   시장 대표 벤치마크 지수
                 </span>
                 <span className="text-xs font-bold text-slate-500">
-                  {currentYear}년 기준 차트
+                  {chartYear}년 기준 차트 (직전 1년 실적)
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
@@ -192,7 +193,7 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
         <div className="px-4 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 flex-wrap text-xs">
           <div className="flex items-center gap-4 flex-wrap">
             <div>
-              <span className="text-[11px] text-slate-500 font-medium">{currentYear}년 종가 지수</span>
+              <span className="text-[11px] text-slate-500 font-medium">{chartYear}년 종가 지수</span>
               <div className="text-base font-extrabold text-slate-900 dark:text-white font-mono tabular-nums">
                 {!isKospi ? '$' : ''}{currentPrice.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} pt
               </div>
@@ -258,7 +259,7 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
             <div className="space-y-3">
               <CompanyPriceChart
                 canonicalId={activeBenchmark}
-                upToYear={currentYear}
+                upToYear={chartYear}
                 isExpanded={true}
               />
             </div>
@@ -269,7 +270,7 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
               <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-200 dark:border-amber-800/50 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
                 <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
                 <div>
-                  <strong>역사적 시장 위기와 지수 변동:</strong> 현재 시뮬레이션 연도({currentYear}년)까지 발생한 실제 금융위기 및 충격 이벤트가 각 시장 지수에 미친 영향을 확인해보세요.
+                  <strong>역사적 시장 위기와 지수 변동:</strong> 직전 연도({chartYear}년)까지 발생한 실제 금융위기 및 충격 이벤트가 각 시장 지수에 미친 영향을 확인해보세요.
                 </div>
               </div>
 
@@ -278,7 +279,7 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
                   <div
                     key={m.year}
                     className={`p-4 rounded-2xl border transition shadow-xs space-y-2 ${
-                      m.year === currentYear
+                      m.year === chartYear
                         ? 'bg-red-50/70 border-red-300 dark:bg-red-950/30 dark:border-red-800'
                         : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700'
                     }`}

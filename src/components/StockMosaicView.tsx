@@ -74,22 +74,24 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
   const holdingStockValues = Object.values(holdings).reduce((sum, h) => sum + (h.currentValueKRW || 0), 0);
   const totalPortfolioValue = cashKRW + holdingStockValues;
 
-  // Benchmark levels and 1-Yr Sparklines for current cutoff year
+  // Benchmark levels and 1-Yr Sparklines for observed cutoff year (prior completed year before current decision)
+  const chartTargetYear = isYearEnd ? currentYear : (currentYear > 1980 ? currentYear - 1 : 1979);
+
   const kospiSparkline = useMemo(() => {
-    return getCompany1YrSparkline('BENCH_KOSPI', currentYear);
-  }, [currentYear]);
+    return getCompany1YrSparkline('BENCH_KOSPI', chartTargetYear);
+  }, [chartTargetYear]);
 
   const sp500Sparkline = useMemo(() => {
-    return getCompany1YrSparkline('BENCH_SP500', currentYear);
-  }, [currentYear]);
+    return getCompany1YrSparkline('BENCH_SP500', chartTargetYear);
+  }, [chartTargetYear]);
 
-  const kospiCurrentLevel = BENCHMARKS.kospi?.prices?.[String(currentYear)] || BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || 100;
-  const kospiPriorLevel = BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || kospiCurrentLevel;
+  const kospiCurrentLevel = BENCHMARKS.kospi?.prices?.[String(chartTargetYear)] || BENCHMARKS.kospi?.prices?.[String(chartTargetYear - 1)] || 100;
+  const kospiPriorLevel = BENCHMARKS.kospi?.prices?.[String(chartTargetYear - 1)] || kospiCurrentLevel;
   const kospiChangePt = kospiCurrentLevel - kospiPriorLevel;
   const kospiYearReturn = kospiSparkline ? kospiSparkline.return1Yr : (kospiPriorLevel > 0 ? (kospiCurrentLevel - kospiPriorLevel) / kospiPriorLevel : 0);
 
-  const sp500CurrentLevel = BENCHMARKS.sp500?.prices?.[String(currentYear)] || BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || 100;
-  const sp500PriorLevel = BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || sp500CurrentLevel;
+  const sp500CurrentLevel = BENCHMARKS.sp500?.prices?.[String(chartTargetYear)] || BENCHMARKS.sp500?.prices?.[String(chartTargetYear - 1)] || 100;
+  const sp500PriorLevel = BENCHMARKS.sp500?.prices?.[String(chartTargetYear - 1)] || sp500CurrentLevel;
   const sp500ChangePt = sp500CurrentLevel - sp500PriorLevel;
   const sp500YearReturn = sp500Sparkline ? sp500Sparkline.return1Yr : (sp500PriorLevel > 0 ? (sp500CurrentLevel - sp500PriorLevel) / sp500PriorLevel : 0);
 
@@ -360,7 +362,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
                   <span className="font-black text-sm text-blue-950">🇰🇷 코스피 200</span>
                   <span className="text-[10px] font-extrabold text-blue-700 bg-blue-100/90 px-1.5 py-0.5 rounded-md">KS200</span>
-                  <span className="text-[10.5px] font-bold text-slate-500 font-mono">{currentYear}년</span>
+                  <span className="text-[10.5px] font-bold text-slate-500 font-mono">{chartTargetYear}년</span>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
@@ -683,7 +685,7 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
                   <span className="font-black text-sm text-purple-950">🇺🇸 S&P 500</span>
                   <span className="text-[10px] font-extrabold text-purple-700 bg-purple-100/90 px-1.5 py-0.5 rounded-md">SPX</span>
-                  <span className="text-[10.5px] font-bold text-slate-500 font-mono">{currentYear}년</span>
+                  <span className="text-[10.5px] font-bold text-slate-500 font-mono">{chartTargetYear}년</span>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">

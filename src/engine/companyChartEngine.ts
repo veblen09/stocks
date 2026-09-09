@@ -32,7 +32,7 @@ export const BENCHMARK_CHARTS: Record<string, BenchmarkChartMeta> = {
     ticker: 'KS200',
     market: 'KR',
     currency: 'KRW',
-    firstValidYear: 1980,
+    firstValidYear: 1979,
     description: '대한민국 유가증권시장 시가총액 상위 200대 우량 대형주 지수',
   },
   kospi: {
@@ -42,7 +42,7 @@ export const BENCHMARK_CHARTS: Record<string, BenchmarkChartMeta> = {
     ticker: 'KS200',
     market: 'KR',
     currency: 'KRW',
-    firstValidYear: 1980,
+    firstValidYear: 1979,
     description: '대한민국 유가증권시장 시가총액 상위 200대 우량 대형주 지수',
   },
   BENCH_SP500: {
@@ -52,7 +52,7 @@ export const BENCHMARK_CHARTS: Record<string, BenchmarkChartMeta> = {
     ticker: 'SPX',
     market: 'US',
     currency: 'USD',
-    firstValidYear: 1980,
+    firstValidYear: 1979,
     description: '미국 증시 시가총액 상위 500대 대표 우량 기업 지수',
   },
   sp500: {
@@ -62,7 +62,7 @@ export const BENCHMARK_CHARTS: Record<string, BenchmarkChartMeta> = {
     ticker: 'SPX',
     market: 'US',
     currency: 'USD',
-    firstValidYear: 1980,
+    firstValidYear: 1979,
     description: '미국 증시 시가총액 상위 500대 대표 우량 기업 지수',
   },
 };
