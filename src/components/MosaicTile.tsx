@@ -333,17 +333,21 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
             {sparkline && sparkline.points.length > 1 ? (
               <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
+                  <linearGradient id={`line-grad-${stock.canonicalId}`} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={sparkline.isPositive ? '#fb7185' : '#60a5fa'} />
+                    <stop offset="100%" stopColor={sparkline.isPositive ? '#e11d48' : '#2563eb'} />
+                  </linearGradient>
                   <linearGradient id={`grad-${stock.canonicalId}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.25" />
-                    <stop offset="100%" stopColor={sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                    <stop offset="0%" stopColor={sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.18" />
+                    <stop offset="100%" stopColor={sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 <path d={sparkline.svgAreaPath} fill={`url(#grad-${stock.canonicalId})`} />
                 <path
                   d={sparkline.svgPath}
                   fill="none"
-                  stroke={sparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                  strokeWidth="2"
+                  stroke={`url(#line-grad-${stock.canonicalId})`}
+                  strokeWidth="1.6"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />

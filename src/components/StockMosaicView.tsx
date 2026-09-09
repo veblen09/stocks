@@ -399,25 +399,72 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   </div>
                 </div>
 
-                {/* Right Tall Sparkline Graph (High/Low Points Visualized) */}
-                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-blue-200/80 shadow-2xs group-hover:border-blue-400 transition-colors relative">
+                {/* Right Tall Sparkline Graph (Modern Fintech Style with Baseline & Pulse Dot) */}
+                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-blue-200/80 shadow-2xs group-hover:border-blue-400 transition-colors relative overflow-hidden">
                   {kospiSparkline && kospiSparkline.points.length > 1 && (
                     <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                       <defs>
-                        <linearGradient id="bench-grad-kospi-card" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
-                          <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                        <linearGradient id="bench-line-grad-kospi" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#fb7185' : '#60a5fa'} />
+                          <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#e11d48' : '#2563eb'} />
                         </linearGradient>
+                        <linearGradient id="bench-area-grad-kospi" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.20" />
+                          <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
+                        </linearGradient>
+                        <filter id="kospi-glow" x="-10%" y="-10%" width="120%" height="120%">
+                          <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} floodOpacity="0.25" />
+                        </filter>
                       </defs>
-                      <path d={kospiSparkline.svgAreaPath} fill="url(#bench-grad-kospi-card)" />
+
+                      {/* Subtle Starting Baseline */}
+                      {kospiSparkline.points[0] && (
+                        <line
+                          x1="0"
+                          y1={kospiSparkline.points[0].y}
+                          x2="100"
+                          y2={kospiSparkline.points[0].y}
+                          stroke="#cbd5e1"
+                          strokeWidth="0.75"
+                          strokeDasharray="2.5 2.5"
+                        />
+                      )}
+
+                      {/* Area Fill */}
+                      <path d={kospiSparkline.svgAreaPath} fill="url(#bench-area-grad-kospi)" />
+
+                      {/* Slim Refined Curve */}
                       <path
                         d={kospiSparkline.svgPath}
                         fill="none"
-                        stroke={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                        strokeWidth="2.6"
+                        stroke="url(#bench-line-grad-kospi)"
+                        strokeWidth="1.85"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        filter="url(#kospi-glow)"
                       />
+
+                      {/* Endpoint Live Glowing Dot */}
+                      {kospiSparkline.points[kospiSparkline.points.length - 1] && (
+                        <g>
+                          <circle
+                            cx={kospiSparkline.points[kospiSparkline.points.length - 1].x}
+                            cy={kospiSparkline.points[kospiSparkline.points.length - 1].y}
+                            r="3.2"
+                            fill={kospiSparkline.isPositive ? '#f43f5e' : '#2563eb'}
+                            opacity="0.35"
+                            className="animate-ping"
+                          />
+                          <circle
+                            cx={kospiSparkline.points[kospiSparkline.points.length - 1].x}
+                            cy={kospiSparkline.points[kospiSparkline.points.length - 1].y}
+                            r="2.2"
+                            fill={kospiSparkline.isPositive ? '#e11d48' : '#1d4ed8'}
+                            stroke="#ffffff"
+                            strokeWidth="1"
+                          />
+                        </g>
+                      )}
                     </svg>
                   )}
                 </div>
@@ -479,25 +526,72 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                   </div>
                 </div>
 
-                {/* Right Tall Sparkline Graph */}
-                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-purple-200/80 shadow-2xs group-hover:border-purple-400 transition-colors relative">
+                {/* Right Tall Sparkline Graph (Modern Fintech Style with Baseline & Pulse Dot) */}
+                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-purple-200/80 shadow-2xs group-hover:border-purple-400 transition-colors relative overflow-hidden">
                   {sp500Sparkline && sp500Sparkline.points.length > 1 && (
                     <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                       <defs>
-                        <linearGradient id="bench-grad-sp500-card" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
-                          <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                        <linearGradient id="bench-line-grad-sp500" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#fb7185' : '#60a5fa'} />
+                          <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#e11d48' : '#2563eb'} />
                         </linearGradient>
+                        <linearGradient id="bench-area-grad-sp500" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.20" />
+                          <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
+                        </linearGradient>
+                        <filter id="sp500-glow" x="-10%" y="-10%" width="120%" height="120%">
+                          <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} floodOpacity="0.25" />
+                        </filter>
                       </defs>
-                      <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-grad-sp500-card)" />
+
+                      {/* Subtle Starting Baseline */}
+                      {sp500Sparkline.points[0] && (
+                        <line
+                          x1="0"
+                          y1={sp500Sparkline.points[0].y}
+                          x2="100"
+                          y2={sp500Sparkline.points[0].y}
+                          stroke="#cbd5e1"
+                          strokeWidth="0.75"
+                          strokeDasharray="2.5 2.5"
+                        />
+                      )}
+
+                      {/* Area Fill */}
+                      <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-area-grad-sp500)" />
+
+                      {/* Slim Refined Curve */}
                       <path
                         d={sp500Sparkline.svgPath}
                         fill="none"
-                        stroke={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                        strokeWidth="2.6"
+                        stroke="url(#bench-line-grad-sp500)"
+                        strokeWidth="1.85"
                         strokeLinecap="round"
                         strokeLinejoin="round"
+                        filter="url(#sp500-glow)"
                       />
+
+                      {/* Endpoint Live Glowing Dot */}
+                      {sp500Sparkline.points[sp500Sparkline.points.length - 1] && (
+                        <g>
+                          <circle
+                            cx={sp500Sparkline.points[sp500Sparkline.points.length - 1].x}
+                            cy={sp500Sparkline.points[sp500Sparkline.points.length - 1].y}
+                            r="3.2"
+                            fill={sp500Sparkline.isPositive ? '#f43f5e' : '#2563eb'}
+                            opacity="0.35"
+                            className="animate-ping"
+                          />
+                          <circle
+                            cx={sp500Sparkline.points[sp500Sparkline.points.length - 1].x}
+                            cy={sp500Sparkline.points[sp500Sparkline.points.length - 1].y}
+                            r="2.2"
+                            fill={sp500Sparkline.isPositive ? '#e11d48' : '#1d4ed8'}
+                            stroke="#ffffff"
+                            strokeWidth="1"
+                          />
+                        </g>
+                      )}
                     </svg>
                   )}
                 </div>
