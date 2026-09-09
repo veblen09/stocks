@@ -32,6 +32,9 @@ describe('Individual Company Price Charts Engine Tests', () => {
       }
     });
 
+
+
+
     it('should correctly identify all-time highs and calculate drawdowns', () => {
       const series = getCompanyHistoricalPriceSeries('KR_005930', 2010, 'ANNUAL');
       expect(series).not.toBeNull();
@@ -149,7 +152,56 @@ describe('Individual Company Price Charts Engine Tests', () => {
       expect(Number.isFinite(lateCandle.ma20!)).toBe(true);
       expect(Number.isFinite(lateCandle.ma60!)).toBe(true);
     });
+
+    it('should correctly simulate sub-dollar US stocks in USD mode (KO 1982) without jumping to $1.00 or cliff drops', () => {
+      const ko1982 = getCompanyNaverChartData('US_KO', 1982, 'DAY', '1Y', 'LOCAL');
+      expect(ko1982).not.toBeNull();
+      expect(ko1982?.currencyMode).toBe('LOCAL');
+      expect(ko1982?.candles.length).toBeGreaterThanOrEqual(200);
+
+      // KO 1981 close: ~$0.26, KO 1982 close: ~$0.40
+      const firstCandle = ko1982!.candles[0];
+      const lastCandle = ko1982!.candles[ko1982!.candles.length - 1];
+
+      // First candle should start around 0.26
+      expect(firstCandle.open).toBeCloseTo(0.2637, 1);
+      // Last candle should end around 0.3955
+      expect(lastCandle.close).toBeCloseTo(0.3955, 1);
+
+      // All intermediate candles should stay in the realistic sub-dollar price corridor ($0.20 to $0.55), NOT jump to $1.00+
+      ko1982!.candles.forEach(c => {
+        expect(c.high).toBeLessThan(0.70);
+        expect(c.low).toBeGreaterThan(0.15);
+      });
+
+      // Daily change on the final day should NOT be a cliff drop of -60%
+      expect(Math.abs(ko1982!.changePercent)).toBeLessThan(0.15); // Normal daily change < 15%
+    });
+
+    it('should correctly simulate AAPL in 1988 in USD mode without jumping to $1.00 or monthly cliff drops', () => {
+      const aapl1988 = getCompanyNaverChartData('US_AAPL', 1988, 'DAY', '1Y', 'LOCAL');
+      expect(aapl1988).not.toBeNull();
+      expect(aapl1988?.currencyMode).toBe('LOCAL');
+      expect(aapl1988?.candles.length).toBeGreaterThanOrEqual(200);
+
+      // AAPL 1987 close: ~$0.288, 1988 close: ~$0.2785
+      const firstCandle = aapl1988!.candles[0];
+      const lastCandle = aapl1988!.candles[aapl1988!.candles.length - 1];
+
+      expect(firstCandle.open).toBeCloseTo(0.2881, 1);
+      expect(lastCandle.close).toBeCloseTo(0.2785, 1);
+
+      // All candles should stay in sub-dollar range around $0.20 ~ $0.40, NOT jump to $1.00+
+      aapl1988!.candles.forEach(c => {
+        expect(c.high).toBeLessThan(0.60);
+        expect(c.low).toBeGreaterThan(0.10);
+      });
+
+      // Daily change on the final day should NOT be a cliff drop of -72%
+      expect(Math.abs(aapl1988!.changePercent)).toBeLessThan(0.10);
+    });
   });
+
 
   describe('4. Robustness Across All 50 Universe Stocks', () => {
     it('should produce strictly valid historical price series for all active stocks', () => {

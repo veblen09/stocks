@@ -58,13 +58,36 @@ describe('Benchmark Chart & Sparkline Consistency', () => {
     expect(sp1981!.isPositive).toBe(false);
   });
 
-  it('1980 Decision Phase: Baseline (1979) benchmark sparklines resolve without error', () => {
-    const kospi1979 = getCompany1YrSparkline('BENCH_KOSPI', 1979);
-    expect(kospi1979).not.toBeNull();
-    expect(kospi1979!.endPrice).toBeCloseTo(10.96, 2);
+  it('1988 Decision Phase: Mini sparkline high/low and candle data 100% matches full Naver chart data', () => {
+    const kospiSpark = getCompany1YrSparkline('BENCH_KOSPI', 1988);
+    const kospiNaver = getCompanyNaverChartData('BENCH_KOSPI', 1988, 'DAY', '1Y', 'KRW');
+    expect(kospiSpark).not.toBeNull();
+    expect(kospiNaver).not.toBeNull();
 
-    const sp1979 = getCompany1YrSparkline('BENCH_SP500', 1979);
-    expect(sp1979).not.toBeNull();
-    expect(sp1979!.endPrice).toBeCloseTo(107.94, 2);
+    expect(kospiSpark!.startPrice).toBe(kospiNaver!.periodStartPrice);
+    expect(kospiSpark!.endPrice).toBe(kospiNaver!.currentPrice);
+    expect(kospiSpark!.minPrice).toBe(kospiNaver!.lowPrice);
+    expect(kospiSpark!.maxPrice).toBe(kospiNaver!.highPrice);
+    expect(kospiSpark!.return1Yr).toBe(kospiNaver!.periodChangePercent);
+
+    // KOSPI 1988 true high is ~103, low is ~57
+    expect(kospiSpark!.maxPrice).toBeCloseTo(103, 0);
+    expect(kospiSpark!.minPrice).toBeCloseTo(57, 0);
+
+    const spSpark = getCompany1YrSparkline('BENCH_SP500', 1988);
+    const spNaver = getCompanyNaverChartData('BENCH_SP500', 1988, 'DAY', '1Y', 'LOCAL');
+    expect(spSpark).not.toBeNull();
+    expect(spNaver).not.toBeNull();
+
+    expect(spSpark!.startPrice).toBe(spNaver!.periodStartPrice);
+    expect(spSpark!.endPrice).toBe(spNaver!.currentPrice);
+    expect(spSpark!.minPrice).toBe(spNaver!.lowPrice);
+    expect(spSpark!.maxPrice).toBe(spNaver!.highPrice);
+    expect(spSpark!.return1Yr).toBe(spNaver!.periodChangePercent);
+
+    // S&P 500 1988 true high is ~295, low is ~242
+    expect(spSpark!.maxPrice).toBeCloseTo(295.37, 0);
+    expect(spSpark!.minPrice).toBeCloseTo(242.01, 0);
   });
 });
+

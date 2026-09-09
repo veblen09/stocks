@@ -12,7 +12,8 @@ import {
 import { GlassCard } from './GlassCard';
 import type { YearlyPerformanceRecord } from '../types/stockGame';
 import { getReturnBgColor, getReturnColor, formatKRW, formatPercent } from '../utils/formatMoney';
-import { getAvailableNewsForYear, getYearRetrospectiveNews } from '../engine/newsEngine';
+import { getAvailableNewsForYear, getYearRetrospectiveNews, getHoldingCompanyEventsForYear } from '../engine/newsEngine';
+import { HoldingCompanyEventModal } from './HoldingCompanyEventModal';
 import {
   getNewlyListedStocksForYear,
   getDelistedStocksForYear,
@@ -77,6 +78,13 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
 
   // Player's investment notes for current holding stocks
   const playerNotes = Object.entries(state.investmentNotes || {}).filter(([_, note]) => note && note.trim().length > 0);
+
+  // Holding stocks during this year and their historical corporate events
+  const holdingCids = (record.holdingsSnapshot || [])
+    .filter(h => h.shares > 0 || h.weight > 0)
+    .map(h => h.canonicalId);
+  const holdingEvents = getHoldingCompanyEventsForYear(currentYear, holdingCids);
+  const [showHoldingEventsModal, setShowHoldingEventsModal] = useState<boolean>(false);
 
   const retColor = getReturnColor(record.annualReturn);
   const retBg = getReturnBgColor(record.annualReturn);
@@ -196,6 +204,32 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
                   다음 예정 IPO: {upcomingIpo.year}년 ({upcomingIpo.companies.map(c => c.currentName).slice(0, 2).join(', ')}{upcomingIpo.companies.length > 2 ? ' 외' : ''})
                 </span>
               )}
+            </div>
+          )}
+
+          {/* Holding Company Events Alert Strip */}
+          {holdingEvents.length > 0 && (
+            <div className="p-2.5 bg-gradient-to-r from-amber-500/10 via-amber-50 to-orange-50 border border-amber-300 rounded-xl text-xs space-y-1 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="font-black text-amber-900 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-600 fill-amber-500" />
+                  {currentYear}년 보유 종목 개별 사건 공시 ({holdingEvents.length}건)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioManager.playUiSound('tab');
+                    setShowHoldingEventsModal(true);
+                  }}
+                  className="text-[11px] font-bold text-amber-950 bg-amber-200/90 hover:bg-amber-300 px-2.5 py-1 rounded-md border border-amber-400 transition cursor-pointer flex items-center gap-1 shadow-2xs"
+                >
+                  <span>개별 공시 팝업 보기</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+              <p className="text-slate-700 font-medium text-[11px]">
+                보유 중인 기업의 역사적 사건 공시입니다. 클릭하여 중립적 영향 분석과 사실 관계를 확인하세요.
+              </p>
             </div>
           )}
 
@@ -361,19 +395,33 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-2.5">
-                  {realizedYearNews.map((news) => (
-                    <div
-                      key={news.id}
-                      className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5"
-                    >
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
-                        <span className="text-blue-700 font-bold">{news.publishedAt}</span>
-                        <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">{news.sourceName}</span>
+                  {realizedYearNews.map((news) => {
+                    const isHoldingNews = news.canonicalCompanyIds?.some(cid => holdingCids.includes(cid));
+                    return (
+                      <div
+                        key={news.id}
+                        className={`p-3.5 rounded-xl space-y-1.5 border transition ${
+                          isHoldingNews
+                            ? 'bg-amber-50/70 border-amber-300 shadow-2xs'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-blue-700 font-bold">{news.publishedAt}</span>
+                            {isHoldingNews && (
+                              <span className="px-1.5 py-0.5 rounded bg-amber-500 text-white font-sans text-[10px] font-bold flex items-center gap-1">
+                                👑 내 보유 종목 사건
+                              </span>
+                            )}
+                          </div>
+                          <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">{news.sourceName}</span>
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-xs leading-snug">{news.titleKo}</h4>
+                        <p className="text-xs text-slate-700 leading-relaxed">{news.summaryKo}</p>
                       </div>
-                      <h4 className="font-bold text-slate-900 text-xs leading-snug">{news.titleKo}</h4>
-                      <p className="text-xs text-slate-700 leading-relaxed">{news.summaryKo}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -445,6 +493,17 @@ export const YearEndBriefingModal: React.FC<YearEndBriefingModalProps> = ({
           </button>
         </div>
       </GlassCard>
+
+      {/* Holding Company Events Popup (Reviewable anytime during briefing) */}
+      {showHoldingEventsModal && (
+        <HoldingCompanyEventModal
+          isOpen={showHoldingEventsModal}
+          year={currentYear}
+          events={holdingEvents}
+          holdingsSnapshot={record.holdingsSnapshot}
+          onClose={() => setShowHoldingEventsModal(false)}
+        />
+      )}
     </div>
   );
 };

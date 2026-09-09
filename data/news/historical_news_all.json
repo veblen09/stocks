@@ -971,6 +971,107 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_1983_KR_005930_DRAM",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "반도체 / IT"
+    ],
+    "eventDate": "1983-12-01",
+    "publishedAt": "1983-12-01",
+    "availableFrom": "1983-12-01",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 64K D-RAM 독자 개발 성공 선언",
+    "titleKo": "삼성전자, 64K D-RAM 독자 개발 성공… 반도체 신화 개막",
+    "summaryKo": "삼성전자가 미국, 일본에 이어 세계 3번째로 64K D-RAM 반도체 개발에 성공했습니다. 이병철 회장의 '도쿄 선언' 이후 불과 10개월 만에 거둔 쾌거로, 대한민국 반도체 산업의 위대한 첫걸음이 시작되었습니다.",
+    "sourceName": "한국경제신문 / 동아일보",
+    "sourceUrl": "https://www.hankyung.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "반도체",
+      "DRAM",
+      "기술혁신"
+    ],
+    "affectedChannels": [
+      "R_AND_D",
+      "PROFITABILITY"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1983년 12월 64K D-RAM 독자 개발 성공 공식 발표.",
+      "impactChannels": [
+        "R_AND_D",
+        "CAPEX"
+      ],
+      "positiveInterpretation": "글로벌 반도체 시장 진입 및 미래 핵심 성장동력 확보.",
+      "negativeInterpretation": "막대한 초기 설비투자 비용과 선진국과의 수율 경쟁 불확실성.",
+      "unknownAtTheTime": "향후 10년 내 메모리 반도체 세계 1위로 도약할지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
+    "id": "COMP_1984_US_AAPL_MACINTOSH",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "빅테크 / IT",
+      "소비자 가전"
+    ],
+    "eventDate": "1984-01-24",
+    "publishedAt": "1984-01-24",
+    "availableFrom": "1984-01-24",
+    "datePrecision": "DAY",
+    "originalTitle": "Apple Introduces the Macintosh with Revolutionary GUI",
+    "titleKo": "애플, 마우스와 그래픽 UI 탑재한 '매킨토시(Macintosh)' 전격 출시",
+    "summaryKo": "애플 컴퓨터가 슈퍼볼 '1984' 광고에 이어 마우스와 그래픽 사용자 인터페이스(GUI)를 적용한 혁신적인 개인용 컴퓨터 '매킨토시'를 공식 발표했습니다.",
+    "sourceName": "뉴욕타임스 / San Jose Mercury News",
+    "sourceUrl": "https://www.nytimes.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "매킨토시",
+      "GUI",
+      "개인용컴퓨터"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "MARKET_SHARE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1984년 1월 24일 연례 주주총회에서 스티브 잡스가 매킨토시 시연 및 출시.",
+      "impactChannels": [
+        "INNOVATION",
+        "MARKET_SHARE"
+      ],
+      "positiveInterpretation": "컴퓨터 인터페이스의 대혁신 및 일반 대중 대상 PC 시장 선도.",
+      "negativeInterpretation": "초기 소프트웨어 부족 및 2,495달러라는 높은 가격 장벽.",
+      "unknownAtTheTime": "IBM PC 호환 기종 및 마이크로소프트 DOS/Windows 진영과의 플랫폼 표준 경쟁 승패."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_1984_GL_GEN",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -1443,6 +1544,56 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_1986_KR_005380_EXCEL_US",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005380"
+    ],
+    "relatedTickers": [
+      "005380"
+    ],
+    "relatedSectors": [
+      "자동차 / 모빌리티"
+    ],
+    "eventDate": "1986-02-15",
+    "publishedAt": "1986-02-15",
+    "availableFrom": "1986-02-15",
+    "datePrecision": "DAY",
+    "originalTitle": "현대자동차, 소형차 '엑셀(Excel)' 미국 시장 첫 수출 개시… 돌풍 예고",
+    "titleKo": "현대자동차, 소형차 '엑셀' 미국 수출 개시… 첫해 16만 대 돌풍",
+    "summaryKo": "현대자동차가 전륜구동 소형차 '포니 엑셀'로 세계 최대 미국 자동차 시장에 공식 진출했습니다. 뛰어난 가성비와 디자인으로 출시 첫해 수입차 신기록인 16만 8천 대 판매를 달성했습니다.",
+    "sourceName": "동아일보 / 로스앤젤레스타임스",
+    "sourceUrl": "https://www.donga.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "자동차수출",
+      "엑셀",
+      "미국시장"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "GLOBAL_EXPANSION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1986년 2월 현대차 엑셀 미국 선적 개시 및 첫해 판매 대박 기록.",
+      "impactChannels": [
+        "REVENUE",
+        "GLOBAL_EXPANSION"
+      ],
+      "positiveInterpretation": "글로벌 완성차 시장 진출 및 막대한 달러 외화 획득.",
+      "negativeInterpretation": "급증하는 판매량 대비 서비스 인프라 및 내구성 품질 논란 위험.",
+      "unknownAtTheTime": "미국 시장 내 장기적인 품질 브랜드 이미지 정착 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_1986_GL_01",
@@ -3250,6 +3401,56 @@
     "retrievedAt": "2026-08-26T00:00:00Z"
   },
   {
+    "id": "COMP_1993_KR_005930_NEW_MANAGEMENT",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "반도체 / IT"
+    ],
+    "eventDate": "1993-06-07",
+    "publishedAt": "1993-06-07",
+    "availableFrom": "1993-06-07",
+    "datePrecision": "DAY",
+    "originalTitle": "이건희 삼성 회장, '마누라 자식 빼고 다 바꿔라' 프랑크푸르트 신경영 선언",
+    "titleKo": "이건희 회장 신경영 선언… '마누라·자식 빼고 다 바꿔라' 품질 혁명",
+    "summaryKo": "이건희 삼성그룹 회장이 독일 프랑크푸르트에서 사장단 회의를 소집하고 '양(Quantity) 위주의 경영에서 질(Quality) 위주로 전면 대전환'하는 프랑크푸르트 신경영을 선포했습니다.",
+    "sourceName": "매일경제 / 조선일보",
+    "sourceUrl": "https://www.mk.co.kr",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "경영혁신",
+      "품질경영",
+      "지배구조"
+    ],
+    "affectedChannels": [
+      "MANAGEMENT",
+      "BRAND_VALUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1993년 6월 7일 프랑크푸르트 신경영 선언 및 불량 제품 화형식 등 강도 높은 품질 개혁 착수.",
+      "impactChannels": [
+        "MANAGEMENT",
+        "BRAND_VALUE"
+      ],
+      "positiveInterpretation": "글로벌 일류 품질 경쟁력 확보 및 브랜드 가치 퀀텀 점프 기대.",
+      "negativeInterpretation": "급격한 조직 문화 개편에 따른 단기적 비용 증가 및 내부 피로감.",
+      "unknownAtTheTime": "삼성전자가 글로벌 가전 및 IT 시장에서 소니(Sony)를 넘어설 수 있을지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_1993_GL_GEN",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -3378,55 +3579,6 @@
       "unknownAtTheTime": "고용시장 견조함 유지 여부."
     },
     "importanceScore": 8,
-    "language": "ko",
-    "isRetrospective": false,
-    "fullTextStored": false,
-    "dataQuality": "HIGH",
-    "retrievedAt": "2026-08-18T00:00:00Z"
-  },
-  {
-    "id": "NEWS_1993_KR_005930_GEN",
-    "scope": "COMPANY",
-    "market": "KR",
-    "canonicalCompanyIds": [
-      "KR_005930"
-    ],
-    "relatedTickers": [
-      "005930"
-    ],
-    "relatedSectors": [
-      "전기전자"
-    ],
-    "eventDate": "1993-11-25",
-    "publishedAt": "1993-11-25",
-    "availableFrom": "1993-11-25",
-    "datePrecision": "DAY",
-    "originalTitle": "Samsung Electronics Annual Report",
-    "titleKo": "삼성전자 1993년 사업보고서 및 실적 공시",
-    "summaryKo": "1993년 연간 결산 실적 발표 및 주요 사업부문별 생산·수출 실적 공시.",
-    "sourceName": "금융감독원 DART / 한국거래소",
-    "sourceUrl": "https://dart.fss.or.kr",
-    "sourceType": "FILING",
-    "evidenceLevel": "PRIMARY_SOURCE",
-    "categories": [
-      "사업보고서",
-      "실적"
-    ],
-    "affectedChannels": [
-      "REVENUE",
-      "COST"
-    ],
-    "neutralAnalysis": {
-      "verifiedFacts": "1993년 감사보고서 및 공시 서류.",
-      "impactChannels": [
-        "REVENUE",
-        "COST"
-      ],
-      "positiveInterpretation": "메모리/가전/모바일 부문 경쟁력 유지.",
-      "negativeInterpretation": "글로벌 IT 수요 변동에 따른 재고 평가 리스크.",
-      "unknownAtTheTime": "차세대 R&D 투자 성과."
-    },
-    "importanceScore": 7,
     "language": "ko",
     "isRetrospective": false,
     "fullTextStored": false,
@@ -3817,6 +3969,57 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_1995_US_MSFT_WIN95",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_MSFT"
+    ],
+    "relatedTickers": [
+      "MSFT"
+    ],
+    "relatedSectors": [
+      "빅테크 / IT",
+      "소프트웨어"
+    ],
+    "eventDate": "1995-08-24",
+    "publishedAt": "1995-08-24",
+    "availableFrom": "1995-08-24",
+    "datePrecision": "DAY",
+    "originalTitle": "Microsoft Launches Windows 95, Sparking a Global PC Phenomenon",
+    "titleKo": "마이크로소프트 'Windows 95' 전 세계 동시 출시… PC 대중화 혁명",
+    "summaryKo": "빌 게이츠의 마이크로소프트가 시작 메뉴와 32비트 GUI, 인터넷 브라우저(IE)를 통합한 'Windows 95'를 전 세계에 출시했습니다. 출시 첫날 백화점과 소프트웨어 매장 앞에 수천 명이 줄을 서는 진풍경이 벌어졌습니다.",
+    "sourceName": "월스트리트저널 / BBC",
+    "sourceUrl": "https://www.wsj.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "Windows95",
+      "PC혁명",
+      "소프트웨어독점"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MARKET_DOMINANCE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1995년 8월 24일 롤링스톤스의 'Start Me Up' 테마곡과 함께 Windows 95 글로벌 출시.",
+      "impactChannels": [
+        "REVENUE",
+        "MARKET_DOMINANCE"
+      ],
+      "positiveInterpretation": "전 세계 PC 운영체제 시장 점유율 90% 이상 장악 및 폭발적 수익 창출.",
+      "negativeInterpretation": "웹 브라우저 끼워팔기 논란에 따른 미 법무부 반독점 소송 리스크.",
+      "unknownAtTheTime": "향후 닷컴 버블과 2000년대 스마트폰 모바일 전환기의 대응 성패."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_1995_KR_GEN",
@@ -4386,6 +4589,57 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_1997_US_AAPL_JOBS_RETURNS",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "빅테크 / IT",
+      "소비자 가전"
+    ],
+    "eventDate": "1997-09-16",
+    "publishedAt": "1997-09-16",
+    "availableFrom": "1997-09-16",
+    "datePrecision": "DAY",
+    "originalTitle": "Steve Jobs Appointed Interim CEO of Apple; Microsoft Invests $150M",
+    "titleKo": "스티브 잡스 애플 임시 CEO 전격 복귀… MS 1.5억 달러 투자 유치",
+    "summaryKo": "파산 위기까지 몰렸던 애플에 공동 창업자 스티브 잡스가 임시 CEO(iCEO)로 복귀했습니다. 잡스는 오랜 숙적이었던 마이크로소프트로부터 1억 5천만 달러 투자를 유치하고 비수익 제품군을 대거 정리하는 구조조정에 돌입했습니다.",
+    "sourceName": "월스트리트저널 / Macworld",
+    "sourceUrl": "https://www.wsj.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "스티브잡스",
+      "경영복귀",
+      "구조조정"
+    ],
+    "affectedChannels": [
+      "MANAGEMENT",
+      "LIQUIDITY"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "스티브 잡스 복귀 및 마이크로소프트의 애플 의결권 없는 주식 1억 5천만 달러 매입 합의.",
+      "impactChannels": [
+        "MANAGEMENT",
+        "LIQUIDITY"
+      ],
+      "positiveInterpretation": "극심한 유동성 위기 해소 및 강력한 리더십 기반 부활의 신호탄.",
+      "negativeInterpretation": "연간 수억 달러 적자 지속 및 맥 OS 시장 점유율 5% 미만 추락 위기.",
+      "unknownAtTheTime": "이듬해 iMac과 2001년 iPod 출시로 애플이 세계 최고 테크 기업으로 부활할지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_1997_US_01",
@@ -4961,6 +5215,57 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-26T00:00:00Z"
+  },
+  {
+    "id": "COMP_1999_US_NVDA_GEFORCE",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "반도체 / 칩셋",
+      "빅테크 / IT"
+    ],
+    "eventDate": "1999-08-31",
+    "publishedAt": "1999-08-31",
+    "availableFrom": "1999-08-31",
+    "datePrecision": "DAY",
+    "originalTitle": "NVIDIA Introduces the World's First GPU: The GeForce 256",
+    "titleKo": "엔비디아(NVIDIA), 세계 최초 GPU 'GeForce 256' 발표 및 나스닥 상장",
+    "summaryKo": "엔비디아가 3D 그래픽 연산을 전담 처리하는 세계 최초의 그래픽 처리 장치(GPU) 'GeForce 256'을 공개했습니다. PC 3D 게이밍의 혁명을 일으키며 같은 해 나스닥 시장에 성공적으로 상장했습니다.",
+    "sourceName": "Business Wire / Tom's Hardware",
+    "sourceUrl": "https://www.nvidia.com",
+    "sourceType": "COMPANY_FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "GPU",
+      "신제품",
+      "나스닥상장"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "MARKET_SHARE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "1999년 8월 세계 최초 GPU 용어 공식 정의 및 GeForce 256 칩셋 출시.",
+      "impactChannels": [
+        "INNOVATION",
+        "MARKET_SHARE"
+      ],
+      "positiveInterpretation": "3dfx, ATI 등 경쟁사를 제치고 3D 그래픽 가속기 독보적 기술 우위 확보.",
+      "negativeInterpretation": "PC 시장 의존도가 높고 반도체 위탁생산(TSMC) 수율 리스크 상존.",
+      "unknownAtTheTime": "GPU가 향후 인공지능(AI)과 딥러닝 연산의 핵심 칩으로 진화할지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_1999_US_01",
@@ -6800,6 +7105,57 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2006_US_NVDA_CUDA",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "반도체 / 칩셋",
+      "빅테크 / IT"
+    ],
+    "eventDate": "2006-11-08",
+    "publishedAt": "2006-11-08",
+    "availableFrom": "2006-11-08",
+    "datePrecision": "DAY",
+    "originalTitle": "NVIDIA Unveils CUDA Architecture for General Purpose GPU Computing",
+    "titleKo": "엔비디아, 범용 GPU 병렬 연산 플랫폼 'CUDA' 전격 공개",
+    "summaryKo": "엔비디아가 그래픽 카드를 과학 계산 및 범용 컴퓨팅(GPGPU)에 활용할 수 있게 해주는 병렬 프로그래밍 아키텍처 'CUDA'를 발표했습니다. 젠슨 황 CEO의 과감한 투자로 AI 연구의 토대가 마련되었습니다.",
+    "sourceName": "NVIDIA Press Release / ACM",
+    "sourceUrl": "https://www.nvidia.com",
+    "sourceType": "COMPANY_FILING",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "CUDA",
+      "병렬컴퓨팅",
+      "소프트웨어생태계"
+    ],
+    "affectedChannels": [
+      "R_AND_D",
+      "ECOSYSTEM"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "모든 지포스 8시리즈 GPU에 CUDA 하드웨어 탑재 및 개발자 무료 배포.",
+      "impactChannels": [
+        "R_AND_D",
+        "ECOSYSTEM"
+      ],
+      "positiveInterpretation": "개발자 생태계 락인(Lock-in) 효과로 타사가 넘볼 수 없는 소프트웨어 해자 구축.",
+      "negativeInterpretation": "수년간 막대한 R&D 비용 지출 대비 게이밍 외 단기 수익 창출 불확실.",
+      "unknownAtTheTime": "10년 후 알렉스넷(AlexNet) 등 딥러닝 붐의 핵심 인프라로 꽃피울지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2006_KR_005930_GEN",
     "scope": "COMPANY",
     "market": "KR",
@@ -6896,6 +7252,57 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_2007_US_AAPL_IPHONE_REVOLUTION",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_AAPL"
+    ],
+    "relatedTickers": [
+      "AAPL"
+    ],
+    "relatedSectors": [
+      "스마트폰",
+      "빅테크 / IT"
+    ],
+    "eventDate": "2007-01-09",
+    "publishedAt": "2007-01-09",
+    "availableFrom": "2007-01-09",
+    "datePrecision": "DAY",
+    "originalTitle": "Steve Jobs Unveils the iPhone: Widescreen iPod, Mobile Phone, Internet Communicator",
+    "titleKo": "[혁명] 스티브 잡스, 세상을 바꾼 '아이폰(iPhone)' 최초 공개",
+    "summaryKo": "스티브 잡스가 맥월드 기조연설에서 '와이드스크린 아이팟, 혁신적인 휴대전화, 획기적인 인터넷 통신기기'를 하나로 통합한 세기의 걸작 '아이폰'을 전격 공개했습니다. 멀티터치 정전식 디스플레이로 모바일 컴퓨팅 시대를 열었습니다.",
+    "sourceName": "Macworld 2007 / 뉴욕타임스",
+    "sourceUrl": "https://www.nytimes.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "아이폰",
+      "스마트폰",
+      "세기의발표"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "REVENUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2007년 1월 9일 샌프란시스코 모스콘 센터에서 스티브 잡스가 아이폰 최초 시연.",
+      "impactChannels": [
+        "INNOVATION",
+        "REVENUE"
+      ],
+      "positiveInterpretation": "기존 피처폰 시장의 판도를 뒤엎고 전 세계 모바일 생태계를 지배할 독보적 플랫폼 탄생.",
+      "negativeInterpretation": "초기 499달러의 고가 논란과 통신사(AT&T) 독점 계약 한계.",
+      "unknownAtTheTime": "향후 앱스토어(App Store) 출시와 함께 인류 생활 방식을 완전히 바꿀지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "COMP_2007_US_BB",
@@ -7707,6 +8114,57 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2010_KR_005930_GALAXY_S",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "스마트폰",
+      "IT / 모바일"
+    ],
+    "eventDate": "2010-06-24",
+    "publishedAt": "2010-06-24",
+    "availableFrom": "2010-06-24",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 플래그십 스마트폰 '갤럭시 S' 글로벌 출시… 아이폰 대항마 부상",
+    "titleKo": "삼성전자 '갤럭시 S' 글로벌 전격 출시… 스마트폰 대전환 본격화",
+    "summaryKo": "삼성전자가 슈퍼 아몰레드 디스플레이와 자체 1GHz AP를 탑재한 플래그십 스마트폰 '갤럭시 S(Galaxy S)'를 출시했습니다. 피처폰에서 스마트폰으로의 전환 지연 우려를 씻어내며 글로벌 안드로이드 진영 대표 주자로 부상했습니다.",
+    "sourceName": "전자신문 / 연합뉴스",
+    "sourceUrl": "https://www.etnews.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "스마트폰",
+      "갤럭시",
+      "신제품"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "COMPETITION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "갤럭시 S 출시 7개월 만에 글로벌 판매량 1,000만 대 돌파.",
+      "impactChannels": [
+        "REVENUE",
+        "COMPETITION"
+      ],
+      "positiveInterpretation": "스마트폰 시장 안착 및 모바일 사업부 영업이익 급증.",
+      "negativeInterpretation": "애플과의 글로벌 특허 소송전 발발 가능성.",
+      "unknownAtTheTime": "글로벌 스마트폰 출하량 기준 세계 1위 자리에 오를 수 있을지 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2010_GL_GEN",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -7885,55 +8343,6 @@
       "unknownAtTheTime": "고용시장 견조함 유지 여부."
     },
     "importanceScore": 8,
-    "language": "ko",
-    "isRetrospective": false,
-    "fullTextStored": false,
-    "dataQuality": "HIGH",
-    "retrievedAt": "2026-08-18T00:00:00Z"
-  },
-  {
-    "id": "NEWS_2010_KR_005930_GEN",
-    "scope": "COMPANY",
-    "market": "KR",
-    "canonicalCompanyIds": [
-      "KR_005930"
-    ],
-    "relatedTickers": [
-      "005930"
-    ],
-    "relatedSectors": [
-      "전기전자"
-    ],
-    "eventDate": "2010-11-25",
-    "publishedAt": "2010-11-25",
-    "availableFrom": "2010-11-25",
-    "datePrecision": "DAY",
-    "originalTitle": "Samsung Electronics Annual Report",
-    "titleKo": "삼성전자 2010년 사업보고서 및 실적 공시",
-    "summaryKo": "2010년 연간 결산 실적 발표 및 주요 사업부문별 생산·수출 실적 공시.",
-    "sourceName": "금융감독원 DART / 한국거래소",
-    "sourceUrl": "https://dart.fss.or.kr",
-    "sourceType": "FILING",
-    "evidenceLevel": "PRIMARY_SOURCE",
-    "categories": [
-      "사업보고서",
-      "실적"
-    ],
-    "affectedChannels": [
-      "REVENUE",
-      "COST"
-    ],
-    "neutralAnalysis": {
-      "verifiedFacts": "2010년 감사보고서 및 공시 서류.",
-      "impactChannels": [
-        "REVENUE",
-        "COST"
-      ],
-      "positiveInterpretation": "메모리/가전/모바일 부문 경쟁력 유지.",
-      "negativeInterpretation": "글로벌 IT 수요 변동에 따른 재고 평가 리스크.",
-      "unknownAtTheTime": "차세대 R&D 투자 성과."
-    },
-    "importanceScore": 7,
     "language": "ko",
     "isRetrospective": false,
     "fullTextStored": false,
@@ -8273,6 +8682,56 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_2012_KR_000660_SK_TAKEOVER",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_000660"
+    ],
+    "relatedTickers": [
+      "000660"
+    ],
+    "relatedSectors": [
+      "반도체 / IT"
+    ],
+    "eventDate": "2012-03-26",
+    "publishedAt": "2012-03-26",
+    "availableFrom": "2012-03-26",
+    "datePrecision": "DAY",
+    "originalTitle": "SK그룹, 하이닉스 인수 완료… 'SK하이닉스' 사명 출범 및 대규모 반도체 투자",
+    "titleKo": "SK그룹 하이닉스 인수 완료… 'SK하이닉스' 출범과 대규모 투자 선언",
+    "summaryKo": "SK그룹이 10여 년간 채권단 관리하에 있던 하이닉스반도체 인수를 공식 매듭짓고 'SK하이닉스'로 새롭게 출범했습니다. 최태원 회장은 메모리 반도체 시장 반등에 대비해 수조 원대 과감한 시설 투자를 단행했습니다.",
+    "sourceName": "매일경제 / 한국경제",
+    "sourceUrl": "https://www.mk.co.kr",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "M_AND_A",
+      "SK하이닉스",
+      "투자확대"
+    ],
+    "affectedChannels": [
+      "MANAGEMENT",
+      "CAPEX"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2012년 3월 SK텔레콤의 지분 인수로 SK하이닉스 정식 출범.",
+      "impactChannels": [
+        "MANAGEMENT",
+        "CAPEX"
+      ],
+      "positiveInterpretation": "안정적인 대기업 지배구조 확보 및 과감한 미세공정 설비투자로 수익성 턴어라운드.",
+      "negativeInterpretation": "글로벌 메모리 반도체 가격 하락세에 따른 단기적 인수합병 부담.",
+      "unknownAtTheTime": "향후 AI 시대 HBM 메모리 세계 1위 공급업체로 우뚝 설 수 있을지 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_2012_GL_GEN",
@@ -9257,6 +9716,57 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2016_US_NVDA_DGX1_PASCAL",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "인공지능",
+      "반도체 / 칩셋"
+    ],
+    "eventDate": "2016-04-05",
+    "publishedAt": "2016-04-05",
+    "availableFrom": "2016-04-05",
+    "datePrecision": "DAY",
+    "originalTitle": "NVIDIA Announces World's First Deep Learning Supercomputer 'DGX-1' and Pascal Architecture",
+    "titleKo": "엔비디아, 세계 최초 딥러닝 슈퍼컴퓨터 'DGX-1' 및 파스칼 아키텍처 발표",
+    "summaryKo": "엔비디아가 딥러닝 인공지능 연구에 특화된 세계 최초의 슈퍼컴퓨터 'DGX-1'과 16nm 파스칼(Pascal) GP100 GPU를 공개했습니다. 젠슨 황 CEO는 1호 DGX-1을 일론 머스크의 오픈AI(OpenAI) 연구소에 직접 전달했습니다.",
+    "sourceName": "GTC 2016 Keynote / TechCrunch",
+    "sourceUrl": "https://www.nvidia.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "인공지능",
+      "딥러닝",
+      "슈퍼컴퓨터"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "DATA_CENTER"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "DGX-1 대당 가격 12만 9천 달러, 170테라플롭스 딥러닝 연산 성능 지원.",
+      "impactChannels": [
+        "INNOVATION",
+        "DATA_CENTER"
+      ],
+      "positiveInterpretation": "글로벌 빅테크 기업들의 AI 연구소향 고마진 서버 GPU 독점 공급 개시.",
+      "negativeInterpretation": "AI 시장 규모의 초기 단계 한계와 전통 게이밍 매출 의존도.",
+      "unknownAtTheTime": "생성형 AI 붐으로 데이터센터 매출이 수백조 원대로 폭발할지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2016_GL_GEN",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -9347,6 +9857,57 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2016_KR_005930_NOTE7_RECALL",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "스마트폰",
+      "IT / 모바일"
+    ],
+    "eventDate": "2016-10-11",
+    "publishedAt": "2016-10-11",
+    "availableFrom": "2016-10-11",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 갤럭시 노트7 배터리 소손 사태로 전 세계 전량 리콜 및 단종 결정",
+    "titleKo": "삼성전자, 갤럭시 노트7 전면 단종… 3조원대 기회손실 및 품질 쇄신",
+    "summaryKo": "삼성전자가 잇따른 배터리 발화 사고로 갤럭시 노트7의 생산 및 판매를 전면 중단하고 전량 단종 조치를 단행했습니다. 단기 손실이 수조 원에 달하지만 철저한 원인 규명과 품질 검증 체계 전면 개편에 나섰습니다.",
+    "sourceName": "조선일보 / 로이터",
+    "sourceUrl": "https://www.chosun.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "리콜",
+      "품질위기",
+      "브랜드리스크"
+    ],
+    "affectedChannels": [
+      "PROFITABILITY",
+      "BRAND_VALUE"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "노트7 전량 회수 및 수조 원대 특별손실 회계 반영.",
+      "impactChannels": [
+        "PROFITABILITY",
+        "BRAND_VALUE"
+      ],
+      "positiveInterpretation": "신속한 단종 결정과 투명한 원인 공개로 신뢰 회복 발판 마련.",
+      "negativeInterpretation": "단기 브랜드 이미지 타격과 모바일 부문 실적 급감.",
+      "unknownAtTheTime": "차기작 갤럭시 S8으로 모바일 시장 지배력을 회복할 수 있을지 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2016_US_GEN",
     "scope": "US_MACRO",
     "market": "US",
@@ -9385,55 +9946,6 @@
       "unknownAtTheTime": "고용시장 견조함 유지 여부."
     },
     "importanceScore": 8,
-    "language": "ko",
-    "isRetrospective": false,
-    "fullTextStored": false,
-    "dataQuality": "HIGH",
-    "retrievedAt": "2026-08-18T00:00:00Z"
-  },
-  {
-    "id": "NEWS_2016_KR_005930_GEN",
-    "scope": "COMPANY",
-    "market": "KR",
-    "canonicalCompanyIds": [
-      "KR_005930"
-    ],
-    "relatedTickers": [
-      "005930"
-    ],
-    "relatedSectors": [
-      "전기전자"
-    ],
-    "eventDate": "2016-11-25",
-    "publishedAt": "2016-11-25",
-    "availableFrom": "2016-11-25",
-    "datePrecision": "DAY",
-    "originalTitle": "Samsung Electronics Annual Report",
-    "titleKo": "삼성전자 2016년 사업보고서 및 실적 공시",
-    "summaryKo": "2016년 연간 결산 실적 발표 및 주요 사업부문별 생산·수출 실적 공시.",
-    "sourceName": "금융감독원 DART / 한국거래소",
-    "sourceUrl": "https://dart.fss.or.kr",
-    "sourceType": "FILING",
-    "evidenceLevel": "PRIMARY_SOURCE",
-    "categories": [
-      "사업보고서",
-      "실적"
-    ],
-    "affectedChannels": [
-      "REVENUE",
-      "COST"
-    ],
-    "neutralAnalysis": {
-      "verifiedFacts": "2016년 감사보고서 및 공시 서류.",
-      "impactChannels": [
-        "REVENUE",
-        "COST"
-      ],
-      "positiveInterpretation": "메모리/가전/모바일 부문 경쟁력 유지.",
-      "negativeInterpretation": "글로벌 IT 수요 변동에 따른 재고 평가 리스크.",
-      "unknownAtTheTime": "차세대 R&D 투자 성과."
-    },
-    "importanceScore": 7,
     "language": "ko",
     "isRetrospective": false,
     "fullTextStored": false,
@@ -9488,6 +10000,56 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_2017_KR_005930_LEEJY_ARREST",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "반도체 / IT"
+    ],
+    "eventDate": "2017-02-17",
+    "publishedAt": "2017-02-17",
+    "availableFrom": "2017-02-17",
+    "datePrecision": "DAY",
+    "originalTitle": "이재용 삼성전자 부회장 구속 기소… 총수 부재 속 반도체 슈퍼사이클 사상 최대 실적",
+    "titleKo": "[특보] 이재용 부회장 구속… 사법 리스크 속 반도체 슈퍼호황 사상 최대 이익",
+    "summaryKo": "특검 수사 결과 이재용 삼성전자 부회장이 뇌물공여 혐의 등으로 전격 구속되었습니다. 창사 이래 초유의 총수 구속 사태 속에서도, 글로벌 서버 D-RAM과 낸드플래시 수요 폭증(슈퍼사이클)에 힘입어 연간 영업이익 53조 원이라는 사상 최대 실적을 경신했습니다.",
+    "sourceName": "연합뉴스 / 중앙일보",
+    "sourceUrl": "https://www.yna.co.kr",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "오너리스크",
+      "지배구조",
+      "반도체호황"
+    ],
+    "affectedChannels": [
+      "MANAGEMENT",
+      "PROFITABILITY"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2017년 2월 17일 이재용 부회장 구속, 2017년 연간 영업이익 53조 6,450억 원 달성.",
+      "impactChannels": [
+        "MANAGEMENT",
+        "PROFITABILITY"
+      ],
+      "positiveInterpretation": "글로벌 데이터센터 서버 반도체 수요 폭발로 메모리 단가 급등 및 천문학적 이익 창출.",
+      "negativeInterpretation": "총수 부재로 인한 대규모 M&A 및 중장기 미래 투자 결정 지연 리스크.",
+      "unknownAtTheTime": "대법원 최종 판결 결과 및 재수감 여부, 반도체 슈퍼호황의 지속 기간."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_2017_GL_GEN",
@@ -9618,55 +10180,6 @@
       "unknownAtTheTime": "고용시장 견조함 유지 여부."
     },
     "importanceScore": 8,
-    "language": "ko",
-    "isRetrospective": false,
-    "fullTextStored": false,
-    "dataQuality": "HIGH",
-    "retrievedAt": "2026-08-18T00:00:00Z"
-  },
-  {
-    "id": "NEWS_2017_KR_005930_GEN",
-    "scope": "COMPANY",
-    "market": "KR",
-    "canonicalCompanyIds": [
-      "KR_005930"
-    ],
-    "relatedTickers": [
-      "005930"
-    ],
-    "relatedSectors": [
-      "전기전자"
-    ],
-    "eventDate": "2017-11-25",
-    "publishedAt": "2017-11-25",
-    "availableFrom": "2017-11-25",
-    "datePrecision": "DAY",
-    "originalTitle": "Samsung Electronics Annual Report",
-    "titleKo": "삼성전자 2017년 사업보고서 및 실적 공시",
-    "summaryKo": "2017년 연간 결산 실적 발표 및 주요 사업부문별 생산·수출 실적 공시.",
-    "sourceName": "금융감독원 DART / 한국거래소",
-    "sourceUrl": "https://dart.fss.or.kr",
-    "sourceType": "FILING",
-    "evidenceLevel": "PRIMARY_SOURCE",
-    "categories": [
-      "사업보고서",
-      "실적"
-    ],
-    "affectedChannels": [
-      "REVENUE",
-      "COST"
-    ],
-    "neutralAnalysis": {
-      "verifiedFacts": "2017년 감사보고서 및 공시 서류.",
-      "impactChannels": [
-        "REVENUE",
-        "COST"
-      ],
-      "positiveInterpretation": "메모리/가전/모바일 부문 경쟁력 유지.",
-      "negativeInterpretation": "글로벌 IT 수요 변동에 따른 재고 평가 리스크.",
-      "unknownAtTheTime": "차세대 R&D 투자 성과."
-    },
-    "importanceScore": 7,
     "language": "ko",
     "isRetrospective": false,
     "fullTextStored": false,
@@ -10430,6 +10943,57 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2021_KR_005380_IONIQ5",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005380"
+    ],
+    "relatedTickers": [
+      "005380"
+    ],
+    "relatedSectors": [
+      "자동차 / 모빌리티",
+      "전기차"
+    ],
+    "eventDate": "2021-02-23",
+    "publishedAt": "2021-02-23",
+    "availableFrom": "2021-02-23",
+    "datePrecision": "DAY",
+    "originalTitle": "현대자동차, E-GMP 기반 전용 전기차 '아이오닉 5' 세계 최초 공개",
+    "titleKo": "현대차, 전용 전기차 '아이오닉 5' 전격 공개… 글로벌 EV 시장 돌풍",
+    "summaryKo": "현대자동차가 독자 개발한 전기차 전용 플랫폼 'E-GMP'를 최초 적용한 '아이오닉 5'를 공개했습니다. 800V 초급속 충전과 V2L(차량 외부 전력 공급) 기술로 '세계 올해의 차'를 석권했습니다.",
+    "sourceName": "한국경제 / 모터트렌드",
+    "sourceUrl": "https://www.hankyung.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "전기차",
+      "아이오닉5",
+      "EGMP"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "GLOBAL_EXPANSION"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2021년 2월 23일 아이오닉 5 온라인 세계 최초 공개, 사전계약 첫날 2만 3천 대 신기록.",
+      "impactChannels": [
+        "INNOVATION",
+        "GLOBAL_EXPANSION"
+      ],
+      "positiveInterpretation": "전기차 전환 경쟁에서 테슬라의 대항마로 떠오르며 북미·유럽 시장 점유율 급등.",
+      "negativeInterpretation": "차량용 반도체 수급 부족 및 글로벌 전기차 가격 인하 경쟁.",
+      "unknownAtTheTime": "미국 인플레이션 감축법(IRA) 보조금 제외 위기를 리스 판매로 극복할 수 있을지 여부."
+    },
+    "importanceScore": 9,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2021_GL_GEN",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -10896,6 +11460,160 @@
     "retrievedAt": "2026-08-18T00:00:00Z"
   },
   {
+    "id": "COMP_2023_US_MSFT_OPENAI",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_MSFT"
+    ],
+    "relatedTickers": [
+      "MSFT"
+    ],
+    "relatedSectors": [
+      "인공지능",
+      "빅테크 / IT",
+      "소프트웨어"
+    ],
+    "eventDate": "2023-01-23",
+    "publishedAt": "2023-01-23",
+    "availableFrom": "2023-01-23",
+    "datePrecision": "DAY",
+    "originalTitle": "Microsoft Extends Partnership with OpenAI with $10B Investment and Copilot Integration",
+    "titleKo": "마이크로소프트, OpenAI에 100억 달러 추가 투자… 생성형 AI 전면 선도",
+    "summaryKo": "사티아 나델라 CEO의 마이크로소프트가 ChatGPT 개발사 OpenAI에 100억 달러(약 13조 원) 규모의 대형 투자를 발표했습니다. Azure 클라우드 인프라와 오피스 프로그램에 'Microsoft Copilot'을 전면 탑재하며 AI 시대 주도권을 잡았습니다.",
+    "sourceName": "블룸버그 / 파이낸셜타임스",
+    "sourceUrl": "https://www.ft.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "OpenAI",
+      "생성형AI",
+      "Copilot"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "CLOUD_GROWTH"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2023년 1월 OpenAI와의 파트너십 수년 연장 및 수십억 달러 규모 추가 투자 공식 발표.",
+      "impactChannels": [
+        "INNOVATION",
+        "CLOUD_GROWTH"
+      ],
+      "positiveInterpretation": "생성형 AI 생태계 선점 및 Azure 클라우드 매출의 폭발적 성장 가속화.",
+      "negativeInterpretation": "막대한 AI 인프라 구축 비용 및 각국 규제 당국의 AI 독점 조사 리스크.",
+      "unknownAtTheTime": "기업용 AI 소프트웨어 구독 서비스의 실제 수익 전환율과 마진 기여도."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
+    "id": "COMP_2023_KR_005930_PRODUCTION_CUT",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_005930"
+    ],
+    "relatedTickers": [
+      "005930"
+    ],
+    "relatedSectors": [
+      "반도체 / IT"
+    ],
+    "eventDate": "2023-04-07",
+    "publishedAt": "2023-04-07",
+    "availableFrom": "2023-04-07",
+    "datePrecision": "DAY",
+    "originalTitle": "삼성전자, 15년 만에 메모리 반도체 인위적 감산 전격 선언… HBM 경쟁 돌입",
+    "titleKo": "삼성전자, 15년 만의 반도체 전격 감산… 메모리 바닥론과 HBM 경쟁",
+    "summaryKo": "글로벌 IT 수요 침체로 분기 영업이익이 95% 급감하자, 삼성전자가 '인위적 감산은 없다'는 기존 입장을 번복하고 15년 만에 메모리 생산량 하향 조정을 공식화했습니다. 시장은 이를 반도체 업황 바닥 신호로 받아들였습니다.",
+    "sourceName": "한국경제신문 / 매일경제",
+    "sourceUrl": "https://www.hankyung.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "반도체감산",
+      "업황바닥",
+      "HBM"
+    ],
+    "affectedChannels": [
+      "SUPPLY",
+      "PROFITABILITY"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2023년 1분기 잠정실적 발표 시 '공급량이 확보된 제품 중심으로 의미 있는 수준까지 생산량 하향 조정' 공식 선언.",
+      "impactChannels": [
+        "SUPPLY",
+        "PROFITABILITY"
+      ],
+      "positiveInterpretation": "메모리 공급 과잉 해소 및 하반기 D-RAM 가격 반등 기대감 고조.",
+      "negativeInterpretation": "AI 가속기용 초고대역폭메모리(HBM3) 시장 주도권을 경쟁사에 선점당한 위기감 고조.",
+      "unknownAtTheTime": "엔비디아 HBM3E 납품 테스트 통과 시점 및 2024년 흑자 전환 폭."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
+    "id": "COMP_2023_US_NVDA_H100_BOOM",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "인공지능",
+      "반도체 / 칩셋",
+      "빅테크 / IT"
+    ],
+    "eventDate": "2023-05-24",
+    "publishedAt": "2023-05-24",
+    "availableFrom": "2023-05-24",
+    "datePrecision": "DAY",
+    "originalTitle": "NVIDIA Surges as Generative AI Drives Massive H100 Demand, Enters $1 Trillion Club",
+    "titleKo": "엔비디아, 생성형 AI 열풍 속 H100 GPU 주문 폭주… 시총 1조 달러 돌파",
+    "summaryKo": "챗GPT(ChatGPT) 등 생성형 AI 열풍으로 마이크로소프트, 구글, 메타 등이 엔비디아의 H100 텐서코어 GPU를 싹쓸이 주문하며 실적이 시장 예상치를 50% 이상 상회했습니다. 반도체 기업 사상 최초로 시가총액 1조 달러를 돌파했습니다.",
+    "sourceName": "블룸버그 / 월스트리트저널",
+    "sourceUrl": "https://www.wsj.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "생성형AI",
+      "H100",
+      "시총1조달러"
+    ],
+    "affectedChannels": [
+      "REVENUE",
+      "MARGIN"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "2023년 1분기 가이던스 110억 달러 제시(시장 컨센서스 71.8억 달러를 53% 상회).",
+      "impactChannels": [
+        "REVENUE",
+        "MARGIN"
+      ],
+      "positiveInterpretation": "AI 가속기 시장 점유율 90% 이상 독점 및 70%를 상회하는 압도적 영업이익률.",
+      "negativeInterpretation": "빅테크 기업들의 자체 AI 칩(ASIC) 개발 및 TSMC CoWoS 패키징 공급 병목.",
+      "unknownAtTheTime": "2024년 블랙웰 출시와 함께 시가총액 3조 달러를 돌파할지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
+  },
+  {
     "id": "NEWS_2023_GL_01",
     "scope": "GLOBAL_MACRO",
     "market": "GLOBAL",
@@ -10939,6 +11657,57 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_2023_KR_000660_HBM3E_EXCLUSIVE",
+    "scope": "COMPANY",
+    "market": "KR",
+    "canonicalCompanyIds": [
+      "KR_000660"
+    ],
+    "relatedTickers": [
+      "000660"
+    ],
+    "relatedSectors": [
+      "반도체 / IT",
+      "인공지능"
+    ],
+    "eventDate": "2023-08-21",
+    "publishedAt": "2023-08-21",
+    "availableFrom": "2023-08-21",
+    "datePrecision": "DAY",
+    "originalTitle": "SK하이닉스, 초고성능 AI 메모리 'HBM3E' 세계 최초 개발 및 엔비디아 독점 공급",
+    "titleKo": "SK하이닉스, 5세대 'HBM3E' 세계 최초 개발… 엔비디아 AI 칩 독점 공급",
+    "summaryKo": "SK하이닉스가 현존 최고 사양의 AI 전용 초고대역폭메모리 'HBM3E'를 세계 최초로 개발하고 엔비디아에 샘플 공급을 개시했습니다. MR-MUF 패키징 기술력을 앞세워 글로벌 HBM 시장 점유율 1위를 확고히 굳혔습니다.",
+    "sourceName": "전자신문 / 블룸버그",
+    "sourceUrl": "https://www.etnews.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "HBM3E",
+      "엔비디아독점",
+      "AI메모리"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "PROFITABILITY"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "초당 1.15TB 이상 데이터 처리 가능한 HBM3E 개발 및 주요 고객사 품질 검증 통과.",
+      "impactChannels": [
+        "INNOVATION",
+        "PROFITABILITY"
+      ],
+      "positiveInterpretation": "고수익 HBM 독점 공급에 따른 사상 최대 수준의 메모리 부문 마진 창출.",
+      "negativeInterpretation": "전통 범용 레거시 D-RAM 및 낸드 부문의 회복 지연.",
+      "unknownAtTheTime": "경쟁사의 HBM3E 수율 정상화 및 시장 진입 시점."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_2023_US_01",
@@ -11135,6 +11904,58 @@
     "fullTextStored": false,
     "dataQuality": "HIGH",
     "retrievedAt": "2026-08-18T00:00:00Z"
+  },
+  {
+    "id": "COMP_2024_US_NVDA_BLACKWELL",
+    "scope": "COMPANY",
+    "market": "US",
+    "canonicalCompanyIds": [
+      "US_NVDA"
+    ],
+    "relatedTickers": [
+      "NVDA"
+    ],
+    "relatedSectors": [
+      "인공지능",
+      "반도체 / 칩셋",
+      "빅테크 / IT"
+    ],
+    "eventDate": "2024-03-18",
+    "publishedAt": "2024-03-18",
+    "availableFrom": "2024-03-18",
+    "datePrecision": "DAY",
+    "originalTitle": "NVIDIA Unveils Blackwell B200 AI Superchip, Becomes Most Valuable Company",
+    "titleKo": "엔비디아, 차세대 괴물 AI 슈퍼칩 '블랙웰(B200)' 공개 및 세계 시총 1위 등극",
+    "summaryKo": "엔비디아가 2,080억 개의 트랜지스터를 집적한 차세대 AI 가속기 '블랙웰(Blackwell B200)'을 전격 공개했습니다. H100 대비 연산 성능이 최대 30배 향상되었으며, 엔비디아는 마이크로소프트와 애플을 제치고 글로벌 시가총액 1위에 등극했습니다.",
+    "sourceName": "GTC 2024 / 로이터",
+    "sourceUrl": "https://www.reuters.com",
+    "sourceType": "NEWS_AGENCY",
+    "evidenceLevel": "PRIMARY_SOURCE",
+    "categories": [
+      "블랙웰",
+      "B200",
+      "시총1위"
+    ],
+    "affectedChannels": [
+      "INNOVATION",
+      "MARKET_CAP"
+    ],
+    "neutralAnalysis": {
+      "verifiedFacts": "Blackwell 아키텍처 기반 B200 GPU 공개, 2개 다이를 10TB/s 초고속 인터커넥트로 연결.",
+      "impactChannels": [
+        "INNOVATION",
+        "MARKET_CAP"
+      ],
+      "positiveInterpretation": "AI 추론 및 학습 비용 획기적 절감으로 차세대 LLM 시장 독점 지속.",
+      "negativeInterpretation": "서버 전력 소모 및 액체 냉각 인프라 구축 난이도, 대중국 수출 규제 강화 리스크.",
+      "unknownAtTheTime": "빅테크들의 연간 AI CapEx 투자가 언제까지 기하급수적으로 지속될 수 있을지 여부."
+    },
+    "importanceScore": 10,
+    "language": "ko",
+    "isRetrospective": false,
+    "fullTextStored": false,
+    "dataQuality": "HIGH",
+    "retrievedAt": "2026-09-09T00:00:00Z"
   },
   {
     "id": "NEWS_2024_GL_GEN",

@@ -232,7 +232,8 @@ export function isSyntheticLinearOrFlat(prices: number[]): boolean {
   const span = maxP - minP;
 
   // Case 1: Flat dummy constants across the year
-  if (span < 0.001 * Math.max(1, maxP)) return true;
+  if (span < 0.001 * Math.max(1e-4, maxP)) return true;
+
 
   // Case 2: Pure linear interpolation (P[m] = P0 + m * delta)
   const diffs: number[] = [];
@@ -369,8 +370,8 @@ export function getYearMonthlyPrices(
   }
 
   // Otherwise, construct a smooth momentum-driven monthly series with natural market swings
-  let startP = 1000;
-  let endP = 1000;
+  let startP = useLocal ? 0.01 : 1000;
+  let endP = useLocal ? 0.01 : 1000;
 
   if (benchMeta) {
     if (benchMeta.canonicalId === 'BENCH_KOSPI') {
@@ -388,7 +389,7 @@ export function getYearMonthlyPrices(
     startP =
       (useLocal ? getStockPriceLocal(canonicalId, year - 1) : getStockPriceKRW(canonicalId, year - 1)) ||
       (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
-      1000;
+      (useLocal ? 0.01 : 1000);
     endP =
       (useLocal ? getStockPriceLocal(canonicalId, year) : getStockPriceKRW(canonicalId, year)) ||
       startP;
@@ -398,6 +399,7 @@ export function getYearMonthlyPrices(
   const seedBase = hashSeed(canonicalId, year, 101);
   let curRunningPrice = startP;
   let lastReturn = 0;
+  const minSafePrice = 1e-5;
 
   for (let m = 1; m <= 12; m++) {
     const mStr = m.toString().padStart(2, '0');
@@ -413,7 +415,7 @@ export function getYearMonthlyPrices(
     }
 
     const remainingMonths = 13 - m;
-    const requiredDrift = (Math.log(Math.max(1, endP)) - Math.log(Math.max(1, curRunningPrice))) / remainingMonths;
+    const requiredDrift = (Math.log(Math.max(minSafePrice, endP)) - Math.log(Math.max(minSafePrice, curRunningPrice))) / remainingMonths;
     const monthlyVol = 0.052; // Realistic monthly macro volatility ~5.2%
     const shock = pseudoRandNorm(seedBase + m * 37) * monthlyVol;
 
@@ -421,7 +423,7 @@ export function getYearMonthlyPrices(
     const stepReturn = 0.32 * lastReturn + 0.68 * shock + requiredDrift;
     lastReturn = stepReturn;
 
-    curRunningPrice = Math.max(1, curRunningPrice * Math.exp(stepReturn));
+    curRunningPrice = Math.max(minSafePrice, curRunningPrice * Math.exp(stepReturn));
 
     result.push({
       year,
@@ -435,7 +437,8 @@ export function getYearMonthlyPrices(
 }
 
 /**
- * Fast 1-year Sparkline calculation for Mosaic Tiles
+ * Fast 1-year Sparkline calculation for Mosaic Tiles & Benchmark mini cards
+ * Unifies directly with getCompanyNaverChartData for 100% consistent high-fidelity wave/candle shapes and max/min prices
  */
 export function getCompany1YrSparkline(
   canonicalId: string,
@@ -449,50 +452,41 @@ export function getCompany1YrSparkline(
   if (upToYear < firstValidYear) return null;
 
   const isSP500 = benchMeta ? benchMeta.canonicalId === 'BENCH_SP500' : false;
-  const isKospi = benchMeta ? benchMeta.canonicalId === 'BENCH_KOSPI' : false;
+  const currencyMode = isSP500 ? 'LOCAL' : 'KRW';
 
-  const monthlyList = getYearMonthlyPrices(canonicalId, upToYear, isSP500);
-  if (monthlyList.length === 0) return null;
+  const naverData = getCompanyNaverChartData(canonicalId, upToYear, 'DAY', '1Y', currencyMode);
+  if (!naverData || naverData.candles.length === 0) return null;
 
-  let startP: number;
-  let endP: number;
-
-  if (isKospi) {
-    startP = BENCHMARKS.kospi?.prices?.[String(upToYear - 1)] || BENCHMARKS.kospi?.prices?.[String(upToYear)] || 100;
-    endP = BENCHMARKS.kospi?.prices?.[String(upToYear)] || startP;
-  } else if (isSP500) {
-    startP = BENCHMARKS.sp500?.prices?.[String(upToYear - 1)] || BENCHMARKS.sp500?.prices?.[String(upToYear)] || 100;
-    endP = BENCHMARKS.sp500?.prices?.[String(upToYear)] || startP;
-  } else {
-    startP =
-      getStockPriceKRW(canonicalId, upToYear - 1) ||
-      monthlyList[0].price ||
-      1000;
-    endP =
-      getStockPriceKRW(canonicalId, upToYear) ||
-      monthlyList[monthlyList.length - 1].price;
-  }
-
-  const rawPrices = [startP, ...monthlyList.map(pt => pt.price)];
+  const {
+    periodStartPrice: startP,
+    currentPrice: endP,
+    periodChangePercent: return1Yr,
+    lowPrice: minP,
+    highPrice: maxP,
+    candles: full240Candles,
+  } = naverData;
 
   const width = 100;
   const height = 40;
   const padTop = 4;
   const padBottom = 4;
   const usableH = height - padTop - padBottom;
-
-  const minP = Math.min(...rawPrices);
-  const maxP = Math.max(...rawPrices);
   const pRange = maxP - minP || 1;
 
+  // 1. Build sampled points & smooth spline for line/wave mode (viewBox 0 0 100 40)
+  // Sample 25 representative points along the exact daily close curve
+  const sampleCount = 25;
   const sampledPoints: { x: number; y: number; price: number; month: number }[] = [];
-  rawPrices.forEach((p, idx) => {
-    const x = (idx / (rawPrices.length - 1)) * width;
-    const y = padTop + usableH - ((p - minP) / pRange) * usableH;
-    sampledPoints.push({ x, y, price: p, month: idx });
-  });
+  for (let i = 0; i < sampleCount; i++) {
+    const cIdx = Math.round((i / (sampleCount - 1)) * (full240Candles.length - 1));
+    const c = full240Candles[cIdx];
+    const x = (i / (sampleCount - 1)) * width;
+    const y = padTop + usableH * (1 - (c.close - minP) / pRange);
+    const month = Math.floor(cIdx / 20) + 1;
+    sampledPoints.push({ x, y, price: c.close, month });
+  }
 
-  // Smooth spline path for sparkline
+  // Smooth cubic spline path for sparkline
   let svgPath = `M ${sampledPoints[0].x.toFixed(1)},${sampledPoints[0].y.toFixed(1)}`;
   for (let i = 0; i < sampledPoints.length - 1; i++) {
     const p0 = sampledPoints[i === 0 ? 0 : i - 1];
@@ -507,84 +501,27 @@ export function getCompany1YrSparkline(
 
     svgPath += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
   }
-
   const svgAreaPath = `${svgPath} L ${width},${height} L 0,${height} Z`;
-  const return1Yr = startP > 0 ? (endP - startP) / startP : 0;
 
-  // 12-month realistic volume simulation with high dynamic range
-  const volumes: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
-  const baseVol = benchMeta ? (benchMeta.market === 'US' ? 2500000 : 950000) : (stock?.market === 'US' ? 2500000 : 950000);
-
-  const tempItems: { month: number; isYangbong: boolean; vol: number }[] = [];
-  const rawVols: number[] = [];
-
-  for (let m = 1; m <= 12; m++) {
-    const curP = monthlyList[m - 1]?.price || endP;
-    const prevP = m === 1 ? startP : (monthlyList[m - 2]?.price || startP);
-    const isYangbong = curP >= prevP;
-    const priceMovePct = Math.abs(curP - prevP) / Math.max(1, prevP);
-
-    // Dynamic volume simulation: high volatility months have surge volume, quiet months have light volume
-    const seed = hashSeed(canonicalId, upToYear * 100 + m, 89);
-    const wave = Math.sin((m / 12) * Math.PI * 2 + (seed % 5));
-    const noise = pseudoRand(seed) * 0.6 + 0.2; // 0.2 ~ 0.8
-    const surge = Math.min(2.8, priceMovePct * 16); // 0 ~ 2.8
-
-    const multiplier = Math.max(0.18, 0.22 + noise * 0.75 + Math.max(0, wave * 0.35) + surge);
-    const vol = Math.round(baseVol * multiplier);
-    rawVols.push(vol);
-    tempItems.push({ month: m, isYangbong, vol });
-  }
-
-  const minV = Math.min(...rawVols);
-  const maxV = Math.max(...rawVols);
-  const spanV = maxV - minV || 1;
-
-  tempItems.forEach(item => {
-    // Dynamic normalized height from 0.15 (15%) to 1.0 (100%)
-    const norm = 0.15 + ((item.vol - minV) / spanV) * 0.85;
-    volumes.push({
-      month: item.month,
-      volume: item.vol,
-      isYangbong: item.isYangbong,
-      normalizedH: Number(norm.toFixed(3)),
-    });
-  });
-
-  // 120-day high-density daily candle simulation (10 trading days per month)
+  // 2. Build 120 Daily Candles (aggregated from 240 trading days with 2 days per candle)
   const dailyCandles: SparklineDailyCandle[] = [];
   const dailyVolumes: { dayIdx: number; month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
   const rawDailyVols: number[] = [];
   const tempDailyItems: { dayIdx: number; month: number; isYangbong: boolean; vol: number }[] = [];
-  const dailyBaseVol = baseVol / 20;
 
-  let prevInterpPrice = startP;
   for (let dIdx = 0; dIdx < 120; dIdx++) {
-    const m = Math.floor(dIdx / 10) + 1; // 1 ~ 12
-    const dayInMonth = dIdx % 10; // 0 ~ 9
-    const mTargetEnd = monthlyList[m - 1]?.price || endP;
-    const mPriorEnd = m === 1 ? startP : (monthlyList[m - 2]?.price || startP);
+    const idx1 = dIdx * 2;
+    const idx2 = Math.min(full240Candles.length - 1, idx1 + 1);
+    const c1 = full240Candles[idx1];
+    const c2 = full240Candles[idx2];
 
-    const progress = (dayInMonth + 1) / 10;
-    const stepSeed = hashSeed(canonicalId, upToYear * 1000 + dIdx, 43);
-    const intraMonthShock = pseudoRandNorm(stepSeed) * 0.012;
-    const dayClose = dayInMonth === 9 ? mTargetEnd : Math.max(1, mPriorEnd + (mTargetEnd - mPriorEnd) * progress + mTargetEnd * intraMonthShock);
-    const dayOpen = prevInterpPrice;
+    const dayOpen = c1.open;
+    const dayClose = c2.close;
+    const dayHigh = Math.max(c1.high, c2.high);
+    const dayLow = Math.min(c1.low, c2.low);
     const isYangbong = dayClose >= dayOpen;
-    const dayPriceMove = Math.abs(dayClose - dayOpen) / Math.max(1, dayOpen);
-
-    const highWick = Math.abs(pseudoRandNorm(stepSeed + 2)) * 0.007 * dayClose;
-    const lowWick = Math.abs(pseudoRandNorm(stepSeed + 3)) * 0.007 * dayClose;
-    const dayHigh = Math.max(dayOpen, dayClose) + highWick;
-    const dayLow = Math.max(1, Math.min(dayOpen, dayClose) - lowWick);
-
-    prevInterpPrice = dayClose;
-
-    // Daily volume shocks: spikes on volatile breakout days, light on consolidation days
-    const volNoise = pseudoRand(stepSeed + 1) * 0.7 + 0.15;
-    const dailySurge = Math.min(3.5, dayPriceMove * 45);
-    const dMultiplier = Math.max(0.12, 0.2 + volNoise * 0.75 + dailySurge);
-    const dayVol = Math.round(dailyBaseVol * dMultiplier);
+    const dayVol = Math.round(c1.volume + c2.volume);
+    const m = Math.floor(dIdx / 10) + 1;
 
     rawDailyVols.push(dayVol);
     tempDailyItems.push({ dayIdx: dIdx, month: m, isYangbong, vol: dayVol });
@@ -616,7 +553,7 @@ export function getCompany1YrSparkline(
     });
   });
 
-  // Calculate Moving Averages on 120 Daily Candles
+  // 3. Calculate Moving Averages on 120 Daily Candles
   for (let i = 0; i < 120; i++) {
     // 5-day MA
     if (i >= 4) {
@@ -637,13 +574,6 @@ export function getCompany1YrSparkline(
     }
   }
 
-  // Price range for 120 Daily Candles (viewBox 0 0 120 40)
-  const candleAllHighs = dailyCandles.map(c => c.high);
-  const candleAllLows = dailyCandles.map(c => c.low);
-  const candleMinP = Math.min(...candleAllLows);
-  const candleMaxP = Math.max(...candleAllHighs);
-  const candlePRange = candleMaxP - candleMinP || 1;
-
   const padT = 4;
   const usableH40 = 32;
 
@@ -652,7 +582,7 @@ export function getCompany1YrSparkline(
   dailyCandles.forEach(c => {
     if (c.ma5 !== null && c.ma5 !== undefined) {
       const x = c.dayIdx + 0.375;
-      const y = padT + usableH40 * (1 - (c.ma5 - candleMinP) / candlePRange);
+      const y = padT + usableH40 * (1 - (c.ma5 - minP) / pRange);
       ma5Points.push({ x, y });
     }
   });
@@ -674,7 +604,7 @@ export function getCompany1YrSparkline(
   dailyCandles.forEach(c => {
     if (c.ma20 !== null && c.ma20 !== undefined) {
       const x = c.dayIdx + 0.375;
-      const y = padT + usableH40 * (1 - (c.ma20 - candleMinP) / candlePRange);
+      const y = padT + usableH40 * (1 - (c.ma20 - minP) / pRange);
       ma20Points.push({ x, y });
     }
   });
@@ -691,7 +621,7 @@ export function getCompany1YrSparkline(
     dailyMa20Path += ` L ${ma20Points[ma20Points.length - 1].x.toFixed(1)},${ma20Points[ma20Points.length - 1].y.toFixed(1)}`;
   }
 
-  // Calculate 10-day Volume Moving Average curve
+  // 4. Volume MA (10-period)
   const maPeriod = 10;
   const maPoints: { x: number; y: number }[] = [];
   for (let i = 0; i < 120; i++) {
@@ -716,6 +646,31 @@ export function getCompany1YrSparkline(
   }
   dailyVolumeMaPath += ` L ${maPoints[maPoints.length - 1].x.toFixed(1)},${maPoints[maPoints.length - 1].y.toFixed(1)}`;
 
+  // 5. 12-Month volumes
+  const volumes: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
+  const rawMonthVols: number[] = [];
+  for (let m = 1; m <= 12; m++) {
+    const mCandles = dailyCandles.filter(c => c.month === m);
+    const mVol = mCandles.reduce((sum, c) => sum + c.volume, 0);
+    rawMonthVols.push(mVol);
+  }
+  const minMV = Math.min(...rawMonthVols);
+  const maxMV = Math.max(...rawMonthVols);
+  const spanMV = maxMV - minMV || 1;
+  for (let m = 1; m <= 12; m++) {
+    const mCandles = dailyCandles.filter(c => c.month === m);
+    const mOpen = mCandles[0]?.open || 0;
+    const mClose = mCandles[mCandles.length - 1]?.close || 0;
+    const mVol = rawMonthVols[m - 1];
+    const norm = 0.15 + ((mVol - minMV) / spanMV) * 0.85;
+    volumes.push({
+      month: m,
+      volume: mVol,
+      isYangbong: mClose >= mOpen,
+      normalizedH: Number(norm.toFixed(3)),
+    });
+  }
+
   return {
     canonicalId,
     year: upToYear,
@@ -736,6 +691,7 @@ export function getCompany1YrSparkline(
     dailyMa20Path,
   };
 }
+
 
 /**
  * Generate full Naver Finance-style OHLCV + MA series for any resolution & period
@@ -783,6 +739,7 @@ export function getCompanyNaverChartData(
     const yearMonths = getYearMonthlyPrices(canonicalId, y, useLocal);
     allMonthlyList.push(...yearMonths);
   }
+  const minSafePrice = 1e-5;
 
   const baseVol = isUsStock ? 2800000 : 950000;
   const rawCandles: {
@@ -817,9 +774,9 @@ export function getCompanyNaverChartData(
       const stepShock = pseudoRandNorm(stepSeed) * dayClose * 0.004;
 
       intradayDelta = 0.4 * intradayDelta + 0.6 * stepShock + stepDrift;
-      const close = isTargetClose ? dayClose : Math.max(1, open + intradayDelta);
+      const close = isTargetClose ? dayClose : Math.max(minSafePrice, open + intradayDelta);
       const high = Math.max(open, close) * (1 + Math.abs(pseudoRandNorm(stepSeed + 1)) * 0.0035);
-      const low = Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(stepSeed + 2)) * 0.0035);
+      const low = Math.max(minSafePrice, Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(stepSeed + 2)) * 0.0035));
 
       const progress = (i + 1) / times.length;
       const uShape = Math.abs(progress - 0.5) * 2;
@@ -853,14 +810,14 @@ export function getCompanyNaverChartData(
       for (let d = 1; d <= tradingDaysPerMonth; d++) {
         const daySeed = hashSeed(canonicalId, mItem.year * 100 + mItem.month, d);
         const remainingDays = tradingDaysPerMonth - d + 1;
-        const drift = (Math.log(Math.max(1, monthClose)) - Math.log(Math.max(1, currentDayPrice))) / remainingDays;
+        const drift = (Math.log(Math.max(minSafePrice, monthClose)) - Math.log(Math.max(minSafePrice, currentDayPrice))) / remainingDays;
         const dailyShock = pseudoRandNorm(daySeed) * 0.011;
 
         dailyMomentum = 0.35 * dailyMomentum + 0.65 * dailyShock + drift;
         const open = currentDayPrice;
-        const close = d === tradingDaysPerMonth ? monthClose : Math.max(1, open * Math.exp(dailyMomentum));
+        const close = d === tradingDaysPerMonth ? monthClose : Math.max(minSafePrice, open * Math.exp(dailyMomentum));
         const dayHigh = Math.max(open, close) * (1 + Math.abs(pseudoRandNorm(daySeed + 1)) * 0.007);
-        const dayLow = Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(daySeed + 2)) * 0.007);
+        const dayLow = Math.max(minSafePrice, Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(daySeed + 2)) * 0.007));
         const vol = Math.round(baseVol * (0.7 + pseudoRand(daySeed + 3) * 0.75));
 
         currentDayPrice = close;
@@ -882,7 +839,7 @@ export function getCompanyNaverChartData(
     const targetMonths = allMonthlyList.filter(m => m.year === upToYear);
     const priorYearEnd =
       allMonthlyList.find(m => m.year === upToYear - 1 && m.month === 12)?.price ||
-      (targetMonths[0] ? targetMonths[0].price * 0.95 : 1000);
+      (targetMonths[0] ? targetMonths[0].price * 0.95 : (useLocal ? 0.01 : 1000));
 
     const tradingDaysPerMonth = 20;
     let runningPrice = priorYearEnd;
@@ -894,14 +851,14 @@ export function getCompanyNaverChartData(
       for (let d = 1; d <= tradingDaysPerMonth; d++) {
         const daySeed = hashSeed(canonicalId, upToYear * 100 + mItem.month, d);
         const remainingDays = tradingDaysPerMonth - d + 1;
-        const drift = (Math.log(Math.max(1, monthClose)) - Math.log(Math.max(1, runningPrice))) / remainingDays;
+        const drift = (Math.log(Math.max(minSafePrice, monthClose)) - Math.log(Math.max(minSafePrice, runningPrice))) / remainingDays;
         const dailyShock = pseudoRandNorm(daySeed) * 0.012;
 
         dailyMomentum = 0.38 * dailyMomentum + 0.62 * dailyShock + drift;
         const open = runningPrice;
-        const close = d === tradingDaysPerMonth ? monthClose : Math.max(1, open * Math.exp(dailyMomentum));
+        const close = d === tradingDaysPerMonth ? monthClose : Math.max(minSafePrice, open * Math.exp(dailyMomentum));
         const dayHigh = Math.max(open, close) * (1 + Math.abs(pseudoRandNorm(daySeed + 1)) * 0.008);
-        const dayLow = Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(daySeed + 2)) * 0.008);
+        const dayLow = Math.max(minSafePrice, Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(daySeed + 2)) * 0.008));
         const vol = Math.round(baseVol * (0.7 + pseudoRand(daySeed + 3) * 0.8));
 
         runningPrice = close;
@@ -922,7 +879,7 @@ export function getCompanyNaverChartData(
     // 3-Year: 36 months x 4 weeks = 144 weekly candles
     const targetMonths = allMonthlyList.filter(m => m.year >= startYear && m.year <= upToYear);
     const weeksPerMonth = 4;
-    let runningPrice = targetMonths[0]?.price || 1000;
+    let runningPrice = targetMonths[0]?.price || (useLocal ? 0.01 : 1000);
     let weekMomentum = 0;
 
     targetMonths.forEach(mItem => {
@@ -931,14 +888,14 @@ export function getCompanyNaverChartData(
       for (let w = 1; w <= weeksPerMonth; w++) {
         const weekSeed = hashSeed(canonicalId, mItem.year * 100 + mItem.month, w * 11);
         const remainingWeeks = weeksPerMonth - w + 1;
-        const drift = (Math.log(Math.max(1, monthClose)) - Math.log(Math.max(1, runningPrice))) / remainingWeeks;
+        const drift = (Math.log(Math.max(minSafePrice, monthClose)) - Math.log(Math.max(minSafePrice, runningPrice))) / remainingWeeks;
         const weekShock = pseudoRandNorm(weekSeed) * 0.022;
 
         weekMomentum = 0.35 * weekMomentum + 0.65 * weekShock + drift;
         const open = runningPrice;
-        const close = w === weeksPerMonth ? monthClose : Math.max(1, open * Math.exp(weekMomentum));
+        const close = w === weeksPerMonth ? monthClose : Math.max(minSafePrice, open * Math.exp(weekMomentum));
         const high = Math.max(open, close) * (1 + Math.abs(pseudoRandNorm(weekSeed + 1)) * 0.012);
-        const low = Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(weekSeed + 2)) * 0.012);
+        const low = Math.max(minSafePrice, Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(weekSeed + 2)) * 0.012));
         const vol = Math.round(baseVol * 4 * (0.75 + pseudoRand(weekSeed + 3) * 0.7));
 
         runningPrice = close;
@@ -962,7 +919,7 @@ export function getCompanyNaverChartData(
       const open = prevPrice;
       const close = mItem.price;
       const high = Math.max(open, close) * (1 + Math.abs(pseudoRandNorm(mSeed + 1)) * 0.025);
-      const low = Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(mSeed + 2)) * 0.025);
+      const low = Math.max(minSafePrice, Math.min(open, close) * (1 - Math.abs(pseudoRandNorm(mSeed + 2)) * 0.025));
       const vol = Math.round(baseVol * 18 * (0.75 + pseudoRand(mSeed + 3) * 0.7));
 
       rawCandles.push({
@@ -1244,7 +1201,7 @@ export function getCompanyMonthlyReplaySeries(
   const stock = STOCKS_BY_ID[canonicalId];
   if (!stock) return null;
 
-  const pStartLocal = getStockPriceLocal(canonicalId, year - 1) || 1;
+  const pStartLocal = getStockPriceLocal(canonicalId, year - 1) || (stock.market === 'US' ? 0.01 : 1);
   const pStartKRW = getStockPriceKRW(canonicalId, year - 1) || 1;
 
   const yearMonthsKRW = getYearMonthlyPrices(canonicalId, year, false);

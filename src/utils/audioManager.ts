@@ -91,16 +91,6 @@ const bgmPlaylist: ClassicalTrack[] = [
     ],
   },
   {
-    name: '로시니 - 윌리엄 텔 서곡 (전곡) 🎻 🎺',
-    urls: [
-      `${CDN_BASE}/bgm-william-tell-full.ogg`,
-      './audio/bgm-william-tell-full.ogg',
-      '/audio/bgm-william-tell-full.ogg',
-      'audio/bgm-william-tell-full.ogg',
-      'https://upload.wikimedia.org/wikipedia/commons/4/43/Gioachino_Rossini%2C_William_Tell_Overture_%28military_band_version%2C_2000%29.ogg',
-    ],
-  },
-  {
     name: '모차르트 - 아이네 클라이네 나흐트무지크 (Allegro) 🎻',
     urls: [
       `${CDN_BASE}/bgm-classical-calm.ogg`,
@@ -149,6 +139,46 @@ const bgmPlaylist: ClassicalTrack[] = [
       'audio/bgm-double-eagle.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/c/c1/Under_the_Double_Eagle.ogg',
       'https://upload.wikimedia.org/wikipedia/commons/d/dc/Josef_Wagner_-_Under_the_Double_Eagle_%281893%29.ogg',
+    ],
+  },
+  {
+    name: '쇼팽 - 화려한 대왈츠 Op. 18 🎹 💃',
+    urls: [
+      `${CDN_BASE}/bgm-chopin-valse.ogg`,
+      './audio/bgm-chopin-valse.ogg',
+      '/audio/bgm-chopin-valse.ogg',
+      'audio/bgm-chopin-valse.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/1/18/Chopin_-_Grande_valse_brillante_in_E_flat_major%2C_Op._18.ogg',
+    ],
+  },
+  {
+    name: '브람스 - 헝가리 무곡 5번 🎻 💃',
+    urls: [
+      `${CDN_BASE}/bgm-brahms-hungarian5.ogg`,
+      './audio/bgm-brahms-hungarian5.ogg',
+      '/audio/bgm-brahms-hungarian5.ogg',
+      'audio/bgm-brahms-hungarian5.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/d/d8/Johannes_Brahms_-_Ungarischer_Tanz_5_g-moll.ogg',
+    ],
+  },
+  {
+    name: '파가니니 - 24개의 카프리스 24번 🎻 ⚡',
+    urls: [
+      `${CDN_BASE}/bgm-paganini-caprice24.ogg`,
+      './audio/bgm-paganini-caprice24.ogg',
+      '/audio/bgm-paganini-caprice24.ogg',
+      'audio/bgm-paganini-caprice24.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/1/17/Paganini_Caprice-24.ogg',
+    ],
+  },
+  {
+    name: '요한 슈트라우스 2세 - 아름답고 푸른 도나우 🌊 🎻 💃',
+    urls: [
+      `${CDN_BASE}/bgm-blue-danube.ogg`,
+      './audio/bgm-blue-danube.ogg',
+      '/audio/bgm-blue-danube.ogg',
+      'audio/bgm-blue-danube.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/9/91/Strauss%2C_An_der_sch%C3%B6nen_blauen_Donau.ogg',
     ],
   },
 ];

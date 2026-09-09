@@ -362,4 +362,29 @@ export function getCompanyComparisonData(
   });
 }
 
+/**
+ * Retrieves historical corporate news events that occurred during year Y
+ * for companies that the player held during that year.
+ */
+export function getHoldingCompanyEventsForYear(
+  year: number,
+  holdingCanonicalIds: string[]
+): HistoricalNewsItem[] {
+  if (!holdingCanonicalIds || holdingCanonicalIds.length === 0) {
+    return [];
+  }
+  const holdingSet = new Set(holdingCanonicalIds);
+  const yStr = year.toString();
+
+  return HISTORICAL_NEWS.filter(item => {
+    if (!item.publishedAt.startsWith(yStr)) return false;
+    return item.canonicalCompanyIds && item.canonicalCompanyIds.some(cid => holdingSet.has(cid));
+  }).sort((a, b) => {
+    if (b.importanceScore !== a.importanceScore) {
+      return b.importanceScore - a.importanceScore;
+    }
+    return a.publishedAt.localeCompare(b.publishedAt);
+  });
+}
+
 

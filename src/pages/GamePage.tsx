@@ -35,6 +35,7 @@ import { RiskDashboardView } from '../components/RiskDashboardView';
 import { NewListingModal } from '../components/NewListingModal';
 import { DelistingAlertModal } from '../components/DelistingAlertModal';
 import { BenchmarkDetailModal, type BenchmarkKey } from '../components/BenchmarkDetailModal';
+import { HoldingCompanyEventModal } from '../components/HoldingCompanyEventModal';
 
 // Live Market Replay System
 import { MarketReplayStage } from '../features/marketReplay/MarketReplayStage';
@@ -57,7 +58,7 @@ import { PortfolioGhostRace } from '../features/gameplay/PortfolioGhostRace';
 
 import { calculatePortfolioValue } from '../engine/portfolioEngine';
 import { calculatePureInvestmentPnL, calculateRiskLevel } from '../engine/metricsEngine';
-import { getMacroNewsForYear, getDecisionCutoffDisplayInfo } from '../engine/newsEngine';
+import { getMacroNewsForYear, getDecisionCutoffDisplayInfo, getHoldingCompanyEventsForYear } from '../engine/newsEngine';
 import {
   getTradableStocks,
   getNewlyListedStocksForYear,
@@ -128,6 +129,10 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   const [showRealLockConfirmModal, setShowRealLockConfirmModal] = useState<boolean>(false);
   const [showRestartModal, setShowRestartModal] = useState<boolean>(false);
 
+  // Holding Company Historical Event Popup Modal
+  const [pendingHoldingEvents, setPendingHoldingEvents] = useState<HistoricalNewsItem[]>([]);
+  const [showHoldingEventsModal, setShowHoldingEventsModal] = useState<boolean>(false);
+
   // Listing & Delisting Notification Modals
   const [pendingNewListings, setPendingNewListings] = useState<HistoricalStockDefinition[]>([]);
   const [pendingDelistings, setPendingDelistings] = useState<HistoricalStockDefinition[]>([]);
@@ -173,6 +178,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   useEffect(() => {
     if (
       !showYearEndModal &&
+      !showHoldingEventsModal &&
       !chapterSummaryData &&
       !showDelistingModal &&
       !showNewListingModal &&
@@ -187,6 +193,7 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     history.length,
     settings.startYear,
     showYearEndModal,
+    showHoldingEventsModal,
     chapterSummaryData,
     showDelistingModal,
     showNewListingModal,
@@ -194,6 +201,11 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
   ]);
 
   // Sequential Modal Transition Handlers
+  const handleProceedFromHoldingEvents = () => {
+    setShowHoldingEventsModal(false);
+    setShowYearEndModal(true);
+  };
+
   const handleProceedAfterYearEnd = () => {
     setShowYearEndModal(false);
     if (chapterSummaryData) {
@@ -392,10 +404,21 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
     setPendingDelistings(delisted);
     setDelistingHoldingsSnapshot(holdingsBefore);
 
+    // Check if player's holdings had major corporate events in this year
+    const holdingCids = Object.entries(holdingsBefore)
+      .filter(([_, h]) => h && (h.shares > 0 || (h.currentWeight || 0) > 0))
+      .map(([cid]) => cid);
+    const holdingEvents = getHoldingCompanyEventsForYear(finishedYear, holdingCids);
+
     if (monthlyReplaySpeed === 'INSTANT') {
       // Step immediately only if user explicitly selected instant mode
       stepOneYear();
-      setShowYearEndModal(true);
+      if (holdingEvents.length > 0) {
+        setPendingHoldingEvents(holdingEvents);
+        setShowHoldingEventsModal(true);
+      } else {
+        setShowYearEndModal(true);
+      }
 
       if (currentChapter && isChapterEndYear(currentYear, settings.endYear)) {
         const summary = calculateChapterSummary(currentChapter, state);
@@ -947,8 +970,19 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
             setPendingDelistings(delisted);
             setDelistingHoldingsSnapshot(holdings);
 
+            const holdingCids = Object.entries(holdings)
+              .filter(([_, h]) => h && (h.shares > 0 || (h.currentWeight || 0) > 0))
+              .map(([cid]) => cid);
+            const holdingEvents = getHoldingCompanyEventsForYear(finishedYear, holdingCids);
+
             stepOneYear();
-            setShowYearEndModal(true);
+
+            if (holdingEvents.length > 0) {
+              setPendingHoldingEvents(holdingEvents);
+              setShowHoldingEventsModal(true);
+            } else {
+              setShowYearEndModal(true);
+            }
 
             if (currentChapter && isChapterEndYear(currentYear, settings.endYear)) {
               const summary = calculateChapterSummary(currentChapter, state);
@@ -971,6 +1005,21 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigate }) => {
           setShowNewsCenterModal(true);
         }}
       />
+
+      {/* Holding Company Historical Event Modal */}
+      {showHoldingEventsModal && (
+        <HoldingCompanyEventModal
+          isOpen={showHoldingEventsModal}
+          year={state.history[state.history.length - 1]?.year || (currentYear > settings.startYear ? currentYear - 1 : currentYear)}
+          events={pendingHoldingEvents}
+          holdingsSnapshot={state.history[state.history.length - 1]?.holdingsSnapshot}
+          onClose={() => {
+            setShowHoldingEventsModal(false);
+            setShowYearEndModal(true);
+          }}
+          onProceedToBriefing={handleProceedFromHoldingEvents}
+        />
+      )}
 
       {/* Year-End Briefing Modal */}
       {showYearEndModal && (
