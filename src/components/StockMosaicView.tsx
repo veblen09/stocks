@@ -84,10 +84,12 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
 
   const kospiCurrentLevel = BENCHMARKS.kospi?.prices?.[String(currentYear)] || BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || 100;
   const kospiPriorLevel = BENCHMARKS.kospi?.prices?.[String(currentYear - 1)] || kospiCurrentLevel;
+  const kospiChangePt = kospiCurrentLevel - kospiPriorLevel;
   const kospiYearReturn = kospiSparkline ? kospiSparkline.return1Yr : (kospiPriorLevel > 0 ? (kospiCurrentLevel - kospiPriorLevel) / kospiPriorLevel : 0);
 
   const sp500CurrentLevel = BENCHMARKS.sp500?.prices?.[String(currentYear)] || BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || 100;
   const sp500PriorLevel = BENCHMARKS.sp500?.prices?.[String(currentYear - 1)] || sp500CurrentLevel;
+  const sp500ChangePt = sp500CurrentLevel - sp500PriorLevel;
   const sp500YearReturn = sp500Sparkline ? sp500Sparkline.return1Yr : (sp500PriorLevel > 0 ? (sp500CurrentLevel - sp500PriorLevel) / sp500PriorLevel : 0);
 
   // Newly listed stocks among tradable
@@ -316,123 +318,6 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                 {watchlist.length}
               </span>
             </button>
-
-            {/* Quick Benchmark Chart Launchers with Enlarged Mini Sparklines */}
-            {onOpenBenchmarkChart && (
-              <div className="flex items-center gap-3 flex-wrap pl-1 sm:pl-3 sm:border-l-2 sm:border-slate-200">
-                {/* KOSPI 200 Benchmark Card (Enlarged) */}
-                <button
-                  type="button"
-                  onClick={() => onOpenBenchmarkChart('BENCH_KOSPI')}
-                  className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/70 to-blue-100/60 hover:from-blue-100 hover:to-indigo-100 text-blue-950 border border-blue-200 hover:border-blue-400 text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2.5 sm:gap-3.5 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
-                  title="클릭 시 코스피 200 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
-                >
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="w-3.5 h-3.5 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
-                    <span className="font-black text-xs sm:text-sm whitespace-nowrap text-blue-950">🇰🇷 코스피 200</span>
-                  </div>
-
-                  <span className="text-xs sm:text-sm text-blue-900 bg-white/95 px-3 py-1.5 rounded-xl font-mono tabular-nums font-black border border-blue-100 shadow-xs">
-                    {kospiCurrentLevel.toFixed(1)}pt
-                  </span>
-
-                  {/* Enlarged 1-Year Mini Sparkline Graph (Larger Width & Height) */}
-                  {kospiSparkline && kospiSparkline.points.length > 1 && (
-                    <div className="w-32 sm:w-48 h-10 sm:h-12 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-blue-200/80 shadow-2xs group-hover:border-blue-400 transition-colors">
-                      <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="bench-grad-kospi" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
-                            <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        <path d={kospiSparkline.svgAreaPath} fill="url(#bench-grad-kospi)" />
-                        <path
-                          d={kospiSparkline.svgPath}
-                          fill="none"
-                          stroke={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                          strokeWidth="2.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  )}
-
-                  <span
-                    className={`text-xs sm:text-[13px] font-mono tabular-nums font-black px-3 py-1.5 rounded-xl border shadow-2xs flex items-center gap-1 ${
-                      kospiYearReturn >= 0
-                        ? 'text-red-700 bg-red-50/95 border-red-200'
-                        : 'text-blue-700 bg-blue-50/95 border-blue-200'
-                    }`}
-                  >
-                    <span>{kospiYearReturn >= 0 ? '▲' : '▼'}</span>
-                    <span>{kospiYearReturn >= 0 ? '+' : ''}{(kospiYearReturn * 100).toFixed(1)}%</span>
-                  </span>
-
-                  <span className="text-xs sm:text-[13px] text-blue-700 font-black group-hover:text-blue-900 flex items-center gap-1 bg-blue-100 group-hover:bg-blue-200 px-3 py-1.5 rounded-xl transition-colors shrink-0 shadow-2xs">
-                    <span>차트</span>
-                    <span className="text-[11px]">↗</span>
-                  </span>
-                </button>
-
-                {/* S&P 500 Benchmark Card (Enlarged) */}
-                <button
-                  type="button"
-                  onClick={() => onOpenBenchmarkChart('BENCH_SP500')}
-                  className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-purple-50 via-fuchsia-50/70 to-purple-100/60 hover:from-purple-100 hover:to-fuchsia-100 text-purple-950 border border-purple-200 hover:border-purple-400 text-xs sm:text-sm font-bold transition-all duration-200 flex items-center gap-2.5 sm:gap-3.5 shadow-xs hover:shadow-md cursor-pointer group active:scale-98"
-                  title="클릭 시 S&P 500 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
-                >
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="w-3.5 h-3.5 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
-                    <span className="font-black text-xs sm:text-sm whitespace-nowrap text-purple-950">🇺🇸 S&P 500</span>
-                  </div>
-
-                  <span className="text-xs sm:text-sm text-purple-900 bg-white/95 px-3 py-1.5 rounded-xl font-mono tabular-nums font-black border border-purple-100 shadow-xs">
-                    ${sp500CurrentLevel.toFixed(1)}
-                  </span>
-
-                  {/* Enlarged 1-Year Mini Sparkline Graph (Larger Width & Height) */}
-                  {sp500Sparkline && sp500Sparkline.points.length > 1 && (
-                    <div className="w-32 sm:w-48 h-10 sm:h-12 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-purple-200/80 shadow-2xs group-hover:border-purple-400 transition-colors">
-                      <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="bench-grad-sp500" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
-                            <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
-                          </linearGradient>
-                        </defs>
-                        <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-grad-sp500)" />
-                        <path
-                          d={sp500Sparkline.svgPath}
-                          fill="none"
-                          stroke={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'}
-                          strokeWidth="2.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                  )}
-
-                  <span
-                    className={`text-xs sm:text-[13px] font-mono tabular-nums font-black px-3 py-1.5 rounded-xl border shadow-2xs flex items-center gap-1 ${
-                      sp500YearReturn >= 0
-                        ? 'text-red-700 bg-red-50/95 border-red-200'
-                        : 'text-blue-700 bg-blue-50/95 border-blue-200'
-                    }`}
-                  >
-                    <span>{sp500YearReturn >= 0 ? '▲' : '▼'}</span>
-                    <span>{sp500YearReturn >= 0 ? '+' : ''}{(sp500YearReturn * 100).toFixed(1)}%</span>
-                  </span>
-
-                  <span className="text-xs sm:text-[13px] text-purple-700 font-black group-hover:text-purple-900 flex items-center gap-1 bg-purple-100 group-hover:bg-purple-200 px-3 py-1.5 rounded-xl transition-colors shrink-0 shadow-2xs">
-                    <span>차트</span>
-                    <span className="text-[11px]">↗</span>
-                  </span>
-                </button>
-              </div>
-            )}
           </div>
 
           {/* View Format (Mosaic vs Table) */}
@@ -455,6 +340,171 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
             )}
           </button>
         </div>
+
+        {/* Dedicated Row: Quick Benchmark Chart Launchers (Side-by-Side 2-Column Grid) */}
+        {onOpenBenchmarkChart && (
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            {/* 1. KOSPI 200 Benchmark Card */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => onOpenBenchmarkChart('BENCH_KOSPI')}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onOpenBenchmarkChart('BENCH_KOSPI'); }}
+              className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-blue-50/90 via-white to-indigo-50/60 hover:from-blue-100/90 hover:to-indigo-100/80 text-blue-950 border border-blue-200/90 hover:border-blue-400 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between gap-2.5 active:scale-[0.99]"
+              title="클릭 시 코스피 200 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
+            >
+              {/* Top Header: Badge, Level, Change & Arrow */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse shrink-0"></span>
+                  <span className="font-black text-xs sm:text-sm text-blue-950">🇰🇷 코스피 200 지수</span>
+                  <span className="text-[10px] font-bold text-blue-700 bg-blue-100/80 px-1.5 py-0.5 rounded">KS200</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`text-xs font-mono tabular-nums font-black px-2.5 py-0.5 rounded-lg border shadow-2xs flex items-center gap-0.5 ${
+                      kospiYearReturn >= 0
+                        ? 'text-red-700 bg-red-50/95 border-red-200'
+                        : 'text-blue-700 bg-blue-50/95 border-blue-200'
+                    }`}
+                  >
+                    <span>{kospiYearReturn >= 0 ? '▲' : '▼'}</span>
+                    <span>{kospiYearReturn >= 0 ? '+' : ''}{(kospiYearReturn * 100).toFixed(2)}%</span>
+                  </span>
+                  <span className="text-[11px] font-black text-blue-700 bg-blue-100 group-hover:bg-blue-200 px-2.5 py-0.5 rounded-lg transition-colors flex items-center gap-0.5 shadow-2xs">
+                    <span>차트</span>
+                    <span>↗</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Main Body: Metrics & Taller Sparkline */}
+              <div className="grid grid-cols-12 gap-3 items-center">
+                {/* Left Metrics */}
+                <div className="col-span-5 space-y-1">
+                  <div className="text-base sm:text-xl font-black font-mono tabular-nums text-slate-900 tracking-tight">
+                    {kospiCurrentLevel.toFixed(2)} <span className="text-xs font-bold text-slate-500">pt</span>
+                  </div>
+                  <div className="text-[11px] font-mono flex items-center gap-1 text-slate-600">
+                    <span className="text-slate-400">연간 변동:</span>
+                    <span className={`font-black ${kospiChangePt >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                      {kospiChangePt >= 0 ? '+' : ''}{kospiChangePt.toFixed(2)} pt
+                    </span>
+                  </div>
+                  <div className="text-[10.5px] font-mono text-slate-500 flex items-center gap-2 pt-0.5">
+                    <span className="text-red-600 font-bold">고 {kospiSparkline?.maxPrice.toFixed(2)}</span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-blue-600 font-bold">저 {kospiSparkline?.minPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Right Tall Sparkline Graph (High/Low Points Visualized) */}
+                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-blue-200/80 shadow-2xs group-hover:border-blue-400 transition-colors relative">
+                  {kospiSparkline && kospiSparkline.points.length > 1 && (
+                    <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="bench-grad-kospi-card" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
+                          <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <path d={kospiSparkline.svgAreaPath} fill="url(#bench-grad-kospi-card)" />
+                      <path
+                        d={kospiSparkline.svgPath}
+                        fill="none"
+                        stroke={kospiSparkline.isPositive ? '#ef4444' : '#3b82f6'}
+                        strokeWidth="2.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 2. S&P 500 Benchmark Card */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => onOpenBenchmarkChart('BENCH_SP500')}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onOpenBenchmarkChart('BENCH_SP500'); }}
+              className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-purple-50/90 via-white to-fuchsia-50/60 hover:from-purple-100/90 hover:to-fuchsia-100/80 text-purple-950 border border-purple-200/90 hover:border-purple-400 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between gap-2.5 active:scale-[0.99]"
+              title="클릭 시 S&P 500 지수 인터랙티브 대형 차트 및 과거 위기 분석 열기"
+            >
+              {/* Top Header: Badge, Level, Change & Arrow */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse shrink-0"></span>
+                  <span className="font-black text-xs sm:text-sm text-purple-950">🇺🇸 S&P 500 지수</span>
+                  <span className="text-[10px] font-bold text-purple-700 bg-purple-100/80 px-1.5 py-0.5 rounded">SPX</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`text-xs font-mono tabular-nums font-black px-2.5 py-0.5 rounded-lg border shadow-2xs flex items-center gap-0.5 ${
+                      sp500YearReturn >= 0
+                        ? 'text-red-700 bg-red-50/95 border-red-200'
+                        : 'text-blue-700 bg-blue-50/95 border-blue-200'
+                    }`}
+                  >
+                    <span>{sp500YearReturn >= 0 ? '▲' : '▼'}</span>
+                    <span>{sp500YearReturn >= 0 ? '+' : ''}{(sp500YearReturn * 100).toFixed(2)}%</span>
+                  </span>
+                  <span className="text-[11px] font-black text-purple-700 bg-purple-100 group-hover:bg-purple-200 px-2.5 py-0.5 rounded-lg transition-colors flex items-center gap-0.5 shadow-2xs">
+                    <span>차트</span>
+                    <span>↗</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Main Body: Metrics & Taller Sparkline */}
+              <div className="grid grid-cols-12 gap-3 items-center">
+                {/* Left Metrics */}
+                <div className="col-span-5 space-y-1">
+                  <div className="text-base sm:text-xl font-black font-mono tabular-nums text-slate-900 tracking-tight">
+                    ${sp500CurrentLevel.toFixed(2)}
+                  </div>
+                  <div className="text-[11px] font-mono flex items-center gap-1 text-slate-600">
+                    <span className="text-slate-400">연간 변동:</span>
+                    <span className={`font-black ${sp500ChangePt >= 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                      {sp500ChangePt >= 0 ? '+$' : '-$'}{Math.abs(sp500ChangePt).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="text-[10.5px] font-mono text-slate-500 flex items-center gap-2 pt-0.5">
+                    <span className="text-red-600 font-bold">고 ${sp500Sparkline?.maxPrice.toFixed(2)}</span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-blue-600 font-bold">저 ${sp500Sparkline?.minPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Right Tall Sparkline Graph */}
+                <div className="col-span-7 h-14 sm:h-16 flex items-center bg-white/95 px-2.5 py-1 rounded-xl border border-purple-200/80 shadow-2xs group-hover:border-purple-400 transition-colors relative">
+                  {sp500Sparkline && sp500Sparkline.points.length > 1 && (
+                    <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="bench-grad-sp500-card" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.35" />
+                          <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'} stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-grad-sp500-card)" />
+                      <path
+                        d={sp500Sparkline.svgPath}
+                        fill="none"
+                        stroke={sp500Sparkline.isPositive ? '#ef4444' : '#3b82f6'}
+                        strokeWidth="2.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Row 2: Search, Sector & Sorting */}
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-2.5 pt-1 text-xs">
