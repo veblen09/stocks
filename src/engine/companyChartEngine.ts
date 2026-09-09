@@ -293,6 +293,44 @@ export function getYearMonthlyPrices(
   if (validCount >= 10 && !isSynthetic) {
     const filled: MonthPriceItem[] = [];
     let lastP = (useLocal ? getStockPriceLocal(canonicalId, year - 1) : getStockPriceKRW(canonicalId, year - 1)) || 100;
+
+    // For BENCH_KOSPI, scale the raw monthly prices to precisely match the official KOSPI 200 index levels (benchmarks.json)
+    if (benchMeta && benchMeta.canonicalId === 'BENCH_KOSPI') {
+      const bmPrev = BENCHMARKS.kospi?.prices?.[String(year - 1)] || BENCHMARKS.kospi?.prices?.[String(year)] || 100;
+      const bmCur = BENCHMARKS.kospi?.prices?.[String(year)] || bmPrev;
+      const rawPrevDec = MONTHLY_PRICES['BENCH_KOSPI']?.[`${year - 1}-12`]?.priceLocal ||
+        (MONTHLY_PRICES['BENCH_KOSPI']?.[`${year}-01`]?.priceLocal ? MONTHLY_PRICES['BENCH_KOSPI'][`${year}-01`].priceLocal * 0.95 : 100);
+      const scaleRatio = rawPrevDec > 0 ? bmPrev / rawPrevDec : 1;
+
+      for (let m = 1; m <= 12; m++) {
+        const item = rawMonths[m - 1];
+        if (m === 12) {
+          filled.push({
+            year,
+            month: 12,
+            price: bmCur,
+            date: item?.date || `${year}-12-28`,
+          });
+        } else if (item) {
+          filled.push({
+            year,
+            month: m,
+            price: Number((item.price * scaleRatio).toFixed(2)),
+            date: item.date,
+          });
+        } else {
+          const mStr = m.toString().padStart(2, '0');
+          filled.push({
+            year,
+            month: m,
+            price: lastP,
+            date: `${year}-${mStr}-28`,
+          });
+        }
+      }
+      return filled;
+    }
+
     for (let m = 1; m <= 12; m++) {
       const item = rawMonths[m - 1];
       if (item) {
@@ -511,7 +549,7 @@ export function getCompanyNaverChartData(
 
   // Fetch complete, smooth monthly dataset for all years in scope
   const allMonthlyList: MonthPriceItem[] = [];
-  for (let y = Math.max(1980, stock.firstValidYear - 1); y <= upToYear; y++) {
+  for (let y = Math.max(1979, stock.firstValidYear - 1); y <= upToYear; y++) {
     const yearMonths = getYearMonthlyPrices(canonicalId, y, useLocal);
     allMonthlyList.push(...yearMonths);
   }

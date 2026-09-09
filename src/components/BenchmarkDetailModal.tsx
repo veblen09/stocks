@@ -194,14 +194,14 @@ export const BenchmarkDetailModal: React.FC<BenchmarkDetailModalProps> = ({
             <div>
               <span className="text-[11px] text-slate-500 font-medium">{currentYear}년 종가 지수</span>
               <div className="text-base font-extrabold text-slate-900 dark:text-white font-mono tabular-nums">
-                {currentPrice.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} pt
+                {!isKospi ? '$' : ''}{currentPrice.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} pt
               </div>
             </div>
 
             <div>
               <span className="text-[11px] text-slate-500 font-medium">연간 변동률</span>
               <div className={`text-base font-extrabold font-mono tabular-nums ${yearReturn >= 0 ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                {yearReturn >= 0 ? '+' : ''}{formatPercent(yearReturn)}
+                {formatPercent(yearReturn)}
               </div>
             </div>
 
