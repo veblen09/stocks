@@ -24,6 +24,12 @@ interface CompanyPriceChartProps {
   upToYear: number;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  defaultMode?: 'MOUNTAIN' | 'CANDLE';
+  defaultCandleType?: NaverCandleType;
+  defaultPeriod?: NaverPeriodType;
+  compact?: boolean;
+  hideAnalytics?: boolean;
+  onOpenModal?: () => void;
 }
 
 export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
@@ -31,12 +37,18 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
   upToYear,
   isExpanded = false,
   onToggleExpand,
+  defaultMode = 'CANDLE',
+  defaultCandleType = 'DAY',
+  defaultPeriod = '1Y',
+  compact = false,
+  hideAnalytics = false,
+  onOpenModal,
 }) => {
-  // Primary view mode: 'MOUNTAIN' (Area line chart) vs 'CANDLE' (Candlestick + MA)
-  const [chartMode, setChartMode] = useState<'MOUNTAIN' | 'CANDLE'>('MOUNTAIN');
-  const [period, setPeriod] = useState<NaverPeriodType>('1Y');
-  const [candleType, setCandleType] = useState<NaverCandleType>('LINE');
-  const [currencyMode, setCurrencyMode] = useState<'KRW' | 'LOCAL'>('KRW');
+  // Primary view mode: 'MOUNTAIN' (Area line chart) vs 'CANDLE' (Candlestick + MA) - Defaults to 'CANDLE' (일봉)
+  const [chartMode, setChartMode] = useState<'MOUNTAIN' | 'CANDLE'>(defaultMode);
+  const [period, setPeriod] = useState<NaverPeriodType>(defaultPeriod);
+  const [candleType, setCandleType] = useState<NaverCandleType>(defaultCandleType);
+  const [currencyMode, setCurrencyMode] = useState<'KRW' | 'LOCAL'>('LOCAL');
   const [showMA, setShowMA] = useState({ ma5: true, ma20: true, ma60: true, ma120: false });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -136,9 +148,9 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
   const activeCandle =
     hoveredIndex !== null && candles[hoveredIndex] ? candles[hoveredIndex] : candles[candles.length - 1];
 
-  // SVG Geometry Settings - Large, High-Resolution, Taller Viewport
-  const svgWidth = effectiveExpanded ? 1320 : 1000;
-  const svgHeight = effectiveExpanded ? 640 : 490;
+  // SVG Geometry Settings - High-Resolution Viewport
+  const svgWidth = effectiveExpanded ? 1320 : (compact ? 880 : 1000);
+  const svgHeight = effectiveExpanded ? 640 : (compact ? 430 : 490);
 
   const padLeft = 82; // Y-axis price labels
   const padRight = 28;
@@ -408,20 +420,34 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
               {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* Expand Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleExpand}
-              className={`p-2 rounded-xl transition cursor-pointer flex items-center gap-1 font-bold text-xs ${
-                effectiveExpanded
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-300'
-                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80'
-              }`}
-              title={effectiveExpanded ? '차트 기본 크기로 보기' : '차트 전체 크게 보기'}
-            >
-              {effectiveExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              <span className="hidden sm:inline">{effectiveExpanded ? '표준 크기' : '크게 보기'}</span>
-            </button>
+            {/* Expand / Open Modal Actions */}
+            {onOpenModal && (
+              <button
+                type="button"
+                onClick={onOpenModal}
+                className="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 transition cursor-pointer flex items-center gap-1 font-bold text-xs"
+                title="인터랙티브 대형 차트 및 과거 위기 분석 팝업 열기"
+              >
+                <span>대형 차트</span>
+                <span className="text-[11px]">↗</span>
+              </button>
+            )}
+
+            {!onOpenModal && (
+              <button
+                type="button"
+                onClick={handleToggleExpand}
+                className={`p-2 rounded-xl transition cursor-pointer flex items-center gap-1 font-bold text-xs ${
+                  effectiveExpanded
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/60 dark:text-blue-300 border border-blue-300'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80'
+                }`}
+                title={effectiveExpanded ? '차트 기본 크기로 보기' : '차트 전체 크게 보기'}
+              >
+                {effectiveExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                <span className="hidden sm:inline">{effectiveExpanded ? '표준 크기' : '크게 보기'}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -919,11 +945,12 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
       </div>
 
       {/* 5. Key Financial Analytics & Historical Metrics Grid */}
-      <div
-        className={`p-3 border-t grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs ${
-          isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-100 bg-slate-50/60'
-        }`}
-      >
+      {!hideAnalytics && (
+        <div
+          className={`p-3 border-t grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs ${
+            isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-100 bg-slate-50/60'
+          }`}
+        >
         <div
           className={`p-2.5 rounded-xl border transition ${
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80 shadow-2xs'
@@ -972,6 +999,7 @@ export const CompanyPriceChart: React.FC<CompanyPriceChartProps> = ({
           </span>
         </div>
       </div>
+      )}
     </div>
   );
 };
