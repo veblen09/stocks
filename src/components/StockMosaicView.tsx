@@ -423,12 +423,9 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#e11d48' : '#2563eb'} />
                           </linearGradient>
                           <linearGradient id="bench-area-grad-kospi" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.20" />
+                            <stop offset="0%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.12" />
                             <stop offset="100%" stopColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
                           </linearGradient>
-                          <filter id="kospi-glow-lg" x="-10%" y="-10%" width="120%" height="120%">
-                            <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor={kospiSparkline.isPositive ? '#f43f5e' : '#3b82f6'} floodOpacity="0.25" />
-                          </filter>
                         </defs>
 
                         {/* Starting Baseline Reference */}
@@ -439,61 +436,53 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             x2="100"
                             y2={kospiSparkline.points[0].y}
                             stroke="#cbd5e1"
-                            strokeWidth="0.75"
-                            strokeDasharray="2.5 2.5"
+                            strokeWidth="1"
+                            strokeDasharray="3 3"
+                            vectorEffect="non-scaling-stroke"
                           />
                         )}
 
                         {/* Gradient Area Fill */}
                         <path d={kospiSparkline.svgAreaPath} fill="url(#bench-area-grad-kospi)" />
 
-                        {/* Refined Smooth Price Line */}
+                        {/* Crisp, Slim, Elegant Price Line */}
                         <path
                           d={kospiSparkline.svgPath}
                           fill="none"
                           stroke="url(#bench-line-grad-kospi)"
-                          strokeWidth="2.0"
+                          strokeWidth="1.75"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          filter="url(#kospi-glow-lg)"
+                          vectorEffect="non-scaling-stroke"
                         />
 
-                        {/* Live Pulsing Beacon Dot */}
+                        {/* Static Crisp Live Dot (No Distracting Ping/Passing Circles) */}
                         {kospiSparkline.points[kospiSparkline.points.length - 1] && (
-                          <g>
-                            <circle
-                              cx={kospiSparkline.points[kospiSparkline.points.length - 1].x}
-                              cy={kospiSparkline.points[kospiSparkline.points.length - 1].y}
-                              r="3.5"
-                              fill={kospiSparkline.isPositive ? '#f43f5e' : '#2563eb'}
-                              opacity="0.35"
-                              className="animate-ping"
-                            />
-                            <circle
-                              cx={kospiSparkline.points[kospiSparkline.points.length - 1].x}
-                              cy={kospiSparkline.points[kospiSparkline.points.length - 1].y}
-                              r="2.3"
-                              fill={kospiSparkline.isPositive ? '#e11d48' : '#1d4ed8'}
-                              stroke="#ffffff"
-                              strokeWidth="1.2"
-                            />
-                          </g>
+                          <circle
+                            cx={kospiSparkline.points[kospiSparkline.points.length - 1].x}
+                            cy={kospiSparkline.points[kospiSparkline.points.length - 1].y}
+                            r="2.2"
+                            fill={kospiSparkline.isPositive ? '#e11d48' : '#2563eb'}
+                            stroke="#ffffff"
+                            strokeWidth="1.2"
+                            vectorEffect="non-scaling-stroke"
+                          />
                         )}
                       </svg>
                     </div>
 
-                    {/* 2. Monthly Volume Bars Area */}
-                    <div className="w-full h-12 sm:h-14 pt-1.5 border-t border-slate-100 flex flex-col justify-between">
+                    {/* 2. Monthly Volume Bars Area (Dynamic Height & Clear Variance) */}
+                    <div className="w-full h-14 sm:h-16 pt-1.5 border-t border-slate-100 flex flex-col justify-between">
                       <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 font-bold px-0.5">
                         <span className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                           <span>월별 거래량</span>
                         </span>
-                        <span className="text-[9px] text-slate-400">1월 ~ 12월</span>
+                        <span className="text-[9px] text-slate-400 font-normal">1월 ~ 12월</span>
                       </div>
 
                       {/* 12-Month Volume Bars */}
-                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-0.5">
+                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-1 min-h-[30px]">
                         {kospiSparkline.volumes?.map((v, vIdx) => (
                           <div
                             key={vIdx}
@@ -501,14 +490,14 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             title={`${v.month}월 거래량: ${(v.volume).toLocaleString()}주 (${v.isYangbong ? '상승월' : '하락월'})`}
                           >
                             <div
-                              style={{ height: `${Math.round(Math.max(16, v.normalizedH * 100))}%` }}
+                              style={{ height: `${Math.max(12, Math.round(v.normalizedH * 100))}%` }}
                               className={`w-full max-w-[12px] rounded-t-[2px] transition-all duration-150 ${
                                 v.isYangbong
-                                  ? 'bg-rose-400 group-hover/vol:bg-rose-600 shadow-2xs'
-                                  : 'bg-blue-400 group-hover/vol:bg-blue-600 shadow-2xs'
+                                  ? 'bg-rose-400/90 group-hover/vol:bg-rose-600'
+                                  : 'bg-blue-400/90 group-hover/vol:bg-blue-600'
                               }`}
                             />
-                            <span className="text-[8.5px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-0.5">
+                            <span className="text-[8.5px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-1 leading-none">
                               {v.month}
                             </span>
                           </div>
@@ -600,12 +589,9 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#e11d48' : '#2563eb'} />
                           </linearGradient>
                           <linearGradient id="bench-area-grad-sp500" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.20" />
+                            <stop offset="0%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.12" />
                             <stop offset="100%" stopColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} stopOpacity="0.0" />
                           </linearGradient>
-                          <filter id="sp500-glow-lg" x="-10%" y="-10%" width="120%" height="120%">
-                            <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor={sp500Sparkline.isPositive ? '#f43f5e' : '#3b82f6'} floodOpacity="0.25" />
-                          </filter>
                         </defs>
 
                         {/* Starting Baseline Reference */}
@@ -616,61 +602,53 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             x2="100"
                             y2={sp500Sparkline.points[0].y}
                             stroke="#cbd5e1"
-                            strokeWidth="0.75"
-                            strokeDasharray="2.5 2.5"
+                            strokeWidth="1"
+                            strokeDasharray="3 3"
+                            vectorEffect="non-scaling-stroke"
                           />
                         )}
 
                         {/* Gradient Area Fill */}
                         <path d={sp500Sparkline.svgAreaPath} fill="url(#bench-area-grad-sp500)" />
 
-                        {/* Refined Smooth Price Line */}
+                        {/* Crisp, Slim, Elegant Price Line */}
                         <path
                           d={sp500Sparkline.svgPath}
                           fill="none"
                           stroke="url(#bench-line-grad-sp500)"
-                          strokeWidth="2.0"
+                          strokeWidth="1.75"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          filter="url(#sp500-glow-lg)"
+                          vectorEffect="non-scaling-stroke"
                         />
 
-                        {/* Live Pulsing Beacon Dot */}
+                        {/* Static Crisp Live Dot (No Distracting Ping/Passing Circles) */}
                         {sp500Sparkline.points[sp500Sparkline.points.length - 1] && (
-                          <g>
-                            <circle
-                              cx={sp500Sparkline.points[sp500Sparkline.points.length - 1].x}
-                              cy={sp500Sparkline.points[sp500Sparkline.points.length - 1].y}
-                              r="3.5"
-                              fill={sp500Sparkline.isPositive ? '#f43f5e' : '#2563eb'}
-                              opacity="0.35"
-                              className="animate-ping"
-                            />
-                            <circle
-                              cx={sp500Sparkline.points[sp500Sparkline.points.length - 1].x}
-                              cy={sp500Sparkline.points[sp500Sparkline.points.length - 1].y}
-                              r="2.3"
-                              fill={sp500Sparkline.isPositive ? '#e11d48' : '#1d4ed8'}
-                              stroke="#ffffff"
-                              strokeWidth="1.2"
-                            />
-                          </g>
+                          <circle
+                            cx={sp500Sparkline.points[sp500Sparkline.points.length - 1].x}
+                            cy={sp500Sparkline.points[sp500Sparkline.points.length - 1].y}
+                            r="2.2"
+                            fill={sp500Sparkline.isPositive ? '#e11d48' : '#2563eb'}
+                            stroke="#ffffff"
+                            strokeWidth="1.2"
+                            vectorEffect="non-scaling-stroke"
+                          />
                         )}
                       </svg>
                     </div>
 
-                    {/* 2. Monthly Volume Bars Area */}
-                    <div className="w-full h-12 sm:h-14 pt-1.5 border-t border-slate-100 flex flex-col justify-between">
+                    {/* 2. Monthly Volume Bars Area (Dynamic Height & Clear Variance) */}
+                    <div className="w-full h-14 sm:h-16 pt-1.5 border-t border-slate-100 flex flex-col justify-between">
                       <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 font-bold px-0.5">
                         <span className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                           <span>월별 거래량</span>
                         </span>
-                        <span className="text-[9px] text-slate-400">1월 ~ 12월</span>
+                        <span className="text-[9px] text-slate-400 font-normal">1월 ~ 12월</span>
                       </div>
 
                       {/* 12-Month Volume Bars */}
-                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-0.5">
+                      <div className="w-full flex-1 flex items-end justify-between gap-1 sm:gap-1.5 px-0.5 pt-1 min-h-[30px]">
                         {sp500Sparkline.volumes?.map((v, vIdx) => (
                           <div
                             key={vIdx}
@@ -678,14 +656,14 @@ export const StockMosaicView: React.FC<StockMosaicViewProps> = ({
                             title={`${v.month}월 거래량: ${(v.volume).toLocaleString()}주 (${v.isYangbong ? '상승월' : '하락월'})`}
                           >
                             <div
-                              style={{ height: `${Math.round(Math.max(16, v.normalizedH * 100))}%` }}
+                              style={{ height: `${Math.max(12, Math.round(v.normalizedH * 100))}%` }}
                               className={`w-full max-w-[12px] rounded-t-[2px] transition-all duration-150 ${
                                 v.isYangbong
-                                  ? 'bg-rose-400 group-hover/vol:bg-rose-600 shadow-2xs'
-                                  : 'bg-blue-400 group-hover/vol:bg-blue-600 shadow-2xs'
+                                  ? 'bg-rose-400/90 group-hover/vol:bg-rose-600'
+                                  : 'bg-blue-400/90 group-hover/vol:bg-blue-600'
                               }`}
                             />
-                            <span className="text-[8.5px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-0.5">
+                            <span className="text-[8.5px] font-mono text-slate-400 group-hover/vol:text-slate-900 group-hover/vol:font-bold mt-1 leading-none">
                               {v.month}
                             </span>
                           </div>

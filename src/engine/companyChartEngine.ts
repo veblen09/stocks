@@ -493,30 +493,44 @@ export function getCompany1YrSparkline(
   const svgAreaPath = `${svgPath} L ${width},${height} L 0,${height} Z`;
   const return1Yr = startP > 0 ? (endP - startP) / startP : 0;
 
-  // 12-month realistic volume simulation
+  // 12-month realistic volume simulation with high dynamic range
   const volumes: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
   const baseVol = benchMeta ? (benchMeta.market === 'US' ? 2500000 : 950000) : (stock?.market === 'US' ? 2500000 : 950000);
-  const volSeed = hashSeed(canonicalId, upToYear, 77);
 
+  const tempItems: { month: number; isYangbong: boolean; vol: number }[] = [];
   const rawVols: number[] = [];
+
   for (let m = 1; m <= 12; m++) {
     const curP = monthlyList[m - 1]?.price || endP;
     const prevP = m === 1 ? startP : (monthlyList[m - 2]?.price || startP);
     const isYangbong = curP >= prevP;
-    const mVolMultiplier = 0.65 + pseudoRand(volSeed + m * 13) * 0.7 + (Math.abs(curP - prevP) / Math.max(1, prevP)) * 2.5;
-    const vol = Math.round(baseVol * mVolMultiplier);
+    const priceMovePct = Math.abs(curP - prevP) / Math.max(1, prevP);
+
+    // Dynamic volume simulation: high volatility months have surge volume, quiet months have light volume
+    const seed = hashSeed(canonicalId, upToYear * 100 + m, 89);
+    const wave = Math.sin((m / 12) * Math.PI * 2 + (seed % 5));
+    const noise = pseudoRand(seed) * 0.6 + 0.2; // 0.2 ~ 0.8
+    const surge = Math.min(2.8, priceMovePct * 16); // 0 ~ 2.8
+
+    const multiplier = Math.max(0.18, 0.22 + noise * 0.75 + Math.max(0, wave * 0.35) + surge);
+    const vol = Math.round(baseVol * multiplier);
     rawVols.push(vol);
-    volumes.push({
-      month: m,
-      volume: vol,
-      isYangbong,
-      normalizedH: 0,
-    });
+    tempItems.push({ month: m, isYangbong, vol });
   }
 
-  const maxVol = Math.max(...rawVols, 1);
-  volumes.forEach(v => {
-    v.normalizedH = Math.max(0.18, v.volume / maxVol);
+  const minV = Math.min(...rawVols);
+  const maxV = Math.max(...rawVols);
+  const spanV = maxV - minV || 1;
+
+  tempItems.forEach(item => {
+    // Dynamic normalized height from 0.15 (15%) to 1.0 (100%)
+    const norm = 0.15 + ((item.vol - minV) / spanV) * 0.85;
+    volumes.push({
+      month: item.month,
+      volume: item.vol,
+      isYangbong: item.isYangbong,
+      normalizedH: Number(norm.toFixed(3)),
+    });
   });
 
   return {
