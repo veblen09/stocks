@@ -331,7 +331,7 @@ export const MosaicTile: React.FC<MosaicTileProps> = ({
           {/* 1-Year Mini Sparkline (Full Width inside card) */}
           <div className="h-6 w-full flex items-center">
             {sparkline && sparkline.points.length > 1 ? (
-              <svg viewBox="0 0 100 28" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+              <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id={`line-grad-${stock.canonicalId}`} x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stopColor={sparkline.isPositive ? '#fb7185' : '#60a5fa'} />

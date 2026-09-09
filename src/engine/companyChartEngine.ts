@@ -114,6 +114,7 @@ export interface Sparkline1YrData {
   points: { x: number; y: number; price: number; month: number }[];
   svgPath: string;
   svgAreaPath: string;
+  volumes?: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[];
 }
 
 export type NaverCandleType = 'DAY' | 'WEEK' | 'MONTH' | 'LINE';
@@ -457,9 +458,9 @@ export function getCompany1YrSparkline(
   const rawPrices = [startP, ...monthlyList.map(pt => pt.price)];
 
   const width = 100;
-  const height = 28;
-  const padTop = 3;
-  const padBottom = 3;
+  const height = 40;
+  const padTop = 4;
+  const padBottom = 4;
   const usableH = height - padTop - padBottom;
 
   const minP = Math.min(...rawPrices);
@@ -492,6 +493,32 @@ export function getCompany1YrSparkline(
   const svgAreaPath = `${svgPath} L ${width},${height} L 0,${height} Z`;
   const return1Yr = startP > 0 ? (endP - startP) / startP : 0;
 
+  // 12-month realistic volume simulation
+  const volumes: { month: number; volume: number; isYangbong: boolean; normalizedH: number }[] = [];
+  const baseVol = benchMeta ? (benchMeta.market === 'US' ? 2500000 : 950000) : (stock?.market === 'US' ? 2500000 : 950000);
+  const volSeed = hashSeed(canonicalId, upToYear, 77);
+
+  const rawVols: number[] = [];
+  for (let m = 1; m <= 12; m++) {
+    const curP = monthlyList[m - 1]?.price || endP;
+    const prevP = m === 1 ? startP : (monthlyList[m - 2]?.price || startP);
+    const isYangbong = curP >= prevP;
+    const mVolMultiplier = 0.65 + pseudoRand(volSeed + m * 13) * 0.7 + (Math.abs(curP - prevP) / Math.max(1, prevP)) * 2.5;
+    const vol = Math.round(baseVol * mVolMultiplier);
+    rawVols.push(vol);
+    volumes.push({
+      month: m,
+      volume: vol,
+      isYangbong,
+      normalizedH: 0,
+    });
+  }
+
+  const maxVol = Math.max(...rawVols, 1);
+  volumes.forEach(v => {
+    v.normalizedH = Math.max(0.18, v.volume / maxVol);
+  });
+
   return {
     canonicalId,
     year: upToYear,
@@ -504,6 +531,7 @@ export function getCompany1YrSparkline(
     points: sampledPoints,
     svgPath,
     svgAreaPath,
+    volumes,
   };
 }
 
