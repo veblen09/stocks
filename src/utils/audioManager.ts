@@ -181,6 +181,16 @@ const bgmPlaylist: ClassicalTrack[] = [
       'https://upload.wikimedia.org/wikipedia/commons/9/91/Strauss%2C_An_der_sch%C3%B6nen_blauen_Donau.ogg',
     ],
   },
+  {
+    name: '모차르트 - 피가로의 결혼, 서곡 KV 492 🎻 🎭',
+    urls: [
+      `${CDN_BASE}/bgm-mozart-figaro.ogg`,
+      './audio/bgm-mozart-figaro.ogg',
+      '/audio/bgm-mozart-figaro.ogg',
+      'audio/bgm-mozart-figaro.ogg',
+      'https://upload.wikimedia.org/wikipedia/commons/e/e2/Mozart%2C_The_Marriage_of_Figaro_%28overture%29.ogg',
+    ],
+  },
 ];
 
 const bgmNames = bgmPlaylist.map(track => track.name);
